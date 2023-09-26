@@ -1,0 +1,18 @@
+.user-page {
+
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  overflow: hidden;
+
+
+}
+
+.user-page-container {
+  display: flex;
+  justify-items: center;
+
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}

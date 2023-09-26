@@ -1,0 +1,304 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+:root {
+  font-family: Inter;
+  line-height: 1.5;
+  font-weight: 400;
+
+  --animation-duration: 200ms;
+  --animation-timing-curve: ease-in-out;
+
+  --navbar-top-height: 56px;
+  /* --header-height: 56px; */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* # ==============   Themes Config ================ # */
+@layer base {
+  :root {
+  }
+
+  .nexus-theme-light {
+    /* # Background */
+    --bg-base-0: #fdfcfc;
+    --bg-base-1: #f6f8fa;
+    --bg-base-2: #e9ebec;
+
+    /* # Foreground*/
+    --fg-base-0: #4a5357;
+    --fg-base-1: #24292f;
+    --fg-base-2: #0d1117;
+
+    --background: var(--bg-base-1);
+    --foreground: var(--fg-base-1);
+
+    /* # Border */
+    --border-0: #;
+    --border-1: #d0d7de;
+    --border: #c9d1d9;
+    --input: #d0d7de;
+    /* --input: 210deg, 18%, 87%; */
+
+    /* # Shadow */
+    --shadow-0: #010409;
+    --shadow-1: #949698;
+
+    /* # Accent */
+    --accent: #0969da;
+    --accent-foreground: #fdfcfc;
+
+    /* # Primary */
+    --primary: #0969da;
+    --fg-primary: var(--bg-base-0);
+    --primary-hover: #3399ff;
+    --fg-primary-hover: var(--bg-base-0);
+    --primary-inverted: var(--bg-base-1);
+    --fg-primary-inverted: var(--primary);
+
+    /* # Secondary */
+    --secondary: #1f883d;
+    --fg-secondary: var(--bg-base-0);
+    --secondary-hover: #26a64a;
+    --fg-secondary-hover: var(--bg-base-0);
+    --secondary-inverted: var(--bg-base-0);
+    --fg-secondary-inverted: #1f883d;
+
+    /* # Destructive */
+    --destructive: #cf222e;
+    --fg-destructive: #fdfcfc;
+    --destructive-hover: #d1434c;
+    --fg-destructive-hover: #fdfcfc;
+    --destructive-inverted: #f6f8fa;
+    --fg-destructive-inverted: #cf222e;
+
+    /* # Muted */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    /* # Popover */
+    --popover: var(--bg-base-0);
+    --popover-foreground: var(--fg-base-2);
+
+    /* # Card */
+    --card: var(--bg-base-0);
+    --card-foreground: var(--fg-base-1);
+
+    /* # Ring, radius */
+    --ring: 240 3.7% 15.9%;
+    --radius: 0.5rem;
+  }
+
+  .nexus-theme-dark {
+    /* # Background */
+    /* --bg-base-1: #0D1117;
+    --bg-base-0: #06090e;
+    --bg-base-2: #4a5357; */
+    --bg-base-1: #181825;
+    --bg-base-0: #11111b;
+    --bg-base-2: #1e1e2e;
+
+    /* # Foreground*/
+    --fg-base-0: #010409;
+    --fg-base-1: #c9d1d9;
+    --fg-base-2: #ffffff;
+
+    --background: var(--bg-base-1);
+    --foreground: var(--fg-base-1);
+
+    /* # Border */
+    --border-0: #;
+    --border-1: #30363d;
+    --input: #d0d7de;
+
+    /* # Shadow */
+    --shadow-0: #010409;
+    --shadow-1: var(--bg-base-2);
+
+    /* # Accent */
+    --accent: #0969da;
+    --accent-foreground: #fdfcfc;
+
+    /* # Primary */
+    --primary: #0969da;
+    --fg-primary: var(--bg-base-0);
+    --primary-hover: #3399ff;
+    --fg-primary-hover: var(--bg-base-0);
+    --primary-inverted: var(--bg-base-1);
+    --fg-primary-inverted: #0969da;
+
+    /* # Secondary */
+    --secondary: #1f883d;
+    --fg-secondary: var(--bg-base-0);
+    --secondary-hover: #26a64a;
+    --fg-secondary-hover: var(--bg-base-0);
+    --secondary-inverted: var(--bg-base-0);
+    --fg-secondary-inverted: #1f883d;
+
+    /* # Destructive */
+    --destructive: #cf222e;
+    --fg-destructive: var(--bg-base-0);
+    --destructive-hover: #d1434c;
+    --fg-destructive-hover: var(--bg-base-0);
+    --destructive-inverted: var(--bg-base-0);
+    --fg-destructive-inverted: #cf222e;
+
+    /* # Muted */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    /* # Popover */
+    --popover: var(--bg-base-0);
+    --popover-foreground: var(--fg-base-2);
+
+    /* # Card */
+    --card: var(--bg-base-0);
+    --card-foreground: var(--fg-base-1);
+
+    /* # Ring, radius */
+    --ring: 240 3.7% 15.9%;
+    --radius: 0.5rem;
+  }
+
+  .nexus-theme-warm {
+    /* # Background */
+    --bg-base-1: #fefae0;
+    --bg-base-0: #faedcd;
+    --bg-base-2: #d4a373;
+
+    /* # Foreground*/
+    --fg-base-0: #4a5357;
+    --fg-base-1: #24292f;
+    --fg-base-2: #0d1117;
+
+    --background: var(--bg-base-1);
+    --foreground: var(--fg-base-1);
+
+    /* # Border */
+    --border-0: #;
+    --border-1: #e9edc9;
+    --input: #d0d7de;
+
+    /* # Shadow */
+    --shadow-0: #010409;
+    --shadow-1: var(--bg-base-2);
+
+    /* # Accent */
+    --accent: #d4a373;
+    --accent-foreground: #fdfcfc;
+
+    /* # Primary */
+    --primary: #0969da;
+    --fg-primary: var(--bg-base-0);
+    --primary-hover: #3399ff;
+    --fg-primary-hover: var(--bg-base-0);
+    --primary-inverted: var(--bg-base-1);
+    --fg-primary-inverted: #0969da;
+
+    /* # Secondary */
+    --secondary: #1f883d;
+    --fg-secondary: var(--bg-base-0);
+    --secondary-hover: #26a64a;
+    --fg-secondary-hover: var(--bg-base-0);
+    --secondary-inverted: var(--bg-base-0);
+    --fg-secondary-inverted: #1f883d;
+
+    /* # Destructive */
+    --destructive: #cf222e;
+    --fg-destructive: var(--bg-base-0);
+    --destructive-hover: #d1434c;
+    --fg-destructive-hover: var(--bg-base-0);
+    --destructive-inverted: var(--bg-base-0);
+    --fg-destructive-inverted: #cf222e;
+
+    /* # Muted */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: var(--fg-base-0);
+    /* --muted-foreground: 240 5% 64.9%; */
+
+    /* # Popover */
+    --popover: var(--bg-base-0);
+    --popover-foreground: var(--fg-base-2);
+
+    /* # Card */
+    --card: var(--bg-base-0);
+    --card-foreground: var(--fg-base-1);
+
+    /* # Ring, radius */
+    --ring: 240 3.7% 15.9%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .step {
+    counter-increment: step;
+  }
+
+  .step:before {
+    @apply absolute w-9 h-9 bg-muted rounded-full font-mono font-medium text-center text-base inline-flex items-center justify-center -indent-px border-4 border-background;
+    @apply ml-[-50px] mt-[-4px];
+    content: counter(step);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+}
+
+/* # ===================== Scroll bars ======================= */
+::-webkit-scrollbar {
+  width: 0.75rem;
+  height: 0.75rem;
+  /* width: 0.5rem; */
+  /* height: 0.5rem; */
+}
+
+::-webkit-scrollbar:horizontal {
+  width: 0.75rem;
+  height: 0.75rem;
+  /* width: 0.5rem; */
+  /* height: 0.5rem; */
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+  width: 0.5rem;
+  height: 1rem;
+}
+
+::-webkit-scrollbar-thumb {
+  --tw-border-opacity: 1;
+  /* border-color: var(--fg-base-0); */
+  background-color: var(--fg-base-0);
+  border-radius: 9999px;
+  border-width: 1px;
+}
+
+::-webkit-scrollbar-track {
+  /* background-color: transparent; */
+  background-color: var(--bg-base-2);
+  border-radius: 9999px;
+}

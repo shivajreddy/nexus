@@ -1,0 +1,122 @@
+/* # ==========================  epc-page  ========================== */
+.epc-container {
+
+  width: 100%;
+  height: 100%;
+
+  --epc-header-height: 40px;
+
+  /* border: 2px dashed red; */
+}
+
+/* # ==========================  epc-grid-home  ========================== */
+#epc-grid-home {
+  width: 100%;
+  /* height: 100%; */
+  height: calc(100% - var(--epc-header-height));
+}
+
+
+
+/* # ==========================  epc-header  ========================== */
+.epc-header {
+  display: flex;
+  position: relative;
+
+  height: var(--epc-header-height);
+
+  /* justify-content: auto; */
+  justify-content: center;
+  align-items: center;
+
+  /* border: 2px dashed black; */
+}
+
+.epc-header>h1 {
+  justify-self: center;
+  /* text-align: center; */
+
+  /* border: solid 2px lightgreen; */
+}
+
+/* # ==========================  epc-controls  ========================== */
+.epc-controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+
+  /* padding: 10px; */
+
+  /* border: solid 2px lightsalmon; */
+}
+
+.epc-controls>button {
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-left: 6px;
+}
+
+
+
+/* ! ag-grid customization------------------------------------ */
+/* # ==========================  ag-grid  ========================== */
+
+.ag-theme-myCustomTheme {
+  --ag-grid-size: 8px;
+  --ag-border-color: red;
+}
+
+.ag-header {
+  border: 1px solid red;
+}
+
+
+/* # ==========================  row-header-group  ========================== */
+
+div[col-id="0_0"].ag-header-group-cell {
+  background-color: lightsalmon;
+}
+
+div[col-id="1_0"].ag-header-group-cell {
+  background-color: lightcyan;
+}
+
+
+/* # ==========================  row-header  ========================== */
+
+div[col-id="column-1"].ag-header-cell,
+div[col-id="column-2"].ag-header-cell,
+div[col-id="column-3"].ag-header-cell {
+  background-color: lightsalmon;
+}
+
+
+/* # ==========================  cell  ========================== */
+
+div[col-id="column-1"].ag-cell,
+div[col-id="column-4"].ag-cell {
+  border-left: solid 2px black;
+}
+
+div[col-id="column-6"].ag-cell {
+  border-right: solid 2px black;
+}
+
+div[col-id="column-1"].ag-cell,
+div[col-id="column-2"].ag-cell,
+div[col-id="column-3"].ag-cell {
+  background-color: rgb(240, 240, 240);
+}
+
+div[col-id="column-1"].ag-cell:hover,
+div[col-id="column-2"].ag-cell:hover,
+div[col-id="column-3"].ag-cell:hover {
+  background-color: rgb(192, 38, 38);
+}
+
+div[col-id="column-7"].ag-cell,
+div[col-id="column-8"].ag-cell,
+div[col-id="column-9"].ag-cell {
+  background-color: lightsalmon;
+}

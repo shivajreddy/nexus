@@ -1,0 +1,17 @@
+.main-layout {
+  --accent-color: rgb(204, 0, 0);
+  --lightest-gray: rgb(237, 237, 237);
+  --light-gray: rgb(144, 144, 144);
+  --medium-gray: rgb(96, 96, 96);
+  --dark-gray: rgb(13, 13, 13);
+
+  --header-height: 56px;
+
+  --sidebar-closed-width: 72px;
+  --sidebar-open-width: 240px;
+}
+
+.main-layout-container {
+  display: flex;
+
+}

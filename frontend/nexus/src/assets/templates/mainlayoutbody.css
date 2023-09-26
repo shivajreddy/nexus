@@ -1,0 +1,13 @@
+.main-layout-body {
+
+  --main-layout-body-margin: 1rem;
+
+  margin: var(--main-layout-body-margin);
+
+  position: relative;
+
+  flex-grow: 1;
+
+  /* border: 2px dashed steelblue; */
+
+}

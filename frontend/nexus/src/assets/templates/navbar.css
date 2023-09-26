@@ -1,0 +1,114 @@
+.top-navbar {
+
+  /* height: var(--header-height); */
+  height: var(--navbar-top-height);
+
+  display: flex;
+  align-items: center;
+
+  padding: 16px;
+
+  position: sticky;
+  top: 0;
+
+
+  z-index: 20;
+
+  background-color: var(--bg-base-0);
+
+  border-bottom: 1px solid var(--border-1);
+
+  /* background-color: aqua; */
+}
+
+
+/* # ============== side bar toggle button ================= */
+.sidebar-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-toggle-btn>svg {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+
+  cursor: pointer;
+  fill: var(--fg-base-1);
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: var(--bg-base-2);
+
+  border-radius: 50%;
+
+  color: var(--fg-base-0);
+}
+
+
+/* # ============== site logo ================= */
+.site-logo>p {
+  user-select: none;
+  padding-left: 16px;
+}
+
+/* # ============== menu ================= */
+.menu {
+  flex-grow: 1;
+
+  margin: 0 4rem;
+  /* border: solid 2px lightblue; */
+}
+
+/* # ============== user-controls ================= */
+.user-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin-right: 5rem;
+
+  /* border: solid 2px lightblue; */
+}
+
+.user-notification {
+  padding: 0 14px;
+  margin-right: 1rem;
+
+  border-radius: 50%;
+  padding: 6px;
+}
+
+.user-notification:hover {
+  background-color: var(--bg-base-2);
+}
+
+.user-notification svg {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.user-avatar {
+  border-radius: 50%;
+  padding: 6px;
+}
+
+.user-avatar:hover {
+  background-color: var(--bg-base-2);
+}
+
+.user-avatar.active {
+  background-color: var(--bg-base-2);
+
+}
+
+.user-avatar svg {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}

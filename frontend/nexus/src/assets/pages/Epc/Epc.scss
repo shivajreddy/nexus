@@ -1,0 +1,21 @@
+@import '~ag-grid-community/src/styles/ag-grid.scss';
+@import '~ag-grid-community/src/styles/ag-theme-balham-dark/sass/ag-theme-balham-dark-mixin.scss';
+
+.button-styling {
+  margin-bottom: 15px;
+  margin-right: 5px;
+}
+
+#example-instructions {
+  margin-bottom: 5px;
+}
+
+// Css Variables
+:root {
+  --custom-header-color: null;
+}
+
+.ag-theme-balham-dark {
+  @include ag-theme-balham-dark(());
+  --ag-header-background-color: var(--custom-header-color);
+}

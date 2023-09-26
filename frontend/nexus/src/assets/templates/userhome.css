@@ -1,0 +1,11 @@
+.user-page {}
+
+.user-page-header {
+  width: fit-content;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background-color: white;
+
+  position: relative;
+  top: 22px;
+}
