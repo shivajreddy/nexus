@@ -1,5 +1,6 @@
 import RegistrationForm from "./RegistrationForm";
 import {useGetAllDepartmentsQuery} from "@pages/auth/eagleApiSlice.ts";
+import React from "react";
 
 interface Iprops {
     isLoginPage: boolean;

@@ -185,9 +185,8 @@ function RegistrationForm({
                 {isLoadingDepartments ?
                     <p>Fetching departments list...</p>
                     : !departmentsList ?
-                        <div className="flex flex-col justify-center items-center h-full mt-8">
-                            <p className="text-red-500">Couldn't fetch departments</p>
-                            <p className="text-red-500">{}</p>
+                        <div className="flex flex-col justify-center items-center h-full">
+                            <p className="text-red-500">{errorFetchingDepartments}</p>
                             <p className="text-red-500">Contact Support.</p>
                         </div>
                         :
@@ -203,5 +202,6 @@ function RegistrationForm({
         </Form>
     );
 }
+
 
 export default RegistrationForm;
