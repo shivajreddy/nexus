@@ -47,7 +47,7 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
         defaultValues: {
             // useremail: "",
             // password: "",
-            useremail: "test@eagleofva.com",
+            useremail: "1test@eagleofva.com",
             password: "password123"
         },
     });
@@ -82,11 +82,9 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                 };
                 const newAuthState: ISecurityState = {accessToken: data?.access_token, user: userData};
                 dispatch(setAuthState(newAuthState))
-                console.log("finished setting the AuthState, now going to navigate to where you came from", fromLocation)
-                // ? TODO: grab the from data somehow and then send user to that end point
-                // ? if they weren't kicked out then take them to homepage
-                navigate(fromLocation, {replace: true})
-                console.log("finished navigating to", fromLocation)
+                // console.log("finished setting the AuthState, now going to navigate to where you came from", fromLocation)
+                navigate(fromLocation, {replace: true}) // + after login send back to where the user came from
+                // console.log("finished navigating to", fromLocation)
             }
         } catch (error) {
             console.error("Error:", error); // Handle any errors here

@@ -1,38 +1,31 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-
 import RegistrationForm from "./RegistrationForm";
-import { BASE_URL } from "@/services/api";
+import {useGetAllDepartmentsQuery} from "@pages/auth/eagleApiSlice.ts";
 
 interface Iprops {
-  isLoginPage: boolean;
-  setIsLoginPage: React.Dispatch<React.SetStateAction<boolean>>;
+    isLoginPage: boolean;
+    setIsLoginPage: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function RegistrationCard({ isLoginPage, setIsLoginPage }: Iprops) {
-  const [allDepartments, setAllDepartments] = useState<string[]>([]);
+function RegistrationCard({isLoginPage, setIsLoginPage}: Iprops) {
 
-  console.log("allDepartments=", allDepartments);
+    // + call the department-api
+    const {data, isLoading, error} = useGetAllDepartmentsQuery(undefined);
+    // console.log("data = ", data, isLoading, error)
 
-  useEffect(() => {
-    const result = axios.get(BASE_URL + "/eagle-data/departments");
-    result.then((response) => {
-      console.log("data= ", response.data);
-      setAllDepartments(response.data);
-    });
-  }, []);
+    return (
+        <div className="p-10 flex flex-col justify-center w-[100%]">
+            <p className="font-bold text-4xl">Register</p>
+            <p>Create your Nexus account</p>
+            <RegistrationForm
+                isLoginPage={isLoginPage}
+                setIsLoginPage={setIsLoginPage}
 
-  return (
-    <div className="p-10 flex flex-col justify-center w-[100%]">
-      <p className="font-bold text-4xl">Register</p>
-      <p>Create your Nexus account</p>
-      <RegistrationForm
-        isLoginPage={isLoginPage}
-        setIsLoginPage={setIsLoginPage}
-        departmentsList={allDepartments}
-      />
-    </div>
-  );
+                isLoadingDepartments={isLoading}
+                errorFetchingDepartments={JSON.stringify(error)}
+                departmentsList={data}
+            />
+        </div>
+    );
 }
 
 export default RegistrationCard;

@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.responses import JSONResponse
 
-from app.database import db, users_coll
+from app.database import users_coll
 from app.email.setup import send_email_with_verification_key
 from app.oauth2 import create_access_token, create_refresh_token, verify_refresh_token, get_current_user_data
 from app.schema import User, NewUserSchema
@@ -98,8 +98,6 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
                                 "message": "Your account has not been verified yet.Please check your email \
                                 for a verification link and follow the instructions to verify your account."
                             })
-
-
 
     # + evaluate password
     if not verify_password(form_data.password, user_doc.get("hashed_password")):
@@ -228,7 +226,7 @@ async def forgot_password_confirmation(secret_key: str):
 
 
 @router.get("/confirm-registration/{username}/{email_verification_key}")
-async def confirm_registration(username:str, email_verification_key: str):
+async def confirm_registration(username: str, email_verification_key: str):
     print("given username:", username)
     print("given key:", email_verification_key)
 
@@ -245,7 +243,8 @@ async def confirm_registration(username:str, email_verification_key: str):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Wrong verification key")
 
     # + Set the verified status to True and delete the email_verification_key
-    users_coll.update_one({"_id": user_doc["_id"]}, {"$set": {"verified": True}, "$unset": {"email_verification_key": ""}})
+    users_coll.update_one({"_id": user_doc["_id"]}, {"$set": {"verified": True},
+                                                     "$unset": {"email_verification_key": ""}})
 
     return {"result": "account successfully verified. Please login with your credentials"}
 
@@ -281,4 +280,3 @@ async def testing_protected_route(
         current_user_data: Annotated[User, Depends(get_current_user_data)]
 ):
     return f"you are, {current_user_data}"
-

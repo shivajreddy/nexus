@@ -21,7 +21,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {useEffect} from "react";
+import React from "react";
+
 
 // :: Form Schema
 const formSchema = z
@@ -51,15 +52,18 @@ const formSchema = z
 interface Iprops {
     isLoginPage: boolean;
     setIsLoginPage: React.Dispatch<React.SetStateAction<boolean>>;
-    departmentsList: string[];
+    isLoadingDepartments: boolean;
+    errorFetchingDepartments: string;
+    departmentsList: string[] | undefined;
 }
 
-function RegistrationForm({isLoginPage, setIsLoginPage, departmentsList,}: Iprops) {
-
-    useEffect(() => {
-        console.log("make a request to grab available departments")
-    }, [])
-
+function RegistrationForm({
+                              isLoginPage,
+                              setIsLoginPage,
+                              isLoadingDepartments,
+                              errorFetchingDepartments,
+                              departmentsList,
+                          }: Iprops) {
     //  :: Define form
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -157,7 +161,7 @@ function RegistrationForm({isLoginPage, setIsLoginPage, departmentsList,}: Iprop
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    {departmentsList.map((department, index) => (
+                                    {departmentsList && departmentsList.map((department, index) => (
                                         <SelectItem key={index} value={department}>
                                             {department}
                                         </SelectItem>
@@ -178,12 +182,23 @@ function RegistrationForm({isLoginPage, setIsLoginPage, departmentsList,}: Iprop
                     </button>
                 </div>
 
-                <button
-                    className="mt-8 w-[40%] self-center border-2 p-2 rounded-lg hover:shadow-lg "
-                    type="submit"
-                >
-                    Register
-                </button>
+                {isLoadingDepartments ?
+                    <p>Fetching departments list...</p>
+                    : !departmentsList ?
+                        <div className="flex flex-col justify-center items-center h-full mt-8">
+                            <p className="text-red-500">Couldn't fetch departments</p>
+                            <p className="text-red-500">{}</p>
+                            <p className="text-red-500">Contact Support.</p>
+                        </div>
+                        :
+                        <Button
+                            className="mt-8 w-[40%] self-center border-2 p-2 rounded-lg hover:shadow-lg "
+                            type="submit"
+                        >
+                            Register
+                        </Button>
+                }
+
             </form>
         </Form>
     );

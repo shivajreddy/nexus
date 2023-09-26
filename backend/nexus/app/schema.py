@@ -42,3 +42,8 @@ class AccessTokenData(BaseModel):
     roles: List[int]
     created_at: str
     exp: datetime
+
+
+class EagleDepartment(BaseException):
+    department_name: str
+

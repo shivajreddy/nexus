@@ -9,7 +9,7 @@ database_name = "nexus"
 db = client[database_name]
 
 # :: name of collections
-eagle_departments_coll = db["eagle-departments"]
+eagle_data_coll = db["eagle-data"]
 users_coll = db["users"]
 
 
