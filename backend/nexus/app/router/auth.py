@@ -263,20 +263,3 @@ async def update_password(
     new_hashed_password = hash_password(new_plain_password)
 
 
-@router.get("/users")
-async def get_all_users(
-        current_user_data: Annotated[User, Depends(get_current_user_data)]
-):
-    print(f"you are, {current_user_data}")
-    result = []
-    for doc in list(users_coll.find()):
-        data = {k: v for (k, v) in doc.items() if k != "_id"}
-        result.append(data)
-    return result
-
-
-@router.get("/test")
-async def testing_protected_route(
-        current_user_data: Annotated[User, Depends(get_current_user_data)]
-):
-    return f"you are, {current_user_data}"

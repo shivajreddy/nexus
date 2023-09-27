@@ -1,37 +1,66 @@
+import {Outlet} from "react-router-dom";
+import useRefreshToken from "@hooks/useRefreshToken.ts";
+import {useEffect, useState} from "react";
 import {useAppSelector} from "@redux/hooks.ts";
 import {selectAuthState} from "@/features/auth/authSlice.ts";
-import {Navigate, Outlet} from "react-router-dom";
-import {useEffect, useState} from "react";
-import {useLazyRefreshQuery} from "@/features/auth/authApiSlice.ts";
+
 
 function PersistentLogin() {
 
-    const [isLoading, setIsLoading] = useState(true);
+    // + check for refresh token
     const authState = useAppSelector(selectAuthState);
+    const refresh_fn = useRefreshToken()
+    const [isLoading, setIsLoading] = useState(true);
 
-    const [lazyRefreshQueryTrigger, {error}] = useLazyRefreshQuery(undefined);
+    console.log("IN PERSISTENT-LOGIN.tsx")
 
     useEffect(() => {
         let isMounted = true;
-        const invokeRefreshQuery = async () => {
-            lazyRefreshQueryTrigger(undefined);
-            isMounted && setIsLoading(false);
+
+        const verifyRefreshToken = async () => {
+            try {
+                await refresh_fn()
+            } catch (err) {
+                console.log("Error caught for refresh_fn in PersistentLogin")
+                console.error(err)
+            } finally {
+                isMounted && setIsLoading(false);
+            }
         }
-        !authState.accessToken ? invokeRefreshQuery() : setIsLoading(false)
+        !authState.accessToken ? verifyRefreshToken() : setIsLoading(false);
+
         return () => {
-            isMounted = false
+            isMounted = false;
         };
-    }, [])
+    }, []);
 
     useEffect(() => {
-        setIsLoading(false);
+        console.log(`isLoading: ${isLoading}`)
+        console.log(`aT: ${JSON.stringify(authState)}`)
     }, [isLoading])
 
-    if (isLoading) return <p>Checking auth state...</p>
-    if (error) return <Navigate to="/login" state={{from: location}} replace/>
-    // if (error) navigate('/login');
-    return <Outlet/>
+    return <>{isLoading ? <p>Loading...</p> : <Outlet/>}</>
 }
 
 
 export default PersistentLogin
+
+
+/*
+    async function makeRefreshCall() {
+        const newAuthState = await refresh_fn();
+        console.log("🚀 response = ", newAuthState)
+    }
+
+    try {
+        console.log("trying refreshtoken")
+        makeRefreshCall()
+        console.log("refresh_fn finished? not awaited")
+    } catch (error) {
+        console.log("ERROR in getting refresh")
+        console.error(error)
+    }
+
+    return <Outlet/>
+
+ */

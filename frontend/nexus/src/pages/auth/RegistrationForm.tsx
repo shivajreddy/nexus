@@ -1,7 +1,7 @@
 import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
 import {Button} from "@/components/ui/button";
 import {
     Form,
@@ -13,7 +13,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
-
 import {
     Select,
     SelectContent,
@@ -21,7 +20,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import React from "react";
+import React, {useState} from "react";
+import axios from "axios";
+import {BASE_URL, REGISTRATION_ENDPOINT} from "@/services/api";
+import {AlertError} from "@pages/auth/AlertError.tsx";
 
 
 // :: Form Schema
@@ -68,16 +70,37 @@ function RegistrationForm({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            useremail: "",
-            password: "",
-            retypePassword: "",
-            department: "",
+            // useremail: "",
+            // password: "",
+            // retypePassword: "",
+            // department: "",
+            useremail: "2test@eagleofva.com",
+            password: "password123",
+            retypePassword: "password123",
+            department: "TEC Lab",
         },
     });
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<boolean>(false);
+
     // :: Define a submit handler
-    function handleOnSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
+    async function handleOnSubmit(values: z.infer<typeof formSchema>) {
+        const postData = {"username": values.useremail, "plain_password": values.password}
+        setLoading(true);
+        setError(null);
+        setSuccess(false);
+        try {
+            const response = await axios.post(BASE_URL + REGISTRATION_ENDPOINT, postData);
+            setSuccess(true);
+            console.log('Response:', response.data);
+        } catch (error) {
+            setError(JSON.stringify(error));
+            console.error('Error:', error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     function handleGoToRegistrationPage(event: React.FormEvent) {
@@ -181,6 +204,17 @@ function RegistrationForm({
                         Log In
                     </button>
                 </div>
+
+
+                {/*<Alert>*/}
+                {/*    <Terminal className="h-4 w-4"/>*/}
+                {/*    <AlertTitle>Heads up!</AlertTitle>*/}
+                {/*    <AlertDescription>*/}
+                {/*        You can add components and dependencies to your app using the cli.*/}
+                {/*    </AlertDescription>*/}
+                {/*</Alert>*/}
+
+                <AlertError/>
 
                 {isLoadingDepartments ?
                     <p>Fetching departments list...</p>

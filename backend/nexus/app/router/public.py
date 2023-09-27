@@ -16,4 +16,3 @@ def get_all_departments_unprotected():
     for item in all_departments:
         all_department_names.append(item["department_name"])
     return all_department_names
-

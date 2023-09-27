@@ -17,7 +17,7 @@ export const authApiSlice = serverAPI.injectEndpoints({
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
             }),
-            // providesTags: ["Auth"]
+            providesTags: ["Auth"]
         }),
 
         logout: builder.query<ILogoutResponse, undefined>({
@@ -34,10 +34,10 @@ export const authApiSlice = serverAPI.injectEndpoints({
                 url: '/auth/refresh',
                 method: "GET",
             }),
-            // invalidatesTags: ["Auth"]
+            invalidatesTags: ["Auth"]
         }),
     }),
-    // overrideExisting: false,
+    overrideExisting: false,
 });
 
 

@@ -11,7 +11,7 @@ export interface ThemeContextInterface {
 
 
 // + State :: Security 
-export interface ISecurityState {
+export interface IAuthState {
     user?: IUser;
     accessToken?: string;
 }

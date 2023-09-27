@@ -2,6 +2,7 @@ import {BaseQueryFn, FetchArgs, createApi, fetchBaseQuery, FetchBaseQueryError} 
 import {setAuthState, removeAuthState} from "@/features/auth/authSlice";
 import {RootState} from "@/redux/store";
 import {BASE_URL, REFRESH_ENDPOINT} from ".";
+import {IAuthState} from "@/types";
 
 
 /*
@@ -17,7 +18,7 @@ import {BASE_URL, REFRESH_ENDPOINT} from ".";
 
 const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
-    credentials: "include",
+    credentials: "include",     // + HTTP only cookie
     prepareHeaders: (headers, {getState}) => {
         const accessToken = (getState() as RootState).auth.accessToken;
         if (accessToken) {
@@ -30,7 +31,9 @@ const baseQuery = fetchBaseQuery({
 
 // * https://redux-toolkit.js.org/rtk-query/usage/customizing-queries
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
+    console.log("🏡going to use baseQueryWithReauth")
     let result = await baseQuery(args, api, extraOptions);
+    console.log("😂 result=", result)
 
     if (result?.error?.status === 403) {  // + if the baseQuery's response is 404 i.e., expired AccessToken
 
@@ -38,7 +41,9 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 
         if (refreshResult.data) {
             const user = (api.getState() as RootState).auth.user;
+            console.log("🍎 user=", user, " refreshResult=", refreshResult)
             // + store the new token
+            // const new_authState: IAuthState = {accessToken: response.data}
             api.dispatch(setAuthState({...refreshResult.data, user}));
 
             // + retry the original query with the new access token
@@ -48,7 +53,6 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
             api.dispatch(removeAuthState());
         }
     }
-
     return result;
 };
 

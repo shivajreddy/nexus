@@ -1,10 +1,10 @@
 import {PayloadAction, createSlice} from "@reduxjs/toolkit";
-import {ISecurityState} from "@/types";
+import {IAuthState} from "@/types";
 import {RootState} from "@/redux/store";
 
 
 // ! demo state, in production state will be empty at beginning
-const INITIAL_STATE: ISecurityState = {
+const INITIAL_STATE: IAuthState = {
     // user: {
     //   username: "demo_user",
     //   department: "",
@@ -24,7 +24,7 @@ const authSlice = createSlice({
     reducers: {
 
         // + add security state
-        setAuthState: (state, action: PayloadAction<ISecurityState>) => {
+        setAuthState: (state, action: PayloadAction<IAuthState>) => {
             const {user, accessToken} = action.payload;
             state.user = user;
             state.accessToken = accessToken;

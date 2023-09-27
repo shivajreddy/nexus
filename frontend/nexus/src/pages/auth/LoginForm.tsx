@@ -14,7 +14,7 @@ import {Input} from "@/components/ui/input";
 import {useAppDispatch} from "@/redux/hooks";
 import {useLocation, useNavigate} from "react-router-dom";
 import {setAuthState} from "@/features/auth/authSlice";
-import {ISecurityState, IUser} from "@/types";
+import {IAuthState, IUser} from "@/types";
 import {useLoginMutation} from "@/features/auth/authApiSlice";
 import React from "react";
 
@@ -62,7 +62,7 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
 
     // + 3. Define a submit handler
     async function handleOnSubmit(values: z.infer<typeof formSchema>) {
-        console.log("handleOnSubmit fn called at LoginForm.tsx");
+        // console.log("handleOnSubmit fn called at LoginForm.tsx");
         try {
             const response = await sendLoginRequest({
                 username: values.useremail,
@@ -80,7 +80,7 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                     roles: data?.roles as [number],
                     team: data?.team as string
                 };
-                const newAuthState: ISecurityState = {accessToken: data?.access_token, user: userData};
+                const newAuthState: IAuthState = {accessToken: data?.access_token, user: userData};
                 dispatch(setAuthState(newAuthState))
                 // console.log("finished setting the AuthState, now going to navigate to where you came from", fromLocation)
                 navigate(fromLocation, {replace: true}) // + after login send back to where the user came from
