@@ -5,7 +5,7 @@ import {Label} from "@/components/ui/label";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 
 import "@assets/pages/User/userhome.css";
-import ThemeToggler from "@/features/themes/ThemeToggler";
+import ThemeToggle from "@/features/themes/ThemeToggle.tsx";
 import {removeAuthState} from "@/features/auth/authSlice";
 import {useAppDispatch} from "@/redux/hooks";
 import {useLazyLogoutQuery} from "@/features/auth/authApiSlice.ts";
@@ -35,7 +35,6 @@ function UserHome() {
                 <div className="user-page-header flex items-baseline ml-8">
                     <p className="font-extrabold text-6xl">{defaultName},</p>
                     <p className="font-bold text-4xl pl-4"> {defaultJobTitle}</p>
-                    pb
                 </div>
 
                 <div className="user-page-container">
@@ -65,7 +64,7 @@ function UserHome() {
                         </CardContent>
                     </Card>
 
-                    <ThemeToggler/>
+                    <ThemeToggle/>
 
                     <Avatar className="w-60 h-60">
                         <AvatarImage src="https://github.com/shadcn.png"/>

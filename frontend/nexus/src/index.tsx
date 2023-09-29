@@ -27,7 +27,6 @@ import AuthTecLab from "./pages/department/teclab/AuthTecLab";
 import AuthSales from "./pages/department/sales/AuthSales";
 import SalesHome from "./pages/department/sales/SalesHome";
 import TecLabHome from "./pages/department/teclab/TecLabHome";
-import PersistentLogin_Old from "@/features/auth/PersistentLogin_Old.tsx";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
 
 // # Router configuration
@@ -41,7 +40,6 @@ const router = createBrowserRouter(
             <Route path="login" element={< LoginPage/>}/>
 
             {/* Secured pages */}
-            {/*<Route element={<PersistentLogin_Old/>}>*/}
             <Route element={<PersistentLogin/>}>
                 <Route element={<AuthRequired/>}>
                     <Route path="/" element={<HomePage/>}/>
@@ -65,7 +63,6 @@ const router = createBrowserRouter(
                     </Route>
                 </Route>
             </Route>
-            {/*</Route>*/}
 
             {/* 404 Page */}
             < Route path="*" element={< PageNotFound/>}/>
@@ -73,6 +70,16 @@ const router = createBrowserRouter(
         </Route>
     )
 );
+
+// const nexus_text_logo = (
+//     "                                                   " + "©\n" +
+//     "███   ██   ███████   ██   ██   ██   ██   ████████\n" +
+//     "████  ██   ██         ██ ██    ██   ██   ██      \n" +
+//     "██ ██ ██   ███████     ███     ██   ██   ████████\n" +
+//     "██  ████   ██         ██ ██    ██   ██         ██\n" +
+//     "██   ███   ███████   ██   ██   ███████   ████████" + "     " + "with ❤️ by Shiva Reddy"
+// )
+// console.log(nexus_text_logo);
 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

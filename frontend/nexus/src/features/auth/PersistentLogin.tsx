@@ -3,6 +3,7 @@ import useRefreshToken from "@hooks/useRefreshToken.ts";
 import {useEffect, useState} from "react";
 import {useAppSelector} from "@redux/hooks.ts";
 import {selectAuthState} from "@/features/auth/authSlice.ts";
+import LoadingSpinner from "@components/common/LoadingSpinner.tsx";
 
 
 function PersistentLogin() {
@@ -34,33 +35,14 @@ function PersistentLogin() {
         };
     }, []);
 
-    useEffect(() => {
-        console.log(`isLoading: ${isLoading}`)
-        console.log(`aT: ${JSON.stringify(authState)}`)
-    }, [isLoading])
+    // useEffect(() => {
+    //     console.log(`isLoading: ${isLoading}`)
+    //     console.log(`aT: ${JSON.stringify(authState)}`)
+    // }, [isLoading])
 
-    return <>{isLoading ? <p>Loading...</p> : <Outlet/>}</>
+    return <>{isLoading ? <LoadingSpinner/> : <Outlet/>}</>
 }
 
 
 export default PersistentLogin
 
-
-/*
-    async function makeRefreshCall() {
-        const newAuthState = await refresh_fn();
-        console.log("🚀 response = ", newAuthState)
-    }
-
-    try {
-        console.log("trying refreshtoken")
-        makeRefreshCall()
-        console.log("refresh_fn finished? not awaited")
-    } catch (error) {
-        console.log("ERROR in getting refresh")
-        console.error(error)
-    }
-
-    return <Outlet/>
-
- */

@@ -1,0 +1,35 @@
+
+#public-home-page {
+    min-height: 100vh;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+#public-home-page-body {
+    margin-left: 6em;
+    margin-right: 6em;
+    /*border: dashed 2px red;*/
+}
+
+#public-nav-top-container {
+    /*background-color: #1f883d;*/
+}
+
+#public-nav-top {
+    overflow: hidden;
+    position: sticky;
+    top: 0;
+
+    display: flex;
+}
+
+#public-nav-top a {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+
