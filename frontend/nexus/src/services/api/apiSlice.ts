@@ -33,9 +33,9 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
     console.log("🏡going to use baseQueryWithReauth")
     let result = await baseQuery(args, api, extraOptions);
-    console.log("😂 result=", result)
 
     if (result?.error?.status === 403) {  // + if the baseQuery's response is 404 i.e., expired AccessToken
+        console.log("😂 result=", result, "😈 and status 403")
 
         const refreshResult = await baseQuery(REFRESH_ENDPOINT, api, extraOptions);
 
@@ -53,6 +53,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
             api.dispatch(removeAuthState());
         }
     }
+    console.log("😂 result=", result, "😶‍🌫️ and not status 403")
     return result;
 };
 

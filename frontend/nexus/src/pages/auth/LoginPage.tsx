@@ -21,7 +21,6 @@ function LoginPage() {
                         className="
           card
           flex
-          h-[50%]
           min-w-[70%]
           lg:min-w-[70%]
           xl:min-w-[70%]

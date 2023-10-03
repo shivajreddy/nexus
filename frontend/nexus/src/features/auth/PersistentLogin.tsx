@@ -40,7 +40,7 @@ function PersistentLogin() {
     //     console.log(`aT: ${JSON.stringify(authState)}`)
     // }, [isLoading])
 
-    return <>{isLoading ? <LoadingSpinner/> : <Outlet/>}</>
+    return <>{isLoading ? <LoadingSpinner width={50}/> : <Outlet/>}</>
 }
 
 

@@ -22,7 +22,7 @@ function RegistrationCard({isLoginPage, setIsLoginPage}: Iprops) {
                 setIsLoginPage={setIsLoginPage}
 
                 isLoadingDepartments={isLoading}
-                errorFetchingDepartments={JSON.stringify(error)}
+                fetchErrorDetail={JSON.stringify(error)}
                 departmentsList={data}
             />
         </div>

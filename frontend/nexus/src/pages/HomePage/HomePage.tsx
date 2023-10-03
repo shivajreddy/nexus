@@ -1,5 +1,4 @@
 import MainLayout from "@/templates/MainLayout"
-import {AlertError} from "@pages/auth/AlertError.tsx";
 import {Button} from "@components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 
@@ -16,7 +15,6 @@ function HomePage() {
 
                 <p>User - home page</p>
                 <p> Testing alert component </p>
-                <AlertError/>
             </div>
             <br/>
         </MainLayout>

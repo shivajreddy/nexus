@@ -39,20 +39,19 @@ async def testing_protected_route(
     return f"you are, {current_user_data}"
 
 
-# sample_data = {
-#     # "_id": 1,
-#     "table_name": "departments",
-#     "data": [
-#         {"department_name": "TEC Lab"},
-#         {"department_name": "Sales"},
-#         {"department_name": "Warranty"},
-#         {"department_name": "Design"},
-#         {"department_name": "TEC Lab"},
-#     ]
-# }
-#
-#
-# @router.get('/setup')
-# def set_up_eagle_data_coll():
-#     # :: goal is to set up eagle-data collection
-#     eagle_data_coll.insert_one(sample_data)
+sample_data = {
+    # "_id": 1,
+    "table_name": "departments",
+    "data": [
+        {"department_name": "TEC Lab"},
+        {"department_name": "Sales"},
+        {"department_name": "Warranty"},
+        {"department_name": "Design"},
+    ]
+}
+
+
+@router.get('/setup')
+def set_up_eagle_data_coll():
+    # :: goal is to set up eagle-data collection
+    eagle_data_coll.insert_one(sample_data)

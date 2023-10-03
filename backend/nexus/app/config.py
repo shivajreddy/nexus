@@ -1,19 +1,19 @@
+import os
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     ENVIRONMENT: str
 
-    SERVER_ADDRESS: str
-
     MONGODB_URL: str
+    DATABASE_NAME: str
+
+    SERVER_ADDRESS: str
+    CLIENT_ORIGIN: str
 
     ACCESS_TOKEN_EXPIRES_IN: int
     REFRESH_TOKEN_EXPIRES_IN: int
     JWT_ALGORITHM: str
-
-    CLIENT_ORIGIN: str
-
     ACCESS_TOKEN_SECRET: str
     REFRESH_TOKEN_SECRET: str
 
@@ -23,13 +23,15 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str
     SENDER_EMAIL: str
 
-    OFFICE_CLIENT_ID: str
-    OFFICE_CLIENT_SECRET: str
-    OFFICE_TENANT_ID: str
-    OFFICE_RESOURCE_URI: str
-
     class Config:
-        env_file = "./.env"
+        env_file: str
 
 
-settings = Settings()
+# Determine the environment and set the appropriate .env.prod file
+env = os.getenv("APP_ENV", "development")
+if env == "production":
+    settings = Settings(_env_file="./.env.prod")
+elif env == "test":
+    settings = Settings(_env_file="./.env.test")
+else:
+    settings = Settings(_env_file="./.env.dev")

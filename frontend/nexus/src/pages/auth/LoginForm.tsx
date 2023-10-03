@@ -16,7 +16,11 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {setAuthState} from "@/features/auth/authSlice";
 import {IAuthState, IUser} from "@/types";
 import {useLoginMutation} from "@/features/auth/authApiSlice";
-import React from "react";
+import React, {useState} from "react";
+import {Alert, AlertDescription, AlertTitle} from "@components/ui/alert.tsx";
+import {BiError} from 'react-icons/bi'
+import LoadingSpinner from "@components/common/LoadingSpinner.tsx";
+
 
 interface Iprops {
     isLoginPage: boolean;
@@ -60,9 +64,10 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
     const fromLocation = location.state?.from?.pathname || "/";
     const navigate = useNavigate();
 
+    const [errorDetail, setErrorDetail] = useState<string>("");
+
     // + 3. Define a submit handler
     async function handleOnSubmit(values: z.infer<typeof formSchema>) {
-        // console.log("handleOnSubmit fn called at LoginForm.tsx");
         try {
             const response = await sendLoginRequest({
                 username: values.useremail,
@@ -70,9 +75,24 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
             });
 
             // Check if response is an error
-            if ('error' in response) { // Handle the error case
-                console.error("Error:", response.error);
+            console.log("🐢✅ response =", response);
+            console.log(isLoading)
+            console.log(isError, error)
+
+            if (response && 'error' in response) { // Ensure that response exists and has an 'error' property
+                console.error("response.error:", response.error);
+                if ((response.error as any).status === 204) {
+                    setErrorDetail(`${values.useremail} is not registered`);
+                } else if ((response.error as any).status === 412) {
+                    setErrorDetail(`${values.useremail} is not Verified. Please check your email
+                for a verification link and follow the instructions to verify your account`);
+                } else if ((response.error as any).status === 401) {
+                    setErrorDetail("Wrong password");
+                } else {
+                    setErrorDetail(JSON.stringify(response.error))
+                }
             } else { // Handle the successful response here
+                console.log("🐌 no error in response")
                 const data = response.data;
                 const userData: IUser = {
                     username: data?.username as string,
@@ -82,9 +102,7 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                 };
                 const newAuthState: IAuthState = {accessToken: data?.access_token, user: userData};
                 dispatch(setAuthState(newAuthState))
-                // console.log("finished setting the AuthState, now going to navigate to where you came from", fromLocation)
-                navigate(fromLocation, {replace: true}) // + after login send back to where the user came from
-                // console.log("finished navigating to", fromLocation)
+                navigate(fromLocation, {replace: true})
             }
         } catch (error) {
             console.error("Error:", error); // Handle any errors here
@@ -137,30 +155,37 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                     )}
                 />
 
-                <div className="flex items-center pt-2">
-                    <p>Don't have an account? </p>
-                    <button
-                        className="pl-4 underline underline-offset-2"
-                        onClick={handleGoToRegistrationPage}
-                    >
-                        Sign Up
-                    </button>
+
+                <div className="flex flex-col justify-center">
+                    <div className="flex items-center p-2">
+                        <p>Don't have an account? </p>
+                        <button
+                            className="pl-4 underline underline-offset-2"
+                            onClick={handleGoToRegistrationPage}
+                        >
+                            Sign Up
+                        </button>
+                    </div>
+                    <div className="flex justify-center items-center p-2">
+                        {isError ?
+                            <Alert variant="destructive">
+                                <BiError/>
+                                <AlertTitle>Error</AlertTitle>
+                                <AlertDescription>{errorDetail}</AlertDescription>
+                            </Alert>
+                            : isLoading
+                                ? <LoadingSpinner width={30}/>
+                                :
+                                <button
+                                    className="border-2 p-2 px-8 rounded-lg hover:shadow-lg "
+                                    type="submit"
+                                >
+                                    Login
+                                </button>
+                        }
+                    </div>
                 </div>
 
-                <div>
-                    {isError ?
-                        <p>{JSON.stringify(error)}</p>
-                        : isLoading
-                            ? <p>Loading...</p>
-                            :
-                            <button
-                                className="mt-8 w-[40%] self-center border-2 p-2 rounded-lg hover:shadow-lg "
-                                type="submit"
-                            >
-                                Login
-                            </button>
-                    }
-                </div>
             </form>
         </Form>
     );

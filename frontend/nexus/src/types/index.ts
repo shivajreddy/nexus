@@ -27,7 +27,7 @@ export interface IUser {
 
 // :: Types for API-Slice
 export interface ILoginResponse {
-    status: string;
+    status: number;
     access_token: string;
     roles: [number];
     username: string;

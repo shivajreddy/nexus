@@ -5,7 +5,9 @@ from app.config import settings
 
 client = MongoClient(settings.MONGODB_URL, tlsCAFile=certifi.where())
 
-database_name = "nexus"
+# use the database dedicated to the environment
+database_name = settings.DATABASE_NAME
+
 db = client[database_name]
 
 # :: name of collections

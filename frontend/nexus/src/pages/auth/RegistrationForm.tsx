@@ -1,7 +1,6 @@
 import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
 import {Button} from "@/components/ui/button";
 import {
     Form,
@@ -21,9 +20,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import React, {useState} from "react";
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import {BASE_URL, REGISTRATION_ENDPOINT} from "@/services/api";
-import {AlertError} from "@pages/auth/AlertError.tsx";
+import LoadingSpinner from "@components/common/LoadingSpinner.tsx";
+import {Alert, AlertDescription, AlertTitle} from "@components/ui/alert.tsx";
+import {BiError} from "react-icons/bi";
+import {FaCheckSquare} from "react-icons/fa";
 
 
 // :: Form Schema
@@ -55,7 +57,7 @@ interface Iprops {
     isLoginPage: boolean;
     setIsLoginPage: React.Dispatch<React.SetStateAction<boolean>>;
     isLoadingDepartments: boolean;
-    errorFetchingDepartments: string;
+    fetchErrorDetail: string;
     departmentsList: string[] | undefined;
 }
 
@@ -63,7 +65,7 @@ function RegistrationForm({
                               isLoginPage,
                               setIsLoginPage,
                               isLoadingDepartments,
-                              errorFetchingDepartments,
+                              fetchErrorDetail,
                               departmentsList,
                           }: Iprops) {
     //  :: Define form
@@ -82,11 +84,12 @@ function RegistrationForm({
     });
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<AxiosError | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
 
     // :: Define a submit handler
     async function handleOnSubmit(values: z.infer<typeof formSchema>) {
+        console.log("Handle On Submit called")
         const postData = {"username": values.useremail, "plain_password": values.password}
         setLoading(true);
         setError(null);
@@ -96,8 +99,11 @@ function RegistrationForm({
             setSuccess(true);
             console.log('Response:', response.data);
         } catch (error) {
-            setError(JSON.stringify(error));
-            console.error('Error:', error);
+            // setError(JSON.stringify(error));
+            if (axios.isAxiosError(error)) {
+                setError(error);
+                console.error('Error:', error);
+            }
         } finally {
             setLoading(false);
         }
@@ -206,31 +212,57 @@ function RegistrationForm({
                 </div>
 
 
-                {/*<Alert>*/}
-                {/*    <Terminal className="h-4 w-4"/>*/}
-                {/*    <AlertTitle>Heads up!</AlertTitle>*/}
-                {/*    <AlertDescription>*/}
-                {/*        You can add components and dependencies to your app using the cli.*/}
-                {/*    </AlertDescription>*/}
-                {/*</Alert>*/}
-
-                <AlertError/>
-
-                {isLoadingDepartments ?
-                    <p>Fetching departments list...</p>
-                    : !departmentsList ?
-                        <div className="flex flex-col justify-center items-center h-full">
-                            <p className="text-red-500">{errorFetchingDepartments}</p>
-                            <p className="text-red-500">Contact Support.</p>
+                <div className="flex flex-col justify-center">
+                    {isLoadingDepartments ?
+                        <div className="flex items-center pt-4">
+                            <LoadingSpinner width={20}/>
+                            <p>Fetching departments list...</p>
                         </div>
-                        :
-                        <Button
-                            className="mt-8 w-[40%] self-center border-2 p-2 rounded-lg hover:shadow-lg "
-                            type="submit"
-                        >
-                            Register
-                        </Button>
-                }
+                        : !departmentsList ?
+                            <div className="pt-6">
+                                <Alert variant="destructive">
+                                    <BiError/>
+                                    <AlertTitle>Error Fetching Eagle Departments</AlertTitle>
+                                    <AlertDescription>{fetchErrorDetail}</AlertDescription>
+                                </Alert>
+                            </div>
+                            :
+                            <div className="pt-4 flex justify-center items-center">
+                                {
+                                    loading ?
+                                        <LoadingSpinner width={45}/>
+                                        :
+                                        success ?
+                                            <Alert variant="success">
+                                                <FaCheckSquare/>
+                                                <AlertTitle>Registration Successful</AlertTitle>
+                                                <AlertDescription>Click on the link sent to your email, to finish
+                                                    registration</AlertDescription>
+                                            </Alert>
+                                            :
+                                            error ?
+                                                <Alert variant="destructive">
+                                                    <BiError/>
+                                                    <AlertTitle>Error</AlertTitle>
+                                                    <AlertDescription>
+                                                        {error.response?.data?.detail.includes("Failed to send email") ?
+                                                            <p>Failed to send verification Email.</p>
+                                                            :
+                                                            <p className="text-lg">{(error?.response?.data.detail).substring(0, 100)}...</p>
+                                                        }
+                                                    </AlertDescription>
+                                                </Alert>
+                                                :
+                                                <Button
+                                                    className="mt-8 w-[40%] self-center border-2 p-2 rounded-lg hover:shadow-lg "
+                                                    type="submit"
+                                                >
+                                                    Register
+                                                </Button>
+                                }
+                            </div>
+                    }
+                </div>
 
             </form>
         </Form>

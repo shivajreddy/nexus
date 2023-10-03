@@ -23,7 +23,7 @@ async def create_user(payload: NewUserSchema):
     existing_user = users_coll.find_one({"username": payload.username})
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Account already exist"
+            status_code=status.HTTP_409_CONFLICT, detail=f"{payload.username} is already registered."
         )
 
     # create new User object
@@ -87,17 +87,19 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
 
     if not user_doc:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User email doesn't exist"
+            # status_code=status.HTTP_204_NO_CONTENT, detail="User email doesn't exist"
+            status_code=status.HTTP_412_PRECONDITION_FAILED, detail="User email doesn't exist"
         )
 
     # + check if the user has verified their account
     if not user_doc.get("verified"):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail={
-                                "error": "Unauthorized",
-                                "message": "Your account has not been verified yet.Please check your email \
-                                for a verification link and follow the instructions to verify your account."
-                            })
+        raise HTTPException(
+            status_code=status.HTTP_412_PRECONDITION_FAILED,
+            detail={
+                "error": "Unauthorized",
+                "message": "Your account has not been verified yet.Please check your email \
+                for a verification link and follow the instructions to verify your account."
+            })
 
     # + evaluate password
     if not verify_password(form_data.password, user_doc.get("hashed_password")):
