@@ -39,8 +39,17 @@ function PersistentLogin() {
     //     console.log(`isLoading: ${isLoading}`)
     //     console.log(`aT: ${JSON.stringify(authState)}`)
     // }, [isLoading])
-
-    return <>{isLoading ? <LoadingSpinner width={50}/> : <Outlet/>}</>
+    return (
+        <>
+            {isLoading ?
+                <div className="flex flex-col justify-center items-center min-w-100 min-h-[100vh] border">
+                    <LoadingSpinner width={50}/>
+                </div>
+                :
+                <Outlet/>
+            }
+        </>
+    )
 }
 
 

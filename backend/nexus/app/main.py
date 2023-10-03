@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException, status
 from starlette.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, status
 
 from app.database import connect_mongodb
 from app.email.setup import send_email, send_email_with_verification_key

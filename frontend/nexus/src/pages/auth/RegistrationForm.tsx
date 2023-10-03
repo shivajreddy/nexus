@@ -20,7 +20,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import React, {useState} from "react";
-import axios, {AxiosError} from "axios";
+import axios from "axios";
 import {BASE_URL, REGISTRATION_ENDPOINT} from "@/services/api";
 import LoadingSpinner from "@components/common/LoadingSpinner.tsx";
 import {Alert, AlertDescription, AlertTitle} from "@components/ui/alert.tsx";
@@ -57,55 +57,57 @@ interface Iprops {
     isLoginPage: boolean;
     setIsLoginPage: React.Dispatch<React.SetStateAction<boolean>>;
     isLoadingDepartments: boolean;
-    fetchErrorDetail: string;
+    // fetchErrorDetail: string;
     departmentsList: string[] | undefined;
 }
+
+type RegistrationStatus = "loading" | "success" | "fail" | undefined;
 
 function RegistrationForm({
                               isLoginPage,
                               setIsLoginPage,
                               isLoadingDepartments,
-                              fetchErrorDetail,
+                              // fetchErrorDetail,
                               departmentsList,
                           }: Iprops) {
     //  :: Define form
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            // useremail: "",
-            // password: "",
-            // retypePassword: "",
-            // department: "",
-            useremail: "2test@eagleofva.com",
-            password: "password123",
-            retypePassword: "password123",
-            department: "TEC Lab",
+            useremail: "",
+            password: "",
+            retypePassword: "",
+            department: "",
+            // useremail: "2test@eagleofva.com",
+            // password: "password123",
+            // retypePassword: "password123",
+            // department: "TEC Lab",
         },
     });
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<AxiosError | null>(null);
-    const [success, setSuccess] = useState<boolean>(false);
+    const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus>(undefined);
+    const [errorRegistering, setErrorRegistering] = useState<{ title: string, detail: string }>();
 
     // :: Define a submit handler
     async function handleOnSubmit(values: z.infer<typeof formSchema>) {
-        console.log("Handle On Submit called")
+        setRegistrationStatus('loading');
         const postData = {"username": values.useremail, "plain_password": values.password}
-        setLoading(true);
-        setError(null);
-        setSuccess(false);
         try {
-            const response = await axios.post(BASE_URL + REGISTRATION_ENDPOINT, postData);
-            setSuccess(true);
-            console.log('Response:', response.data);
+            await axios.post(BASE_URL + REGISTRATION_ENDPOINT, postData);
+            setRegistrationStatus('success');
         } catch (error) {
-            // setError(JSON.stringify(error));
             if (axios.isAxiosError(error)) {
-                setError(error);
-                console.error('Error:', error);
+                if (error.response?.status === 409) {
+                    setRegistrationStatus('fail');
+                    setErrorRegistering({title: "Already Registered", detail: `${error.response.data.detail}`})
+                } else if (error.response?.data.detail.startsWith("Failed to send email")) {
+                    setRegistrationStatus('fail');
+                    setErrorRegistering({title: "SERVER ERROR: Failed to Send email", detail: "Contact Support!"})
+                } else {
+                    setRegistrationStatus('fail');
+                    setErrorRegistering({title: "SERVER ERROR", detail: "Contact Support!"})
+                }
             }
-        } finally {
-            setLoading(false);
         }
     }
 
@@ -223,16 +225,16 @@ function RegistrationForm({
                                 <Alert variant="destructive">
                                     <BiError/>
                                     <AlertTitle>Error Fetching Eagle Departments</AlertTitle>
-                                    <AlertDescription>{fetchErrorDetail}</AlertDescription>
+                                    <AlertDescription>Contact Support</AlertDescription>
                                 </Alert>
                             </div>
                             :
                             <div className="pt-4 flex justify-center items-center">
                                 {
-                                    loading ?
+                                    registrationStatus === 'loading' ?
                                         <LoadingSpinner width={45}/>
                                         :
-                                        success ?
+                                        registrationStatus === 'success' ?
                                             <Alert variant="success">
                                                 <FaCheckSquare/>
                                                 <AlertTitle>Registration Successful</AlertTitle>
@@ -240,16 +242,12 @@ function RegistrationForm({
                                                     registration</AlertDescription>
                                             </Alert>
                                             :
-                                            error ?
+                                            registrationStatus === 'fail' ?
                                                 <Alert variant="destructive">
                                                     <BiError/>
-                                                    <AlertTitle>Error</AlertTitle>
+                                                    <AlertTitle>{errorRegistering?.title}</AlertTitle>
                                                     <AlertDescription>
-                                                        {error.response?.data?.detail.includes("Failed to send email") ?
-                                                            <p>Failed to send verification Email.</p>
-                                                            :
-                                                            <p className="text-lg">{(error?.response?.data.detail).substring(0, 100)}...</p>
-                                                        }
+                                                        <p>{errorRegistering?.detail}</p>
                                                     </AlertDescription>
                                                 </Alert>
                                                 :

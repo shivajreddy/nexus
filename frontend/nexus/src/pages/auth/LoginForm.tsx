@@ -64,7 +64,8 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
     const fromLocation = location.state?.from?.pathname || "/";
     const navigate = useNavigate();
 
-    const [errorDetail, setErrorDetail] = useState<string>("");
+    // const [errorDetail, setErrorDetail] = useState<string>("");
+    const [errorDetail, setErrorDetail] = useState<{ title: string, content: string }>();
 
     // + 3. Define a submit handler
     async function handleOnSubmit(values: z.infer<typeof formSchema>) {
@@ -81,15 +82,26 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
 
             if (response && 'error' in response) { // Ensure that response exists and has an 'error' property
                 console.error("response.error:", response.error);
-                if ((response.error as any).status === 204) {
-                    setErrorDetail(`${values.useremail} is not registered`);
+                if ((response.error as any).status === 404) {
+                    // setErrorDetail(`${values.useremail} is not registered`);
+                    setErrorDetail({
+                        title: "Account not found",
+                        content: `${values.useremail} is not registered on Nexus`
+                    })
                 } else if ((response.error as any).status === 412) {
-                    setErrorDetail(`${values.useremail} is not Verified. Please check your email
-                for a verification link and follow the instructions to verify your account`);
+                    // setErrorDetail(`${values.useremail} is not Verified. Please check your email
+                    // for a verification link and follow the instructions to verify your account`);
+                    setErrorDetail({
+                        title: "Incomplete Registration",
+                        content: `${values.useremail} is not Verified. Please check your email
+                        for a verification link and follow the instructions to verify your account`
+                    })
                 } else if ((response.error as any).status === 401) {
-                    setErrorDetail("Wrong password");
+                    // setErrorDetail("Wrong password");
+                    setErrorDetail({title: "Credentials Error", content: "Wrong Password"})
                 } else {
-                    setErrorDetail(JSON.stringify(response.error))
+                    // setErrorDetail(JSON.stringify(response.error))
+                    setErrorDetail({title: "Complete Detail", content: JSON.stringify(response.error)})
                 }
             } else { // Handle the successful response here
                 console.log("🐌 no error in response")
@@ -170,8 +182,8 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                         {isError ?
                             <Alert variant="destructive">
                                 <BiError/>
-                                <AlertTitle>Error</AlertTitle>
-                                <AlertDescription>{errorDetail}</AlertDescription>
+                                <AlertTitle>{errorDetail?.title}</AlertTitle>
+                                <AlertDescription>{errorDetail?.content}</AlertDescription>
                             </Alert>
                             : isLoading
                                 ? <LoadingSpinner width={30}/>

@@ -2,7 +2,6 @@ import {BaseQueryFn, FetchArgs, createApi, fetchBaseQuery, FetchBaseQueryError} 
 import {setAuthState, removeAuthState} from "@/features/auth/authSlice";
 import {RootState} from "@/redux/store";
 import {BASE_URL, REFRESH_ENDPOINT} from ".";
-import {IAuthState} from "@/types";
 
 
 /*

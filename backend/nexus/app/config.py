@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     MONGODB_URL: str
     DATABASE_NAME: str
 
-    SERVER_ADDRESS: str
+    SERVER_ORIGIN: str
     CLIENT_ORIGIN: str
 
     ACCESS_TOKEN_EXPIRES_IN: int

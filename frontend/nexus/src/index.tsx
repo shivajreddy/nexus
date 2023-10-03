@@ -28,16 +28,19 @@ import AuthSales from "./pages/department/sales/AuthSales";
 import SalesHome from "./pages/department/sales/SalesHome";
 import TecLabHome from "./pages/department/teclab/TecLabHome";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
+import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route errorElement={<UiErrorPage/>}>
 
-
             {/* Public pages */}
             <Route path="welcome" element={< PublicHomePage/>}/>
             <Route path="login" element={< LoginPage/>}/>
+            <Route path="wtf" element={< SuccessfulRegistration/>}/>
+            <Route path="auth/confirm-registration/:user_email/:email_verification_key"
+                   element={< SuccessfulRegistration/>}/>
 
             {/* Secured pages */}
             <Route element={<PersistentLogin/>}>

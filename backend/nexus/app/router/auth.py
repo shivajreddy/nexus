@@ -6,6 +6,8 @@ from fastapi import APIRouter, HTTPException, Depends, status, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.responses import JSONResponse
 
+from fastapi.templating import Jinja2Templates
+
 from app.database import users_coll
 from app.email.setup import send_email_with_verification_key
 from app.oauth2 import create_access_token, create_refresh_token, verify_refresh_token, get_current_user_data
@@ -88,7 +90,7 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
     if not user_doc:
         raise HTTPException(
             # status_code=status.HTTP_204_NO_CONTENT, detail="User email doesn't exist"
-            status_code=status.HTTP_412_PRECONDITION_FAILED, detail="User email doesn't exist"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User email doesn't exist"
         )
 
     # + check if the user has verified their account
@@ -228,7 +230,7 @@ async def forgot_password_confirmation(secret_key: str):
 
 
 @router.get("/confirm-registration/{username}/{email_verification_key}")
-async def confirm_registration(username: str, email_verification_key: str):
+async def confirm_registration(request:Request, username: str, email_verification_key: str):
     print("given username:", username)
     print("given key:", email_verification_key)
 
@@ -239,7 +241,10 @@ async def confirm_registration(username: str, email_verification_key: str):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="User email doesn't exist"
         )
     if user_doc.get("verified"):      # check if the user has already verified their account
-        return {"result": "account already verified"}
+        return JSONResponse(
+            status_code=status.HTTP_304_NOT_MODIFIED,
+            content={"result": "account already verified"},
+        )
 
     if user_doc.get("email_verification_key") != email_verification_key:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Wrong verification key")

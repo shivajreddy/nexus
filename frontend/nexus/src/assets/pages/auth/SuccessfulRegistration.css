@@ -1,0 +1,244 @@
+
+.main-container {
+    background-color: #1e1e2e;
+
+    min-width: 100vw;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /*border: solid 2px red;*/
+}
+
+.loadup {
+    margin: 0;
+    padding: 0;
+    transform: translateY(1rem);
+    -webkit-transform: translateY(1rem);
+    opacity: 0;
+    animation-delay: .95s;
+    animation-duration: .3s;
+    animation-fill-mode: forwards;
+    animation-name: loadUp;
+}
+
+#login {
+    transform: translateY(1rem);
+    -webkit-transform: translateY(1rem);
+    opacity: 0;
+    animation-delay: 1.5s;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-name: loadUp;
+}
+
+.thank-you-wrapper {
+    margin: 4rem auto 0;
+    /*border: 1px solid #cba6f7;*/
+    width: 30vw;
+    background: #cba6f7;
+    /*box-shadow: 0 6px 6px hsl(0deg 10% 2% / 5.3);*/
+
+    filter: drop-shadow(1px 2px 8px hsl(231deg, 11%, 47%));
+
+    text-align: center;
+    border-radius: .6rem;
+    padding-bottom: 3rem;
+    animation-delay: .2s;
+    animation-duration: .3s;
+    animation-fill-mode: forwards;
+    animation-name: getFullThankyouWidth;
+
+}
+
+.check-mark-block {
+    position: relative;
+    transform: translateY(0);
+    opacity: 0;
+    margin: auto;
+    width: 8rem;
+    height: 8rem;
+    background-image: linear-gradient(to top, #a6e3a1 0%, #94e2d5 100%);
+    box-shadow: 0 6px 6px hsl(0deg 0% 0% / 0.3);
+    /*background-image: linear-gradient(to top, #99f449 0%, #05ebb5 100%);*/
+    border-radius: .6rem;
+    overflow: hidden;
+    animation-delay: .4s;
+    animation-duration: .3s;
+    animation-fill-mode: forwards;
+    animation-name: loadUpThankyou;
+}
+
+.check-mark-wrapper {
+    position: relative;
+    text-align: center;
+    margin: auto;
+    padding: 5rem 10% 4rem 16%;
+    transition: all ease;
+}
+
+.check-mark-wrapper span {
+    position: relative;
+    width: 3rem;
+    height: .7rem;
+    background: transparent;
+    display: block;
+    border-radius: 30px;
+    /*transform: rotate(0);*/
+    transition: all 0.3s;
+    transform: rotate(33deg);
+    filter: drop-shadow(20px 10px 10px rgba(0, 0, 0, .2));
+    /*     border: 1px solid #ddd; */
+}
+
+.check-mark-wrapper span:last-child {
+    width: 5rem;
+    height: .7rem;
+    display: block;
+    border-radius: 30px;
+    transform-origin: top;
+    transition: all .3s;
+    transform: translateY(-1.7rem) translateX(1rem) rotate(-56deg);
+}
+
+.check-mark-wrapper span::before {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: #fff;
+    border-radius: 30px;
+    animation-delay: .65s;
+    animation-duration: .3s;
+    animation-fill-mode: forwards;
+    animation-name: getFullWidth;
+}
+
+.check-mark-wrapper span:last-child::before {
+    animation-delay: .85s;
+}
+
+@keyframes getFullWidth {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes getFullThankyouWidth {
+    0% {
+        width: 0;
+        opacity: 0;
+    }
+    100% {
+        width: 50%;
+        opacity: 1;
+    }
+}
+
+@keyframes loadUpThankyou {
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(-2.5rem);
+        opacity: 1;
+    }
+}
+
+@keyframes loadUp {
+    0% {
+        transform: translateY(1rem);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media only screen and (max-device-width: 767px) {
+    .thank-you-wrapper {
+        animation-name: getFullThankyouWidthSmall;
+    }
+
+    @keyframes getFullThankyouWidthSmall {
+        0% {
+            width: 0;
+            opacity: 0;
+        }
+        100% {
+            width: 40%;
+            opacity: 1;
+        }
+    }
+}
+
+.fail-mark-block {
+    position: relative;
+    transform: translateY(0);
+    opacity: 0;
+    margin: auto;
+    width: 8rem;
+    height: 8rem;
+    background-image: linear-gradient(to top, #fab387 0%, #f38ba8 100%);
+    box-shadow: 0 6px 6px hsl(0deg 0% 0% / 0.3);
+    /*background-image: linear-gradient(to top, #99f449 0%, #05ebb5 100%);*/
+    border-radius: .6rem;
+    overflow: hidden;
+    animation-delay: .4s;
+    animation-duration: .3s;
+    animation-fill-mode: forwards;
+    animation-name: loadUpThankyou;
+}
+
+.fail-mark-wrapper {
+    position: relative;
+    text-align: center;
+    margin: auto;
+    padding: 5rem 10% 4rem 16%;
+}
+
+.fail-mark-wrapper span:first-child {
+    width: 6em;
+    height: .5rem;
+    display: block;
+    transform-origin: center;
+    transition: all .3s;
+    transform: translateX(-0.2rem) translateY(-1.4rem) rotate(50deg);
+}
+
+.fail-mark-wrapper span:last-child {
+    width: 6em;
+    height: .5rem;
+    display: block;
+    transform-origin: center;
+    transition: all .3s;
+    transform: translateX(-0.2rem) translateY(-1.9rem) rotate(-50deg);
+}
+
+.fail-mark-wrapper span::before {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: #fff;
+    border-radius: 30px;
+    animation-delay: .65s;
+    animation-duration: .3s;
+    animation-fill-mode: forwards;
+    animation-name: getFullWidth;
+}
+
+.fail-mark-wrapper span:last-child::before {
+    animation-delay: .85s;
+}

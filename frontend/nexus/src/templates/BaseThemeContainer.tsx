@@ -45,7 +45,7 @@ function BaseThemeContainer({children}: IProps) {
     // * THEMING -------------------------------------------
 
     return (
-        <div className="base-container">
+        <div>
             {children}
         </div>
     )
