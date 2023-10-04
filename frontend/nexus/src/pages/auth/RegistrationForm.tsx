@@ -38,7 +38,8 @@ const formSchema = z
                 (value) =>
                     value.endsWith("@eagleofva.com") || value.endsWith("@tecofva.com"),
                 {
-                    message: "( Use @eagleofva.com or @tecofva.com )",
+                    // message: "( Use @eagleofva.com or @tecofva.com )",
+                    message: "(Invalid Email domain)",
                 }
             ),
         password: z.string().min(8, {

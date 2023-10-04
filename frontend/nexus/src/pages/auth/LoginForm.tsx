@@ -98,7 +98,7 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                     })
                 } else if ((response.error as any).status === 401) {
                     // setErrorDetail("Wrong password");
-                    setErrorDetail({title: "Credentials Error", content: "Wrong Password"})
+                    setErrorDetail({title: "Login Failed", content: "Invalid Credentials"})
                 } else {
                     // setErrorDetail(JSON.stringify(response.error))
                     setErrorDetail({title: "Complete Detail", content: JSON.stringify(response.error)})
