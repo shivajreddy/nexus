@@ -1,0 +1,41 @@
+/* set the background color of many elements across the grid */
+.ag-theme-alpine {
+    /*--ag-background-color: #b833e1;*/
+    /*--ag-cell-horizontal-padding: 10px;*/
+
+    --ag-alpine-active-color: #b833e1;
+    --ag-row-hover-color: #b833e1;
+    --ag-row-hover-column-color: #b833e1;
+
+    --ag-grid-size: 5px;
+
+    /*--ag-row-height: 10px;*/
+
+    --ag-header-column-separator-display: block;
+
+    --ag-header-column-separator-width: 1px;
+    --ag-header-column-separator-color: black;
+
+    --ag-borders: solid 1px;
+    --ag-border-color: black;
+
+    font-family: "Berkeley Mono", monospace;
+
+}
+
+.ag-theme-alpine .ag-side-buttons, .ag-theme-alpine-dark .ag-side-buttons {
+    /*width: calc(var(--ag-grid-size) * 1);*/
+}
+
+/* change the font style of a single UI component */
+.ag-theme-alpine .ag-header-cell-label {
+    /*font-weight: 700;*/
+    /*font-style: oblique;*/
+    font-size: 14px;
+}
+
+.ag-theme-shiva1 {
+    /*--ag-odd-row-background-color: #aaa;*/
+    /*--ag-alpine-active-color: #1e2e2e;*/
+}
+

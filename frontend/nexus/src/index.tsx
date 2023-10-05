@@ -29,6 +29,7 @@ import SalesHome from "./pages/department/sales/SalesHome";
 import TecLabHome from "./pages/department/teclab/TecLabHome";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
 import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
+import EpcTest1 from "@pages/department/teclab/Epc/EpcTest1.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -46,6 +47,7 @@ const router = createBrowserRouter(
             <Route element={<PersistentLogin/>}>
                 <Route element={<AuthRequired/>}>
                     <Route path="/" element={<HomePage/>}/>
+                    {/*<Route path="epc" element={<EpcTest1/>}/>*/}
                     <Route path="epc" element={<Epc/>}/>
                     <Route path="pipeline" element={<Pipeline/>}/>
                     <Route path="tasks" element={<Tasks/>}/>

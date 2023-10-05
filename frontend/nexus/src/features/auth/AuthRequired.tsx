@@ -11,7 +11,7 @@ const AuthRequired = () => {
 
     const location = useLocation();
     const authState = useAppSelector(selectAuthState);
-    console.log("in AuthRequired, authState:", authState)
+    // console.log("in AuthRequired, authState:", authState)
     return (
         // + if authState is incomplete, send to login, remember current page
         // TODO: check also authState.user

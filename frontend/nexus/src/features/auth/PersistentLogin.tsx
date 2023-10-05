@@ -13,7 +13,7 @@ function PersistentLogin() {
     const refresh_fn = useRefreshToken()
     const [isLoading, setIsLoading] = useState(true);
 
-    console.log("IN PERSISTENT-LOGIN.tsx")
+    // console.log("IN PERSISTENT-LOGIN.tsx")
 
     useEffect(() => {
         let isMounted = true;
@@ -22,7 +22,7 @@ function PersistentLogin() {
             try {
                 await refresh_fn()
             } catch (err) {
-                console.log("Error caught for refresh_fn in PersistentLogin")
+                // console.log("Error caught for refresh_fn in PersistentLogin")
                 console.error(err)
             } finally {
                 isMounted && setIsLoading(false);

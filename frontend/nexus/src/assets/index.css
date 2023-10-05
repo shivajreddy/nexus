@@ -20,6 +20,20 @@ body {
   /* --header-height: 56px; */
 }
 
+/* File: font.css */
+@font-face {
+  font-family: 'CustomFont1Name';
+  src: local('CustomFont1Name'),
+  url('./fonts/BerkeleyMono-Regular.woff') format('woff'),
+  url('./fonts/BerkeleyMono-Regular.woff2') format('woff2'),
+  url('./fonts/BerkeleyMono-Bold.woff') format('woff'),
+  url('./fonts/BerkeleyMono-Bold.woff2') format('woff2'),
+  url('./fonts/BerkeleyMono-Italic.woff') format('woff'),
+  url('./fonts/BerkeleyMono-Italic.woff2') format('woff2'),
+  url('./fonts/BerkeleyMono-BoldItalic.woff') format('woff'),
+  url('./fonts/BerkeleyMono-BoldItalic.woff2') format('woff2');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
