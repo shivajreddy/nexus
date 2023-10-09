@@ -58,7 +58,7 @@ const columnDefinitions = [
 
 ];
 
-const sampleRowData  = {
+const sampleRowData = {
         community_name: 'The Bluffton',
         section: '0',
         lot_number: '20',
@@ -80,6 +80,8 @@ const sampleRowData  = {
         permit_expected_submit: "2023-10-26",
         permit_submitted: "2023-10-22",
         permit_received: "None",
+        bbp_expected: "2023-11-10",
+        bbp_posted: "2023-11-23",
         notes: "this is a note1"
     };
 
