@@ -1,0 +1,34 @@
+#new-lot-form {
+    border: solid 2px red;
+}
+
+#new-lot-form-lot-info {
+    border: solid 1px green;
+
+    margin: 10px;
+}
+
+#new-lot-form-drafting {
+    border: solid 1px purple;
+
+}
+
+#new-lot-form-engineering {
+    border: solid 1px gray;
+}
+
+#new-lot-form-plat {
+    border: solid 1px yellow;
+}
+
+#new-lot-form-permitting {
+    border: solid 1px pink;
+}
+
+#new-lot-form-build-by-plans {
+    border: solid 1px blue;
+}
+
+#new-lot-form-notes {
+    border: solid 1px black;
+}

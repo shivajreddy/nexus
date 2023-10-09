@@ -1,10 +1,12 @@
-import BaseThemeContainer from "@templates/BaseThemeContainer.tsx";
+import MainLayout from "@templates/MainLayout.tsx";
+import NewLotForm from "@pages/department/teclab/Epc/NewLotForm.tsx";
 
 function NewLot() {
     return (
-        <BaseThemeContainer>
+        <MainLayout>
             <h1>New lot page</h1>
-        </BaseThemeContainer>
+            <NewLotForm/>
+        </MainLayout>
     );
 }
 
