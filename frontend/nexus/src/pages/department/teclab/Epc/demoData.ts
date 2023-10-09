@@ -58,8 +58,7 @@ const columnDefinitions = [
 
 ];
 
-const rowData = [
-    {
+const sampleRowData  = {
         community_name: 'The Bluffton',
         section: '0',
         lot_number: '20',
@@ -82,53 +81,10 @@ const rowData = [
         permit_submitted: "2023-10-22",
         permit_received: "None",
         notes: "this is a note1"
-    },
-    {
-        drafting: '0',
-        engineering: '4',
-        plat: '2022-12-08',
-        permit: 'C.Zobel',
-        bbp: '2022-12-12',
-        notes: 'DFI',
-        community: '2022-12-26',
-        section: 'AES',
-        'lot#': '2022-12-26',
-        'contract-date': 'James City',
-        'assigned-to': '2022-12-29',
-        'draft-deadline': 'None',
-        'eng-planned-receipt': 'On Hold',
-    },
-    {
-        drafting: '5',
-        engineering: '02',
-        plat: '2023-02-23',
-        permit: 'C.Zobel',
-        bbp: '2023-02-27',
-        notes: 'HBS',
-        community: '2023-03-13',
-        section: 'Koontz',
-        'lot#': '2023-03-13',
-        'contract-date': 'Henrico',
-        'assigned-to': '2023-03-16',
-        'draft-deadline': 'None',
-        'eng-planned-receipt': 'On Hold',
-    },
-    {
-        drafting: '5',
-        engineering: '28',
-        plat: '2023-04-04',
-        permit: 'C.Zobel',
-        bbp: '2023-04-06',
-        notes: 'Struc Tech',
-        community: '2023-04-20',
-        section: 'EDA',
-        'lot#': '2023-04-20',
-        'contract-date': 'Goochland',
-        'assigned-to': '2023-04-25',
-        'draft-deadline': 'None',
-        'eng-planned-receipt': 'permit & hold lot- lot change from 9-5',
-    },
-];
+    };
+
+
+const rowData = Array.from({ length: 50}, () => ({ ...sampleRowData}));
 
 
 export {columnDefinitions, rowData}

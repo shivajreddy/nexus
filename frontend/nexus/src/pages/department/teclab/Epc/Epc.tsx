@@ -30,7 +30,6 @@ const gridOptions = {
     defaultColDef: defaultColumnSettings,
     columnDefs: columnDefinitions,
 
-
     // Group columns
     groupHeaderHeight: 40,
 
