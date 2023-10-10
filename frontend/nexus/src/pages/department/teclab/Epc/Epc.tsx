@@ -11,6 +11,8 @@ import "@/assets/pages/Epc/Epc.css"
 
 
 import {rowData, columnDefinitions} from "./demoData.ts";
+import {BsPlusCircleFill} from "react-icons/bs";
+import {useNavigate} from "react-router-dom";
 
 
 const defaultColumnSettings = {
@@ -51,9 +53,15 @@ const gridOptions = {
 
 
 function Epc() {
+    const navigate = useNavigate();
     return (
         <MainLayout>
             <div className="epc-container">
+
+
+                {/* TODO: this should be role specific*/}
+                <button onClick={() => navigate('lot/new')}><BsPlusCircleFill/>Add New Lot</button>
+
                 <div className="epc-header">
                     <h1 className="font-bold lg:text-2xl"> Eagle Projects Console </h1>
                     <EpcMenu/>

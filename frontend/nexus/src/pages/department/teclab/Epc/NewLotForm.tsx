@@ -46,7 +46,9 @@ const NewLotForm = () => {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
                 <div id="new-lot-form">
-                    <div id="new-lot-form-lot-info">
+
+                    <div className="new-lot-section" id="new-lot-form-lot-info">
+                        <p className="section-card-title text-2xl font-bold">Lot Info</p>
                         <div className="space-y-4">
                             <FormField
                                 control={form.control}
@@ -97,32 +99,53 @@ const NewLotForm = () => {
                         </div>
                     </div>
 
-                    <div id="new-lot-form-drafting">
+                    <div className="new-lot-section" id="new-lot-form-drafting">
+                        <p className="section-card-title text-2xl font-bold">Drafting</p>
+                        <div>
+                            <label>some label </label>
+                            <input type="text"/>
+                        </div>
+                    </div>
+
+                    <div className="new-lot-section" id="new-lot-form-engineering">
+                        <p className="section-card-title text-2xl font-bold">Engineering</p>
+                        <div className="section-card-field-text">
+                            <label htmlFor="community">Community</label>
+                            <input id="community" type="text"/>
+                        </div>
+                        <div className="section-card-field-dropdown">
+                            <label></label>
+                        </div>
+                        <div className="section-card-field-checkbox">
+                            <label htmlFor="">Date:</label>
+                            <input id="" type="date"/>
+                        </div>
+                        <div className="section-card-field-date">
+                            <label htmlFor="">Date:</label>
+                            <input id="" type="date"/>
+                        </div>
+                    </div>
+
+                    <div className="new-lot-section" id="new-lot-form-plat">
+                        <p className="section-card-title text-2xl font-bold">Plat</p>
                         <label>some label </label>
                         <input type="text"/>
                     </div>
 
-                    <div id="new-lot-form-engineering">
+                    <div className="new-lot-section" id="new-lot-form-permitting">
+                        <p className="section-card-title text-2xl font-bold">Permitting</p>
                         <label>some label </label>
                         <input type="text"/>
                     </div>
 
-                    <div id="new-lot-form-plat">
+                    <div className="new-lot-section" id="new-lot-form-build-by-plans">
+                        <p className="section-card-title text-2xl font-bold">Build By Plans</p>
                         <label>some label </label>
                         <input type="text"/>
                     </div>
 
-                    <div id="new-lot-form-permitting">
-                        <label>some label </label>
-                        <input type="text"/>
-                    </div>
-
-                    <div id="new-lot-form-build-by-plans">
-                        <label>some label </label>
-                        <input type="text"/>
-                    </div>
-
-                    <div id="new-lot-form-notes">
+                    <div className="new-lot-section" id="new-lot-form-notes">
+                        <p className="section-card-title text-2xl font-bold">Notes</p>
                         <label>some label </label>
                         <input type="text"/>
                     </div>
