@@ -12,14 +12,20 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import {FaInfoCircle} from "react-icons/fa";
+import {MdOutlineStorage} from "react-icons/md";
 
 
 function EpcMenu() {
     return (
         <div style={{position: "absolute", right: "0", bottom: "0"}}>
+            {/*<div style={{}}>*/}
+
             <Sheet>
                 <SheetTrigger>
-                    <div className="pl-4 pr-4 h-8 rounded-none rounded-t-lg">Menu</div>
+                    <div className="flex justify-center items-center mx-10">
+                        <p className="pr-2"><MdOutlineStorage/></p>
+                        Menu
+                    </div>
                 </SheetTrigger>
                 <SheetContent className="flex flex-col justify-center items-center">
                     <SheetHeader></SheetHeader>

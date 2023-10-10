@@ -3,7 +3,6 @@ import {Button} from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -15,11 +14,25 @@ import {useForm} from "react-hook-form"
 import * as z from "zod"
 
 import "@/assets/pages/Epc/NewLotForm.css"
+import {Textarea} from "@components/ui/textarea.tsx";
+import {Checkbox} from "@components/ui/checkbox.tsx";
 
 
 const FormSchema = z.object({
-    marketing_emails: z.boolean().default(false).optional(),
-    security_emails: z.boolean(),
+    // Lot-info
+    lot_status_finished: z.boolean().default(false).optional(),
+    lot_status_released: z.boolean().default(false).optional(),
+
+    // Drafting
+    // drafting_drafter: z.
+
+    // Engineering
+
+    // Plat
+
+    //Permitting
+
+    // Build By Plans
 })
 
 
@@ -27,7 +40,7 @@ const NewLotForm = () => {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            security_emails: true,
+            // security_emails: true,
         },
     })
 
@@ -49,54 +62,42 @@ const NewLotForm = () => {
 
                     <div className="new-lot-section" id="new-lot-form-lot-info">
                         <p className="section-card-title text-2xl font-bold">Lot Info</p>
-                        <div className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="marketing_emails"
-                                render={({field}) => (
-                                    <FormItem
-                                        className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base">
-                                                Marketing emails
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Receive emails about new products, features, and more.
-                                            </FormDescription>
-                                        </div>
-                                        <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="security_emails"
-                                render={({field}) => (
-                                    <FormItem
-                                        className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base">Security emails</FormLabel>
-                                            <FormDescription>
-                                                Receive emails about your account security.
-                                            </FormDescription>
-                                        </div>
-                                        <FormControl>
-                                            <Switch
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                disabled
-                                                aria-readonly
-                                            />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                        <FormField
+                            control={form.control}
+                            name="lot_status_finished"
+                            render={({field}) => (
+                                <FormItem
+                                    className="flex items-center space-y-0 my-2">
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="text-xl pl-2">
+                                        Finished
+                                    </FormLabel>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="lot_status_released"
+                            render={({field}) => (
+                                <FormItem
+                                    className="flex flex-row  space-y-0 my-2">
+                                    <FormControl className="flex">
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="text-xl pl-2">
+                                        Released
+                                    </FormLabel>
+                                </FormItem>
+                            )}
+                        />
                     </div>
 
                     <div className="new-lot-section" id="new-lot-form-drafting">
@@ -146,8 +147,7 @@ const NewLotForm = () => {
 
                     <div className="new-lot-section" id="new-lot-form-notes">
                         <p className="section-card-title text-2xl font-bold">Notes</p>
-                        <label>some label </label>
-                        <input type="text"/>
+                        <Textarea placeholder="Notes aboue the lot"/>
                     </div>
 
                 </div>

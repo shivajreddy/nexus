@@ -13,13 +13,17 @@
 
 
 .epc-header {
-    display: flex;
+    /*display: flex;*/
     position: relative;
 
     height: var(--epc-header-height);
 
     justify-content: center;
     align-items: center;
+
+    display: grid;
+    /*grid-template-columns: 70vw 20vw;*/
+    grid-template-columns: 1fr 1fr;
 
 
     /* border: 2px dashed black; */

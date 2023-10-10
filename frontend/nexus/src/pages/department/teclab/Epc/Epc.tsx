@@ -13,6 +13,8 @@ import "@/assets/pages/Epc/Epc.css"
 import {rowData, columnDefinitions} from "./demoData.ts";
 import {BsPlusCircleFill} from "react-icons/bs";
 import {useNavigate} from "react-router-dom";
+import {MdClearAll, MdOutlineStorage} from "react-icons/md";
+import {CgMenuGridO} from "react-icons/cg";
 
 
 const defaultColumnSettings = {
@@ -58,13 +60,29 @@ function Epc() {
         <MainLayout>
             <div className="epc-container">
 
+                <div className="epc-header border">
+                    <div className="border-r-2">
+                        <h1 className="font-bold lg:text-2xl"> Eagle Projects Console </h1>
+                    </div>
 
-                {/* TODO: this should be role specific*/}
-                <button onClick={() => navigate('lot/new')}><BsPlusCircleFill/>Add New Lot</button>
+                    <div className="flex mx-10">
+                        {/* TODO: this should be role specific*/}
+                        <div className="flex justify-center items-center">
+                            <button className="flex justify-center items-center" onClick={() => navigate('lot/new')}>
+                                <p className="pr-2"><BsPlusCircleFill/></p>
+                                Add New Lot
+                            </button>
+                        </div>
+                        <div className="flex justify-center items-center ml-8">
+                            <button className="flex justify-center items-center" onClick={() => navigate('lot/new')}>
+                                <p className="pr-2"><CgMenuGridO/></p>
+                                All Lots
+                            </button>
+                        </div>
 
-                <div className="epc-header">
-                    <h1 className="font-bold lg:text-2xl"> Eagle Projects Console </h1>
-                    <EpcMenu/>
+                        <EpcMenu/>
+
+                    </div>
                 </div>
 
                 <div
