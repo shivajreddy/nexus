@@ -1,5 +1,5 @@
 import MainLayout from "@templates/MainLayout.tsx";
-import NewLotForm from "@pages/department/teclab/Epc/NewLotForm.tsx";
+import NewLotForm from "@pages/department/teclab/Epc/NewLot/NewLotForm.tsx";
 
 function NewLot() {
     return (
