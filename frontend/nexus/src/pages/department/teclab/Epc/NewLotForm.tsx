@@ -15,7 +15,9 @@ import * as z from "zod"
 
 import "@/assets/pages/Epc/NewLotForm.css"
 import {Textarea} from "@components/ui/textarea.tsx";
-import {Checkbox} from "@components/ui/checkbox.tsx";
+
+import {Calendar} from "lucide-react";
+import {cn} from "@/lib/utils.ts";
 
 
 const FormSchema = z.object({
@@ -95,6 +97,58 @@ const NewLotForm = () => {
                                     <FormLabel className="text-xl pl-2">
                                         Released
                                     </FormLabel>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="lot_status_released"
+                            render={({field}) => (
+                                <FormItem
+                                    className="flex flex-row  space-y-0 my-2">
+                                    <FormControl className="flex">
+                                        {/*<Switch*/}
+                                        {/*    checked={field.value}*/}
+                                        {/*    onCheckedChange={field.onChange}*/}
+                                        {/*/>*/}
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            disabled={(date) =>
+                                                date > new Date() || date < new Date("1900-01-01")
+                                            }
+                                            initialFocus
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="text-xl pl-2">
+                                        Released
+                                    </FormLabel>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="dob"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col">
+                                    <FormLabel>Date of birth</FormLabel>
+                                    <FormControl>
+                                        <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-[240px] pl-3 text-left font-normal",
+                                                !field.value && "text-muted-foreground"
+                                            )}
+                                        >
+                                            {/*{field.value ? (*/}
+                                            {/*    format(field.value, "PPP")*/}
+                                            {/*) : (*/}
+                                            {/*    <span>Pick a date</span>*/}
+                                            {/*)}*/}
+                                            {/*<CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>*/}
+                                        </Button>
+                                    </FormControl>
                                 </FormItem>
                             )}
                         />
