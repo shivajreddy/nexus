@@ -23,15 +23,17 @@ function BaseThemeContainer({children}: IProps) {
 
     // :: Update store with user-preferred theme, else set default theme in state & LS
     useEffect(() => {
-        const defaultProjectTheme: IThemeOptions = {value: "nexus-theme-light"};
-        const currentLocalThemeValue = GetFromLS("nexus-theme");
+        const defaultProjectTheme: IThemeOptions = {value: "catppuccin-mocha"};
+        // const defaultProjectTheme: IThemeOptions = {value: "nexus-theme-light"};
+        const currentLocalThemeValue = GetFromLS("theme");
 
         // + There is no valid nexus-theme value in local storage
         if (currentLocalThemeValue === null ||
             currentLocalThemeValue === undefined ||
-            !["nexus-theme-light", "nexus-theme-warm", "nexus-theme-dark"].includes(currentLocalThemeValue)
+            // !["nexus-theme-light", "nexus-theme-warm", "nexus-theme-dark"].includes(currentLocalThemeValue)
+            !["catppuccin-latte", "catppuccin-frappe", "catppuccin-mocha"].includes(currentLocalThemeValue)
         ) {
-            SaveToLS("nexus-theme", defaultProjectTheme.value)
+            SaveToLS("theme", defaultProjectTheme.value)
         } else {
             dispatch(updateTheme(currentLocalThemeValue))
         }

@@ -9,6 +9,7 @@ import {Button} from "@/components/ui/button";
 import {useAppDispatch, useAppSelector} from "@redux/hooks.ts";
 import {IThemeOptions} from "@/types";
 
+
 function ThemeToggle() {
 
     // state from store
@@ -24,9 +25,9 @@ function ThemeToggle() {
         dispatch(updateTheme(themeOption))
 
         // Update value in LocalStorage
-        SaveToLS("nexus-theme", themeOption)
+        SaveToLS("theme", themeOption)
 
-        console.log("✅ Saved to LS", themeOption);
+        console.log("Saved to LS :: ", themeOption);
     }
 
     function handleSelectionChange(value: IThemeOptions["value"]) {

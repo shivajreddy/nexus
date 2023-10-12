@@ -15,6 +15,11 @@ module.exports = {
         "2xl": "1400px",
       },
     },
+    colors: {
+      default: {
+        bg0: "var(--peach)"
+      }
+    }
   },
   plugins: [require("tailwindcss-animate")],
 }
