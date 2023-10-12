@@ -1,5 +1,4 @@
 import {FormEvent, useState} from "react"
-import {useDispatch, useSelector} from "react-redux";
 import {selectTheme, updateTheme} from "./themeSlice";
 import {SaveToLS} from "@/hooks";
 
@@ -8,10 +7,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import {useAppDispatch, useAppSelector} from "@redux/hooks.ts";
-
-interface IThemeOptions {
-    value: "nexus-theme-light" | "nexus-theme-warm" | "nexus-theme-dark"
-}
+import {IThemeOptions} from "@/types";
 
 function ThemeToggle() {
 

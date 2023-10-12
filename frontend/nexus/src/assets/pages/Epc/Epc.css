@@ -4,8 +4,6 @@
     width: 100%;
     height: 100%;
 
-    font-family: "Berkeley Mono", monospace;
-
     --epc-header-height: 40px;
 
     /* border: 2px dashed red; */
@@ -18,7 +16,7 @@
 
     height: var(--epc-header-height);
 
-    justify-content: center;
+    /*justify-content: center;*/
     align-items: center;
 
     display: grid;
@@ -36,6 +34,8 @@
     width: 100%;
     /*height: 100%;*/
     height: calc(100% - var(--epc-header-height));
+
+    font-family: "Berkeley Mono", monospace;
 }
 
 

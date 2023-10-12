@@ -15,6 +15,7 @@ import {BsPlusCircleFill} from "react-icons/bs";
 import {useNavigate} from "react-router-dom";
 import {MdClearAll, MdOutlineStorage} from "react-icons/md";
 import {CgMenuGridO} from "react-icons/cg";
+import React from "react";
 
 
 const defaultColumnSettings = {
@@ -94,7 +95,8 @@ function Epc() {
                         rowData={rowData}
                         columnDefs={columnDefinitions}
                         gridOptions={gridOptions}
-                    ></AgGridReact>
+                    />
+
                 </div>
 
             </div>

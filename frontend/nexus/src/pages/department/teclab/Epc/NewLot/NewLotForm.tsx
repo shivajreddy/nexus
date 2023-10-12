@@ -68,7 +68,7 @@ const NewLotForm = () => {
     });
 
     return (
-        <div id="new-lot-form-container">
+        <div id="new-lot-form-container" className="border">
 
             {/* 1: Lot Info */}
             <Card className="new-lot-section" id="new-lot-form-lot-info">
@@ -86,7 +86,6 @@ const NewLotForm = () => {
                                  name="Released"
                                  isChecked={newLotData.lot_status_released}
                                  updateLotData={setNewLotData}
-                                 update
                     />
                     <FieldDate id="1_contract_date" name="Contract Date"/>
                     <FieldText id="1_section" name={"Section"}/>

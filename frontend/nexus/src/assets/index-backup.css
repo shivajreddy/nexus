@@ -1,0 +1,406 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+:root {
+    font-family: Inter, serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    --animation-duration: 200ms;
+    --animation-timing-curve: ease-in-out;
+
+    --navbar-top-height: 56px;
+    /* --header-height: 56px; */
+}
+
+/* File: font.css */
+@font-face {
+    font-family: 'CustomFont1Name';
+    src: local('CustomFont1Name'),
+    url('./fonts/BerkeleyMono-Regular.woff') format('woff'),
+    url('./fonts/BerkeleyMono-Regular.woff2') format('woff2'),
+    url('./fonts/BerkeleyMono-Bold.woff') format('woff'),
+    url('./fonts/BerkeleyMono-Bold.woff2') format('woff2'),
+    url('./fonts/BerkeleyMono-Italic.woff') format('woff'),
+    url('./fonts/BerkeleyMono-Italic.woff2') format('woff2'),
+    url('./fonts/BerkeleyMono-BoldItalic.woff') format('woff'),
+    url('./fonts/BerkeleyMono-BoldItalic.woff2') format('woff2');
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* # ==============   Themes Config ================ # */
+@layer base {
+    :root {
+    }
+
+    .catppuccin-latte {
+        --rosewater: #dc8a78;
+        --flamingo: #dd7878;
+        --pink: #ea76cb;
+        --mauve: #8839ef;
+        --red: #d20f39;
+        --maroon: #e64553;
+        --peach: #fe640b;
+        --yellow: #df8e1d;
+        --green: #40a02b;
+        --teal: #179299;
+        --sky: #04a5e5;
+        --sapphire: #209fb5;
+        --blue: #1e66f5;
+        --lavender: #7287fd;
+        --text: #4c4f69;
+        --subtext1: #5c5f77;
+        --subtext0: #6c6f85;
+        --overlay2: #7c7f93;
+        --overlay1: #8c8fa1;
+        --overlay0: #9ca0b0;
+        --surface2: #acb0be;
+        --surface1: #bcc0cc;
+        --surface0: #ccd0da;
+        --base: #eff1f5;
+        --mantle: #e6e9ef;
+        --crust: #dce0e8;
+    }
+
+    .catppuccin-frappe {
+        --rosewater: #f2d5cf;
+        --flamingo: #eebebe;
+        --pink: #f4b8e4;
+        --mauve: #ca9ee6;
+        --red: #e78284;
+        --maroon: #ea999c;
+        --peach: #ef9f76;
+        --yellow: #e5c890;
+        --green: #a6d189;
+        --teal: #81c8be;
+        --sky: #99d1db;
+        --sapphire: #85c1dc;
+        --blue: #8caaee;
+        --lavender: #babbf1;
+        --text: #c6d0f5;
+        --subtext1: #b5bfe2;
+        --subtext0: #a5adce;
+        --overlay2: #949cbb;
+        --overlay1: #838ba7;
+        --overlay0: #737994;
+        --surface2: #626880;
+        --surface1: #51576d;
+        --surface0: #414559;
+        --base: #303446;
+        --mantle: #292c3c;
+        --crust: #232634;
+    }
+
+    .catppuccin-mocha {
+        --rosewater: #f5e0dc;
+        --flamingo: #f2cdcd;
+        --pink: #f5c2e7;
+        --mauve: #cba6f7;
+        --red: #f38ba8;
+        --maroon: #eba0ac;
+        --peach: #fab387;
+        --yellow: #f9e2af;
+        --green: #a6e3a1;
+        --teal: #94e2d5;
+        --sky: #89dceb;
+        --sapphire: #74c7ec;
+        --blue: #89b4fa;
+        --lavender: #b4befe;
+        --text: #cdd6f4;
+        --subtext1: #bac2de;
+        --subtext0: #a6adc8;
+        --overlay2: #9399b2;
+        --overlay1: #7f849c;
+        --overlay0: #6c7086;
+        --surface2: #585b70;
+        --surface1: #45475a;
+        --surface0: #313244;
+        --base: #1e1e2e;
+        --mantle: #181825;
+        --crust: #11111b;
+    }
+
+    .nexus-theme-light {
+        /* # Background */
+        --bg-base-0: #eff1f5;
+        --bg-base-1: #e6e9ef;
+        --bg-base-2: #dce0e8;
+
+        /* # Foreground*/
+        --fg-base-0: #4c4f69;
+        --fg-base-1: #24292f;
+        --fg-base-2: #0d1117;
+
+        --background: var(--bg-base-1);
+        --foreground: var(--fg-base-1);
+
+        /* # Border */
+        --border-0: #d0d7de;
+        --border-1: #d0d7de;
+        --border: #c9d1d9;
+        --input: #d0d7de;
+        /* --input: 210deg, 18%, 87%; */
+
+        /* # Shadow */
+        --shadow-0: #010409;
+        --shadow-1: #949698;
+
+        /* # Accent */
+        --accent: #0969da;
+        --accent-foreground: #fdfcfc;
+
+        /* # Primary */
+        --primary: #1e66f5;
+        --fg-primary: var(--bg-base-0);
+        --primary-hover: #3399ff;
+        --fg-primary-hover: var(--bg-base-0);
+        --primary-inverted: var(--bg-base-1);
+        --fg-primary-inverted: var(--primary);
+
+        /* # Secondary */
+        --secondary: #40a02b;
+        --fg-secondary: #ffffff;
+        /*--fg-secondary: var(--bg-base-0);*/
+        --secondary-hover: #26a64a;
+        --fg-secondary-hover: var(--bg-base-0);
+        --secondary-inverted: var(--bg-base-0);
+        --fg-secondary-inverted: #1f883d;
+
+        /* # Destructive */
+        --destructive: #d20f39;
+        --fg-destructive: #ffffff;
+        --destructive-hover: #d1434c;
+        --fg-destructive-hover: #fdfcfc;
+        --destructive-inverted: #f6f8fa;
+        --fg-destructive-inverted: #cf222e;
+
+        /* # Muted */
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+
+        /* # Popover */
+        --popover: var(--bg-base-0);
+        --popover-foreground: var(--fg-base-2);
+
+        /* # Card */
+        --card: var(--bg-base-0);
+        --card-foreground: var(--fg-base-1);
+
+        /* # Ring, radius */
+        --ring: 240 3.7% 15.9%;
+        --radius: 0.5rem;
+    }
+
+    .nexus-theme-dark {
+        /* # Background */
+        /* --bg-base-1: #0D1117;
+        --bg-base-0: #06090e;
+        --bg-base-2: #4a5357; */
+        --bg-base-1: #181825;
+        --bg-base-0: #11111b;
+        --bg-base-2: #1e1e2e;
+
+        /* # Foreground*/
+        --fg-base-0: #010409;
+        --fg-base-1: #c9d1d9;
+        --fg-base-2: #ffffff;
+
+        --background: var(--bg-base-1);
+        --foreground: var(--fg-base-1);
+
+        /* # Border */
+        --border-0: #30363d;
+        --border-1: #30363d;
+        --input: #d0d7de;
+
+        /* # Shadow */
+        --shadow-0: #010409;
+        --shadow-1: var(--bg-base-2);
+
+        /* # Accent */
+        --accent: #0969da;
+        --accent-foreground: #fdfcfc;
+
+        /* # Primary */
+        --primary: #0969da;
+        --fg-primary: var(--bg-base-0);
+        --primary-hover: #3399ff;
+        --fg-primary-hover: var(--bg-base-0);
+        --primary-inverted: var(--bg-base-1);
+        --fg-primary-inverted: #0969da;
+
+        /* # Secondary */
+        --secondary: #1f883d;
+        --fg-secondary: var(--bg-base-0);
+        --secondary-hover: #26a64a;
+        --fg-secondary-hover: var(--bg-base-0);
+        --secondary-inverted: var(--bg-base-0);
+        --fg-secondary-inverted: #1f883d;
+
+        /* # Destructive */
+        --destructive: #cf222e;
+        --fg-destructive: var(--bg-base-0);
+        --destructive-hover: #d1434c;
+        --fg-destructive-hover: var(--bg-base-0);
+        --destructive-inverted: var(--bg-base-0);
+        --fg-destructive-inverted: #cf222e;
+
+        /* # Muted */
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+
+        /* # Popover */
+        --popover: var(--bg-base-0);
+        --popover-foreground: var(--fg-base-2);
+
+        /* # Card */
+        --card: var(--bg-base-0);
+        --card-foreground: var(--fg-base-1);
+
+        /* # Ring, radius */
+        --ring: 240 3.7% 15.9%;
+        --radius: 0.5rem;
+    }
+
+    .nexus-theme-warm {
+        /* # Background */
+        --bg-base-1: #fefae0;
+        --bg-base-0: #faedcd;
+        --bg-base-2: #d4a373;
+
+        /* # Foreground*/
+        --fg-base-0: #4a5357;
+        --fg-base-1: #24292f;
+        --fg-base-2: #0d1117;
+
+        --background: var(--bg-base-1);
+        --foreground: var(--fg-base-1);
+
+        /* # Border */
+        --border-0: #e9edc9;
+        --border-1: #e9edc9;
+        --input: #d0d7de;
+
+        /* # Shadow */
+        --shadow-0: #010409;
+        --shadow-1: var(--bg-base-2);
+
+        /* # Accent */
+        --accent: #d4a373;
+        --accent-foreground: #fdfcfc;
+
+        /* # Primary */
+        --primary: #0969da;
+        --fg-primary: var(--bg-base-0);
+        --primary-hover: #3399ff;
+        --fg-primary-hover: var(--bg-base-0);
+        --primary-inverted: var(--bg-base-1);
+        --fg-primary-inverted: #0969da;
+
+        /* # Secondary */
+        --secondary: #1f883d;
+        --fg-secondary: var(--bg-base-0);
+        --secondary-hover: #26a64a;
+        --fg-secondary-hover: var(--bg-base-0);
+        --secondary-inverted: var(--bg-base-0);
+        --fg-secondary-inverted: #1f883d;
+
+        /* # Destructive */
+        --destructive: #cf222e;
+        --fg-destructive: var(--bg-base-0);
+        --destructive-hover: #d1434c;
+        --fg-destructive-hover: var(--bg-base-0);
+        --destructive-inverted: var(--bg-base-0);
+        --fg-destructive-inverted: #cf222e;
+
+        /* # Muted */
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: var(--fg-base-0);
+        /* --muted-foreground: 240 5% 64.9%; */
+
+        /* # Popover */
+        --popover: var(--bg-base-0);
+        --popover-foreground: var(--fg-base-2);
+
+        /* # Card */
+        --card: var(--bg-base-0);
+        --card-foreground: var(--fg-base-1);
+
+        /* # Ring, radius */
+        --ring: 240 3.7% 15.9%;
+        --radius: 0.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
+    }
+}
+
+@layer utilities {
+    .step {
+        counter-increment: step;
+    }
+
+    .step:before {
+        @apply absolute w-9 h-9 bg-muted rounded-full font-mono font-medium text-center text-base inline-flex items-center justify-center -indent-px border-4 border-background;
+        @apply ml-[-50px] mt-[-4px];
+        content: counter(step);
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        @apply px-4;
+    }
+}
+
+/* # ===================== Scroll bars ======================= */
+::-webkit-scrollbar {
+    /*width: 0.75rem;*/
+    /*height: 0.75rem;*/
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+::-webkit-scrollbar:horizontal {
+    /*width: 0.75rem;*/
+    /*height: 0.75rem;*/
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+    width: 0.5rem;
+    height: 1rem;
+}
+
+::-webkit-scrollbar-thumb {
+    --tw-border-opacity: 1;
+    /* border-color: var(--fg-base-0); */
+    background-color: var(--fg-base-0);
+    border-radius: 9999px;
+    border-width: 1px;
+}
+
+::-webkit-scrollbar-track {
+    /* background-color: transparent; */
+    background-color: var(--bg-base-2);
+    border-radius: 9999px;
+}

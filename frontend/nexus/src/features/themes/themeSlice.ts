@@ -1,26 +1,26 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { IThemeOptions } from "@/types";
-import { RootState } from "@/redux/store";
+import {createSlice} from "@reduxjs/toolkit";
+import {IThemeOptions} from "@/types";
+import {RootState} from "@/redux/store";
 
 
-const initialState: IThemeOptions = { value: "nexus-theme-light" }
+// const initialState: IThemeOptions = { value: "nexus-theme-light" }
+const initialState: IThemeOptions = {value: "catppuccin-mocha"}
 
 const themeSlice = createSlice({
-  name: "theme",
-  initialState,
+    name: "theme",
+    initialState,
 
-  reducers: {
+    reducers: {
 
-    updateTheme(state, action) {  // + action
-      state.value = action.payload
-    }
-  },
+        updateTheme(state, action) {  // + action
+            state.value = action.payload
+        }
+    },
 
 });
 
 
-
 export default themeSlice.reducer;
 
-export const { updateTheme } = themeSlice.actions;
+export const {updateTheme} = themeSlice.actions;
 export const selectTheme = (state: RootState) => state.theme;

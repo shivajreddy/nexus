@@ -1,6 +1,7 @@
 // + State :: Theme
 export interface IThemeOptions {
-    value: "nexus-theme-light" | "nexus-theme-warm" | "nexus-theme-dark"
+    // value: "nexus-theme-light" | "nexus-theme-warm" | "nexus-theme-dark"
+    value: "catppuccin-latte" | "catppuccin-frappe" | "catppuccin-mocha"
 }
 
 export interface ThemeContextInterface {
