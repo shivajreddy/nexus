@@ -74,7 +74,8 @@ function Epc() {
                             </button>
                         </div>
                         <div className="flex justify-center items-center ml-8">
-                            <button className="flex justify-center items-center" onClick={() => navigate('lot/new')}>
+                            <button className="flex justify-center items-center"
+                                    onClick={() => navigate('/epc/all-lots')}>
                                 <p className="pr-2"><CgMenuGridO/></p>
                                 All Lots
                             </button>
