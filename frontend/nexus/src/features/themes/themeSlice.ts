@@ -4,7 +4,8 @@ import {RootState} from "@/redux/store";
 
 
 // const initialState: IThemeOptions = { value: "nexus-theme-light" }
-const initialState: IThemeOptions = {value: "catppuccin-mocha"}
+// const initialState: IThemeOptions = {value: "catppuccin-mocha"}
+const initialState: IThemeOptions = {value: "light"}
 
 const themeSlice = createSlice({
     name: "theme",

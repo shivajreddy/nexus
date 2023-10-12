@@ -9,7 +9,7 @@ import {NavLink} from "react-router-dom"
 import {Badge} from "@/components/ui/badge"
 
 import {useAppSelector} from "@/redux/hooks"
-import {ReactElement} from "react"
+import {ReactElement, useState} from "react"
 
 interface ISidebarItem {
     name: string,
@@ -78,6 +78,17 @@ function SideBar() {
     const sidebarStatusState = useAppSelector((state) => state.sidebarStatus.isOpen)
     const sidebarStatus = sidebarStatusState ? "open" : "closed"
 
+    const [sidebarVisible, setSidebarVisible] = useState(true);
+
+    function hideSidebar() {
+        console.log("hi");
+        document.querySelector('.sidebar')
+        document.querySelector('.sidebar').style.transform =
+            document.querySelector('.sidebar').style.transform === 'translateX(0)' ? 'translateX(-100%)' : 'translateX(0)';
+    }
+
+    const sidebarClass = `sidebar-${sidebarVisible ? 'open' : 'close'}`
+
 
     return (
         <aside className={`sidebar ${sidebarStatus} bg-card`}>
@@ -99,10 +110,10 @@ function SideBar() {
             </div>
             <div className="sidebar-footer">
                 <div id="sidebar-footer-tec-logo" className="">
-                    <img src={tecLogo}/>
+                    <img src={tecLogo} alt=''/>
                 </div>
                 <div id="sidebar-footer-eagle-logo" className="">
-                    <img src={eagleLogoIcon}/>
+                    <img src={eagleLogoIcon} alt=''/>
                 </div>
             </div>
 

@@ -6,6 +6,12 @@
 
 body {
     margin: 0;
+
+    /* + Default styles*/
+    background-color: var(--bg-0);
+    color: var(--text);
+
+    border: var(--overlay0);
 }
 
 :root {
@@ -18,6 +24,8 @@ body {
 
     --navbar-top-height: 56px;
     /* --header-height: 56px; */
+
+    color: var(--text);
 }
 
 /* File: font.css */
@@ -39,42 +47,13 @@ body {
 @tailwind components;
 @tailwind utilities;
 
-/* :: ==============   Themes Config ================ # */
+
 @layer base {
     :root {
-        /* # Background */
-        --bg-base-0: var(--base);
-        --bg-base-1: #181825;
-        --bg-base-2: #1e1e2e;
-
-        /* # Foreground*/
-        --fg-base-0: #010409;
-        --fg-base-1: #c9d1d9;
-        --fg-base-2: #ffffff;
-
-        --background: 0 0% 100%;
-        --foreground: 240 10% 3.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 240 10% 3.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 240 10% 3.9%;
-        --primary: 240 5.9% 10%;
-        --primary-foreground: 0 0% 98%;
-        --secondary: 240 4.8% 95.9%;
-        --secondary-foreground: 240 5.9% 10%;
-        --muted: 240 4.8% 95.9%;
-        --muted-foreground: 240 3.8% 46.1%;
-        --accent: 240 4.8% 95.9%;
-        --accent-foreground: 240 5.9% 10%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 240 5.9% 90%;
-        --input: 240 5.9% 90%;
-        --ring: 240 5.9% 10%;
-        --radius: 0.5rem;
     }
 
-    .catppuccin-latte {
+    /*:: Light Theme ::*/
+    .light {
         --rosewater: #dc8a78;
         --flamingo: #dd7878;
         --pink: #ea76cb;
@@ -89,7 +68,7 @@ body {
         --sapphire: #209fb5;
         --blue: #1e66f5;
         --lavender: #7287fd;
-        --text: #4c4f69;
+        --text: #1111b;
         --subtext1: #5c5f77;
         --subtext0: #6c6f85;
         --overlay2: #7c7f93;
@@ -101,9 +80,72 @@ body {
         --base: #eff1f5;
         --mantle: #e6e9ef;
         --crust: #dce0e8;
+
+        /*+ Background Colors +*/
+        --bg-0: var(--base);
+        --bg-1: var(--overlay1);
+        --bg-2: var(--overlay2);
+
+        /*+ Foreground Colors +*/
+        --fg-0: var(--base);
+        --fg-1: var(--overlay1);
+        --fg-2: var(--overlay2);
+
+        /*+ Primary Colors +*/
+        --primary-0: #1111b;
+        --primary-1: #1111b;
+        --primary-2: #1111b;
+
+        /*+ Secondary Colors +*/
+        --secondary-0: #1111b;
+        --secondary-1: #1111b;
+        --secondary-2: #1111b;
+
+        /*+ Danger Colors +*/
+
+
+        /* + Borders +*/
+        --border-0: var(--surface0);
     }
 
-    .catppuccin-frappe {
+    /*:: Dark Theme ::*/
+    .dark {
+        --rosewater: #f5e0dc;
+        --flamingo: #f2cdcd;
+        --pink: #f5c2e7;
+        --mauve: #cba6f7;
+        --red: #f38ba8;
+        --maroon: #eba0ac;
+        --peach: #fab387;
+        --yellow: #f9e2af;
+        --green: #a6e3a1;
+        --teal: #94e2d5;
+        --sky: #89dceb;
+        --sapphire: #74c7ec;
+        --blue: #89b4fa;
+        --lavender: #b4befe;
+        --text: #cdd6f4;
+        --subtext1: #bac2de;
+        --subtext0: #a6adc8;
+        --overlay2: #9399b2;
+        --overlay1: #7f849c;
+        --overlay0: #6c7086;
+        --surface2: #585b70;
+        --surface1: #45475a;
+        --surface0: #313244;
+        --base: #1e1e2e;
+        --mantle: #181825;
+        --crust: #11111b;
+
+        /*+ Primary Colors +*/
+        --primary-0: var(--crust);
+
+        /* + Borders +*/
+        --border-0: var(--surface0);
+    }
+
+    /*:: Warm Theme ::*/
+    .warm {
         --rosewater: #f2d5cf;
         --flamingo: #eebebe;
         --pink: #f4b8e4;
@@ -131,37 +173,7 @@ body {
         --mantle: #292c3c;
         --crust: #232634;
     }
-
-    .catppuccin-mocha {
-        --rosewater: #f5e0dc;
-        --flamingo: #f2cdcd;
-        --pink: #f5c2e7;
-        --mauve: #cba6f7;
-        --red: #f38ba8;
-        --maroon: #eba0ac;
-        --peach: #fab387;
-        --yellow: #f9e2af;
-        --green: #a6e3a1;
-        --teal: #94e2d5;
-        --sky: #89dceb;
-        --sapphire: #74c7ec;
-        --blue: #89b4fa;
-        --lavender: #b4befe;
-        --text: #cdd6f4;
-        --subtext1: #bac2de;
-        --subtext0: #a6adc8;
-        --overlay2: #9399b2;
-        --overlay1: #7f849c;
-        --overlay0: #6c7086;
-        --surface2: #585b70;
-        --surface1: #45475a;
-        --surface0: #313244;
-        --base: #1e1e2e;
-        --mantle: #181825;
-        --crust: #11111b;
-    }
-
 }
 
 
-/* :: ===================== Scroll bars ======================= */
+/*!* :: ===================== Scroll bars ======================= *!*/

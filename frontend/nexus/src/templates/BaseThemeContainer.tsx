@@ -23,7 +23,8 @@ function BaseThemeContainer({children}: IProps) {
 
     // :: Update store with user-preferred theme, else set default theme in state & LS
     useEffect(() => {
-        const defaultProjectTheme: IThemeOptions = {value: "catppuccin-mocha"};
+        const defaultProjectTheme: IThemeOptions = {value: "light"};
+        // const defaultProjectTheme: IThemeOptions = {value: "catppuccin-mocha"};
         // const defaultProjectTheme: IThemeOptions = {value: "nexus-theme-light"};
         const currentLocalThemeValue = GetFromLS("theme");
 
@@ -31,7 +32,8 @@ function BaseThemeContainer({children}: IProps) {
         if (currentLocalThemeValue === null ||
             currentLocalThemeValue === undefined ||
             // !["nexus-theme-light", "nexus-theme-warm", "nexus-theme-dark"].includes(currentLocalThemeValue)
-            !["catppuccin-latte", "catppuccin-frappe", "catppuccin-mocha"].includes(currentLocalThemeValue)
+            // !["catppuccin-latte", "catppuccin-frappe", "catppuccin-mocha"].includes(currentLocalThemeValue)
+            !["light", "warm", "dark"].includes(currentLocalThemeValue)
         ) {
             SaveToLS("theme", defaultProjectTheme.value)
         } else {
@@ -41,7 +43,9 @@ function BaseThemeContainer({children}: IProps) {
 
     // :: Apply Theme to DOM
     useEffect(() => {
-        document.body.classList.remove('nexus-theme-light', 'nexus-theme-dark', 'nexus-theme-warm');
+        // document.body.classList.remove('nexus-theme-light', 'nexus-theme-dark', 'nexus-theme-warm');
+        // document.body.classList.remove('catppuccin-latte', 'catppuccin-frappe', 'catppuccin-mocha');
+        document.body.classList.remove('light', 'warm', 'dark');
         document.body.classList.add(`${theme.value}`);
     }, [theme])
     // * THEMING -------------------------------------------

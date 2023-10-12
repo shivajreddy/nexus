@@ -51,9 +51,12 @@ function ThemeToggle() {
                                 </SelectTrigger>
 
                                 <SelectContent position="popper">
-                                    <SelectItem value="nexus-theme-light">Light</SelectItem>
-                                    <SelectItem value="nexus-theme-warm">Warm</SelectItem>
-                                    <SelectItem value="nexus-theme-dark">Dark</SelectItem>
+                                    {/*<SelectItem value="catppuccin-latte">Light</SelectItem>*/}
+                                    {/*<SelectItem value="catppuccin-frappe">Warm</SelectItem>*/}
+                                    {/*<SelectItem value="catppuccin-mocha">Dark</SelectItem>*/}
+                                    <SelectItem value="light">Light</SelectItem>
+                                    <SelectItem value="warm">Warm</SelectItem>
+                                    <SelectItem value="dark">Dark</SelectItem>
                                 </SelectContent>
 
                             </Select>
