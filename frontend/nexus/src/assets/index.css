@@ -137,8 +137,28 @@ body {
         --mantle: #181825;
         --crust: #11111b;
 
+        /*+ Background Colors +*/
+        --bg-0: #1e1e2e;
+        --bg-1: #1e1e2e;
+        --bg-2: #1e1e2e;
+
+        /*+ Foreground Colors +*/
+        --fg-0: var(--base);
+        --fg-1: var(--overlay1);
+        --fg-2: var(--overlay2);
+
         /*+ Primary Colors +*/
-        --primary-0: var(--crust);
+        --primary-0: #1111b;
+        --primary-1: #1111b;
+        --primary-2: #1111b;
+
+        /*+ Secondary Colors +*/
+        --secondary-0: #1111b;
+        --secondary-1: #1111b;
+        --secondary-2: #1111b;
+
+        /*+ Danger Colors +*/
+
 
         /* + Borders +*/
         --border-0: var(--surface0);
