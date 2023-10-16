@@ -5,13 +5,15 @@
 }
 
 body {
+    position: relative;
     margin: 0;
 
-    /* + Default styles*/
-    background-color: var(--bg-0);
+    /* :: Default styles :: */
+    background-color: var(--bg-1);
     color: var(--text);
-
-    border: var(--overlay0);
+    /*border: #1f1f47;*/
+    border: #DDE0E7;
+    /*border: none;*/
 }
 
 :root {
@@ -54,6 +56,7 @@ body {
 
     /*:: Light Theme ::*/
     .light {
+        /* + catppuccin-Latte palette*/
         --rosewater: #dc8a78;
         --flamingo: #dd7878;
         --pink: #ea76cb;
@@ -81,13 +84,36 @@ body {
         --mantle: #e6e9ef;
         --crust: #dce0e8;
 
+        /* + shadcn - light palette*/
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+        --primary: 240 5.9% 10%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 240 4.8% 95.9%;
+        --secondary-foreground: 240 5.9% 10%;
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+        --accent: 240 4.8% 95.9%;
+        --accent-foreground: 240 5.9% 10%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+        --ring: 240 5.9% 10%;
+        --radius: 0.5rem;
+
         /*+ Background Colors +*/
-        --bg-0: var(--base);
-        --bg-1: var(--overlay1);
-        --bg-2: var(--overlay2);
+        --bg-0: #CDD0D9;
+        /*--bg-1: #E7E9EE;*/
+        --bg-1: #DDE0E7;
+        --bg-2: #EFF1F5;
 
         /*+ Foreground Colors +*/
-        --fg-0: var(--base);
+        --fg-0: var(--text);
         --fg-1: var(--overlay1);
         --fg-2: var(--overlay2);
 
@@ -103,13 +129,15 @@ body {
 
         /*+ Danger Colors +*/
 
-
         /* + Borders +*/
         --border-0: var(--surface0);
+        --border-1: var(--surface1);
+        --border-2: var(--surface2);
     }
 
     /*:: Dark Theme ::*/
     .dark {
+        /* + catppuccin-Mocha palette*/
         --rosewater: #f5e0dc;
         --flamingo: #f2cdcd;
         --pink: #f5c2e7;
@@ -136,6 +164,28 @@ body {
         --base: #1e1e2e;
         --mantle: #181825;
         --crust: #11111b;
+
+
+        /*+ shadcn - dark palette +*/
+        --background: 240 10% 3.9%;
+        --foreground: 0 0% 98%;
+        --card: 240 10% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 240 10% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+        --accent: 240 3.7% 15.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --ring: 240 4.9% 83.9%;
 
         /*+ Background Colors +*/
         --bg-0: #1e1e2e;
