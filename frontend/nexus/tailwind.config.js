@@ -10,8 +10,14 @@ module.exports = {
   theme: {
     extend: {
       textColor: {
-        base: 'var(--background)'
-      }
+        base: 'var(--text)'
+      },
+      borderColor: {
+        // DEFAULT: "#d20f39",
+        DEFAULT: "var(--border-0)",
+        border0: "var(--border-0)",
+        border1: "var(--border-1)",
+      },
     },
     container: {
       center: true,
@@ -21,7 +27,6 @@ module.exports = {
       },
     },
     colors: {
-      border: "var(--border-1)",
       input: "var(--input)",
       // input: "hsl(var(--input))",
       ring: "hsl(var(--ring))",
@@ -36,37 +41,35 @@ module.exports = {
         fg0: "var(--fg-0)",
         fg1: "var(--fg-1)",
         fg2: "var(--fg-2)",
-        border0: "var(--border-0)",
-        border1: "var(--border-1)",
-        border2: "var(--border-2)",
+      },
+      button: {
+        bg0: "var(--btn-bg-0)",
+        bg1: "var(--btn-bg-1)",
+        bg2: "var(--btn-bg-2)",
+        fg0: "var(--btn-fg-0)",
+        fg1: "var(--btn-fg-1)",
+        fg2: "var(--btn-fg-2)",
       },
       primary: {
-        DEFAULT: "var(--primary)",
-        bg0: "var(--)",
-        bg1: "",
-        bg2: "",
-        foreground: "var(--fg-primary)",
-        foreground1: "var(--fg-primary)",
-        hover: "var(--primary-hover)",
-        foregroundHover: "var(--fg-primary-hover)",
-        inverted: "var(--primary-inverted)",
-        foregroundInverted: "var(--fg-primary-inverted)",
+        DEFAULT: "var(--primary-bg-0)",
+        bg0: "var(--primary-bg-0)",
+        bg1: "var(--primary-bg-1)",
+        fg0: "var(--primary-fg-0)",
+        fg1: "var(--primary-fg-1)",
       },
       secondary: {
-        DEFAULT: "var(--secondary)",
-        foreground: "var(--fg-0)",
-        hover: "var(--secondary-hover)",
-        foregroundHover: "var(--fg-secondary-hover)",
-        inverted: "var(--secondary-inverted)",
-        foregroundInverted: "var(--fg-secondary-inverted)",
+        DEFAULT: "var(--secondary-bg-0)",
+        bg0: "var(--secondary-bg-0)",
+        bg1: "var(--secondary-bg-1)",
+        fg0: "var(--secondary-fg-0)",
+        fg1: "var(--secondary-fg-1)",
       },
       destructive: {
-        DEFAULT: "var(--destructive)",
-        foreground: "var(--fg-destructive)",
-        hover: "var(--destructive-hover)",
-        foregroundHover: "var(--fg-destructive-hover)",
-        inverted: "var(--destructive-inverted)",
-        foregroundInverted: "var(--fg-destructive-inverted)",
+        DEFAULT: "var(--destructive-bg-0)",
+        bg0: "var(--destructive-bg-0)",
+        bg1: "var(--destructive-bg-1)",
+        fg0: "var(--destructive-fg-0)",
+        fg1: "var(--destructive-fg-1)",
       },
       muted: {
         DEFAULT: "var(--muted)",

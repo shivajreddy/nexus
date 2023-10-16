@@ -9,7 +9,7 @@ import {NavLink} from "react-router-dom"
 import {Badge} from "@/components/ui/badge"
 
 import {useAppSelector} from "@/redux/hooks"
-import {ReactElement, useState} from "react"
+import {ReactElement} from "react"
 
 interface ISidebarItem {
     name: string,
@@ -78,20 +78,8 @@ function SideBar() {
     const sidebarStatusState = useAppSelector((state) => state.sidebarStatus.isOpen)
     const sidebarStatus = sidebarStatusState ? "open" : "closed"
 
-    const [sidebarVisible, setSidebarVisible] = useState(true);
-
-    function hideSidebar() {
-        console.log("hi");
-        document.querySelector('.sidebar')
-        document.querySelector('.sidebar').style.transform =
-            document.querySelector('.sidebar').style.transform === 'translateX(0)' ? 'translateX(-100%)' : 'translateX(0)';
-    }
-
-    const sidebarClass = `sidebar-${sidebarVisible ? 'open' : 'close'}`
-
-
     return (
-        <aside className={`sidebar ${sidebarStatus} bg-card`}>
+        <aside className={`sidebar ${sidebarStatus} border-r border-r-border0`}>
 
             <div className="sidebar-header"></div>
             <div className="sidebar-content">

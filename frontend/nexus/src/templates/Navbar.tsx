@@ -1,16 +1,17 @@
 import UserNotifications from "@/features/notifications/UserNotifications";
 import "@assets/templates/navbar.css"
 import {FaCircleUser} from "react-icons/fa6"
-import {NavLink} from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 
 import {useAppDispatch} from "@/redux/hooks";
 import {toggleSidebar_action} from "@/features/sidebar/sidebarSlice";
-import React, {useState} from "react";
+import React from "react";
 
 
 function Navbar() {
 
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
@@ -30,7 +31,9 @@ function Navbar() {
             </div>
 
             <div className="site-logo">
-                <p className="font-bold text-3xl">Nexus</p>
+                <button className="ml-4" onClick={() => navigate('/')}>
+                    <p className="font-bold text-3xl">Nexus</p>
+                </button>
             </div>
 
             <div className="menu">

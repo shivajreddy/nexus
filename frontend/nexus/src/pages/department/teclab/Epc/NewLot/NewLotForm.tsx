@@ -68,7 +68,7 @@ const NewLotForm = () => {
     });
 
     return (
-        <div id="new-lot-form-container" className="border">
+        <div id="new-lot-form-container" className="rounded-lg rounded-t-none border border-t-0 bg-default-bg2">
 
             {/* 1: Lot Info */}
             <Card className="new-lot-section" id="new-lot-form-lot-info">

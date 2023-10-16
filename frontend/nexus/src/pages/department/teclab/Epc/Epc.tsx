@@ -61,9 +61,9 @@ function Epc() {
         <MainLayout>
             <div className="epc-container">
 
-                <div className="epc-header border">
+                <div className="epc-header border border-b-0 rounded rounded-b-none">
                     <div className="border-r-2">
-                        <h1 className="font-bold lg:text-2xl"> Eagle Projects Console </h1>
+                        <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
                     </div>
 
                     <div className="flex mx-10">

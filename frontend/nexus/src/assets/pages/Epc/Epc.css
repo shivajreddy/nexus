@@ -6,6 +6,8 @@
 
     --epc-header-height: 40px;
 
+    background-color: var(--bg-2);
+
     /* border: 2px dashed red; */
 }
 

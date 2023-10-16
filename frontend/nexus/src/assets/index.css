@@ -12,7 +12,8 @@ body {
     background-color: var(--bg-1);
     color: var(--text);
     /*border: #1f1f47;*/
-    border: #DDE0E7;
+    /*border: #DDE0E7;*/
+    /*border: var(--surface0);*/
     /*border: none;*/
 }
 
@@ -27,7 +28,7 @@ body {
     --navbar-top-height: 56px;
     /* --header-height: 56px; */
 
-    color: var(--text);
+    color: var(--text-1);
 }
 
 /* File: font.css */
@@ -71,7 +72,8 @@ body {
         --sapphire: #209fb5;
         --blue: #1e66f5;
         --lavender: #7287fd;
-        --text: #1111b;
+        --text-0: #4c4f69;
+        --text-1: #343541;
         --subtext1: #5c5f77;
         --subtext0: #6c6f85;
         --overlay2: #7c7f93;
@@ -108,31 +110,43 @@ body {
 
         /*+ Background Colors +*/
         --bg-0: #CDD0D9;
-        /*--bg-1: #E7E9EE;*/
         --bg-1: #DDE0E7;
         --bg-2: #EFF1F5;
+        --btn-bg-0: #11111b;
+        --btn-bg-1: #313244;
+        --btn-bg-2: #000;
 
         /*+ Foreground Colors +*/
         --fg-0: var(--text);
         --fg-1: var(--overlay1);
         --fg-2: var(--overlay2);
+        --btn-fg-0: #ffffff;
+        --btn-fg-1: var(--mantle);
+        --btn-fg-2: var(--crust);
 
         /*+ Primary Colors +*/
-        --primary-0: #1111b;
-        --primary-1: #1111b;
-        --primary-2: #1111b;
+        --primary-bg-0: var(--blue);
+        --primary-bg-1: hsl(220, 91%, 30%);
+        --primary-fg-0: var(--base);
+        --primary-fg-1: var(--mantle);
 
         /*+ Secondary Colors +*/
-        --secondary-0: #1111b;
-        --secondary-1: #1111b;
-        --secondary-2: #1111b;
+        --secondary-bg-0: var(--peach);
+        --secondary-bg-1: hsl(22, 99%, 42%);
+        --secondary-fg-0: var(--base);
+        --secondary-fg-1: var(--mantle);
 
-        /*+ Danger Colors +*/
+        /*+ Destructive Colors +*/
+        --destructive-bg-0: var(--red);
+        --destructive-bg-1: hsl(347, 87%, 34%);
+        --destructive-fg-0: var(--base);
+        --destructive-fg-1: var(--mantle);
 
         /* + Borders +*/
-        --border-0: var(--surface0);
-        --border-1: var(--surface1);
-        --border-2: var(--surface2);
+        /*--border-0: var(--border);*/
+        --border-0: var(--overlay0);
+        --border-1: var(--red);
+        --border-2: var(--blue);
     }
 
     /*:: Dark Theme ::*/
