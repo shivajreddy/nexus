@@ -16,6 +16,7 @@ import {useNavigate} from "react-router-dom";
 import {MdClearAll, MdOutlineStorage} from "react-icons/md";
 import {CgMenuGridO} from "react-icons/cg";
 import React from "react";
+import {Button} from "@components/ui/button.tsx";
 
 
 const defaultColumnSettings = {
@@ -61,7 +62,7 @@ function Epc() {
         <MainLayout>
             <div className="epc-container">
 
-                <div className="epc-header border border-b-0 rounded rounded-b-none">
+                <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
                     <div className="border-r-2">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
                     </div>
@@ -69,24 +70,24 @@ function Epc() {
                     <div className="flex mx-10">
                         {/* TODO: this should be role specific*/}
                         <div className="flex justify-center items-center">
-                            <button className="flex justify-center items-center" onClick={() => navigate('lot/new')}>
+                            <Button variant="outline" className="flex justify-center items-center"
+                                    onClick={() => navigate('lot/new')}>
                                 <p className="pr-2"><BsPlusCircleFill/></p>
                                 Add New Lot
-                            </button>
+                            </Button>
                         </div>
                         <div className="flex justify-center items-center ml-8">
-                            <button className="flex justify-center items-center"
+                            <Button variant="outline" className="flex justify-center items-center"
                                     onClick={() => navigate('/epc/all-lots')}>
                                 <p className="pr-2"><CgMenuGridO/></p>
                                 All Lots
-                            </button>
+                            </Button>
                         </div>
 
                         <EpcMenu/>
 
                     </div>
                 </div>
-
                 <div
                     id="nexus-epc-grid-container"
                     className="ag-theme-alpine ag-theme-nexus"

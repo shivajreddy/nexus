@@ -13,7 +13,7 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import * as z from "zod"
 
-import "@assets/pages/Epc/NewLotForm.css"
+import "@assets/pages/Epc/NewLot.css"
 import {Textarea} from "@components/ui/textarea.tsx";
 
 import {format} from "date-fns"
@@ -104,9 +104,6 @@ const NewLotForm = () => {
     }
 
     return (
-
-
-
 
 
         <Form {...form}>

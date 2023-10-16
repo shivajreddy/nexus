@@ -17,15 +17,15 @@ import {MdOutlineStorage} from "react-icons/md";
 
 function EpcMenu() {
     return (
-        <div style={{position: "absolute", right: "0"}}>
+        <div style={{position: "absolute", right: "2em"}}>
             {/*<div style={{}}>*/}
 
             <Sheet>
                 <SheetTrigger>
-                    <div className="flex justify-center items-center mx-10">
+                    <Button variant="outline">
                         <p className="pr-2"><MdOutlineStorage/></p>
                         Menu
-                    </div>
+                    </Button>
                 </SheetTrigger>
                 <SheetContent className="flex flex-col justify-center items-center">
                     <SheetHeader></SheetHeader>
