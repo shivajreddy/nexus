@@ -13,6 +13,9 @@
 
 
 .epc-header {
+
+    background-color: var(--bg-1);
+
     /*display: flex;*/
     position: relative;
 

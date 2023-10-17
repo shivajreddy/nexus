@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 *,
 *::before,
 *::after {
@@ -9,26 +13,12 @@ body {
     margin: 0;
 
     /* :: Default styles :: */
-    background-color: var(--bg-1);
+    background-color: var(--bg-0);
     color: var(--text);
     /*border: #1f1f47;*/
     /*border: #DDE0E7;*/
     /*border: var(--surface0);*/
     /*border: none;*/
-}
-
-:root {
-    font-family: Inter, serif;
-    line-height: 1.5;
-    font-weight: 400;
-
-    --animation-duration: 200ms;
-    --animation-timing-curve: ease-in-out;
-
-    --navbar-top-height: 56px;
-    /* --header-height: 56px; */
-
-    color: var(--text-1);
 }
 
 /* File: font.css */
@@ -46,13 +36,22 @@ body {
     font-style: auto;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 
 @layer base {
     :root {
+        font-family: Inter, serif;
+        line-height: 1.5;
+        font-weight: 400;
+
+        --animation-duration: 200ms;
+        --animation-timing-curve: ease-in-out;
+
+        --navbar-top-height: 56px;
+        /* --header-height: 56px; */
+
+        color: var(--text-1);
+
+
     }
 
     /*:: Light Theme ::*/
@@ -109,9 +108,13 @@ body {
         --radius: 0.5rem;
 
         /*+ Background Colors +*/
-        --bg-0: #CDD0D9;
-        --bg-1: #DDE0E7;
-        --bg-2: #EFF1F5;
+        /*--bg-0: #CDD0D9;*/
+        --bg-0: #E8E9ED;
+        /*--bg-1: #DDE0E7;*/
+        --bg-1: #F3F4F7;
+        /*--bg-1: #EFF1F5;*/
+        /*--bg-2: #EFF1F5;*/
+        --bg-2: #ffffff;
         --btn-bg-0: #11111b;
         --btn-bg-1: #313244;
         --btn-bg-2: #000;
@@ -119,7 +122,7 @@ body {
         /*+ Foreground Colors +*/
         --fg-0: var(--text);
         --fg-1: var(--overlay1);
-        --fg-2: var(--overlay2);
+        --fg-2: #000000;
         --btn-fg-0: #ffffff;
         --btn-fg-1: var(--mantle);
         --btn-fg-2: var(--crust);
@@ -145,8 +148,9 @@ body {
         /* + Borders +*/
         /*--border-0: var(--border);*/
         --border-0: var(--overlay0);
-        --border-1: var(--overlay1);
-        --border-2: var(--overlay2);
+        /*--border-1: var(--overlay1);*/
+        --border-1: var(--red);
+        --border-2: var(--border);
     }
 
     /*:: Dark Theme ::*/

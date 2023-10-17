@@ -2,6 +2,7 @@ import * as React from "react"
 
 import {cn} from "@/lib/utils"
 
+
 // "bg-default-bg2 rounded-lg border border-solid-red text-foreground shadow-md",
 const Card = React.forwardRef<
     HTMLDivElement,
@@ -17,6 +18,7 @@ const Card = React.forwardRef<
     />
 ))
 Card.displayName = "Card"
+
 
 const CardHeader = React.forwardRef<
     HTMLDivElement,

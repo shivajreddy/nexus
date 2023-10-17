@@ -10,7 +10,7 @@
 }
 
 .new-lot-section {
-    width: 25%;
+    min-width: 27%;
 
     margin: 10px;
 

@@ -66,9 +66,9 @@ function NewLot() {
 
     return (
         <MainLayout>
-            <div className="border rounded pb-2">
-                <div className="epc-header rounded rounded-b-none bg-default-bg2 py-2 border-b">
-                    <div className="">
+            <div className="border rounded pb-2 bg-default-bg1">
+                <div className="epc-header rounded rounded-b-none py-2 border-b">
+                    <div className="border-r">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
                     </div>
 

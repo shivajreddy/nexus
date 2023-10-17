@@ -60,8 +60,8 @@ function ThemeToggle() {
                                 </SelectContent>
 
                             </Select>
-                            <Button type="submit" className="mt-4 w-[100%]">
-                                Update Theme
+                            <Button variant="primary" type="submit" className="mt-4">
+                                Update
                             </Button>
                         </form>
                     </div>

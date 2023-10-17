@@ -18,7 +18,7 @@
     top: var(--header-height);
     /*top: var(--navbar-top-height);*/
 
-    border-right: solid 1px var(--border-2);
+    border-right: solid 1px var(--border-0);
 
     display: flex;
     flex-direction: column;
@@ -27,7 +27,7 @@
 
     user-select: none;
 
-    background: var(--bg-2);
+    background: var(--bg-1);
 
     transition: width var(--animation-duration) var(--animation-timing-curve);
     /* background-color: aliceblue; */
@@ -105,7 +105,7 @@
     cursor: pointer;
     border-radius: 10px;
     /* color: var(--accent); */
-    background-color: var(--bg-1);
+    background-color: var(--bg-0);
 }
 
 .sidebar.open .sidebar-content-item {

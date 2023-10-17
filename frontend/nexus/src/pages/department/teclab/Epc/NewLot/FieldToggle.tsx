@@ -24,7 +24,7 @@ const FieldToggle = (props: IProps) => {
                 <Label className="text-lg font-medium cursor-pointer" htmlFor={props.id}>{props.name}</Label>
                 <div className="flex-grow border-t ml-4"></div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 flex items-center">
                 <Switch
                     checked={props.isChecked}
                     onCheckedChange={setNewFieldState}
