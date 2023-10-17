@@ -6,7 +6,6 @@ import {format} from "date-fns";
 import {Calendar} from "@components/ui/calendar.tsx";
 import {useState} from "react";
 import {Label} from "@components/ui/label.tsx";
-import {Input} from "@components/ui/input.tsx";
 
 interface Iprops {
     id: string;
@@ -16,7 +15,7 @@ interface Iprops {
 const FieldDate = (props: Iprops) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     return (
-        <div className="flex items-center">
+        <div key={props.id} className="flex items-center py-2">
             <div className="flex-1 flex flex-grow items-center">
                 <Label className="text-lg font-medium cursor-pointer" htmlFor={props.id}>{props.name}</Label>
                 <div className="flex-grow border-t ml-4"></div>

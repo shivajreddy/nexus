@@ -66,7 +66,7 @@ function NewLot() {
 
     return (
         <MainLayout>
-            <div className="border rounded pb-2 bg-default-bg1">
+            <div className="border rounded pb-4 bg-default-bg1">
                 <div className="epc-header rounded rounded-b-none py-2 border-b">
                     <div className="border-r">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
@@ -106,8 +106,8 @@ function NewLot() {
                             <FieldDate id="1_contract_date" name="Contract Date"/>
                             <FieldText id="1_section" name={"Section"}/>
                             <FieldText id="1_lot_number" name={"Lot Number"} placeholder="write a lot #"/>
-                            <FieldDropDown name={"Product"} data={["shiva", "reddy"]}/>
-                            <FieldDropDown name={"Elevation"} data={["shiva", "reddy"]}/>
+                            <FieldDropDown id="1_product" name={"Product"} data={["shiva", "reddy"]}/>
+                            <FieldDropDown id="1_elevation" name={"Elevation"} data={["shiva", "reddy"]}/>
                         </CardContent>
                     </Card>
 
@@ -118,43 +118,39 @@ function NewLot() {
                             <CardDescription>Drafter and their time information</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <FieldDate id="1_contract_date" name="Contract Date"/>
-                            <FieldText id="1_section" name={"Section"}/>
-                            <FieldText id="1_lot_number" name={"Lot Number"} placeholder="write a lot #"/>
-                            <FieldDropDown name={"Product"} data={["shiva", "reddy"]}/>
-                            <FieldDropDown name={"Elevation"} data={["shiva", "reddy"]}/>
+                            <FieldDropDown id="2_drafter" name={"Drafter"} data={["shiva", "reddy"]}/>
+                            <FieldDate id="2_assigned" name="Assigned"/>
+                            <FieldDate id="2_expected" name="Expected"/>
                         </CardContent>
                     </Card>
 
-                    {/* 3: Engineering */}
-                    <Card className="new-lot-section" id="new-lot-form-engineering">
-                        <CardHeader>
-                            <CardTitle>Engineering</CardTitle>
-                            <CardDescription>Engineer and their time information</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <FieldDate id="1_contract_date" name="Contract Date"/>
-                            <FieldText id="1_section" name={"Section"}/>
-                            <FieldText id="1_lot_number" name={"Lot Number"} placeholder="write a lot #"/>
-                            <FieldDropDown name={"Product"} data={["shiva", "reddy"]}/>
-                            <FieldDropDown name={"Elevation"} data={["shiva", "reddy"]}/>
-                        </CardContent>
-                    </Card>
+                    <div className="new-lot-section">
+                        {/* 3: Engineering */}
+                        <Card className="mb-4" id="new-lot-form-engineering">
+                            <CardHeader>
+                                <CardTitle>Engineering</CardTitle>
+                                <CardDescription>Engineer and their time information</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <FieldDropDown id="3_engineer" name={"Engineer"} data={["shiva", "reddy"]}/>
+                                <FieldDate id="3_assigned" name="Assigned"/>
+                                <FieldDate id="3_expected" name="Expected"/>
+                            </CardContent>
+                        </Card>
 
-                    {/* 4: Plat*/}
-                    <Card className="new-lot-section" id="new-lot-form-plat">
-                        <CardHeader>
-                            <CardTitle>Plat Engineer</CardTitle>
-                            <CardDescription>Plat-Engineer and their time information</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <FieldDate id="1_contract_date" name="Contract Date"/>
-                            <FieldText id="1_section" name={"Section"}/>
-                            <FieldText id="1_lot_number" name={"Lot Number"} placeholder="write a lot #"/>
-                            <FieldDropDown name={"Product"} data={["shiva", "reddy"]}/>
-                            <FieldDropDown name={"Elevation"} data={["shiva", "reddy"]}/>
-                        </CardContent>
-                    </Card>
+                        {/* 4: Plat*/}
+                        <Card className="mt-4" id="new-lot-form-plat">
+                            <CardHeader>
+                                <CardTitle>Plat Engineer</CardTitle>
+                                <CardDescription>Plat-Engineer and their time information</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <FieldDropDown id="4_plat_engineer" name={"Plat Engineer"} data={["shiva", "reddy"]}/>
+                                <FieldDate id="4_assigned" name="Assigned"/>
+                                <FieldDate id="4_expected" name="Expected"/>
+                            </CardContent>
+                        </Card>
+                    </div>
 
                     {/* 5: Permitting */}
                     <Card className="new-lot-section" id="new-lot-form-permitting">
@@ -166,8 +162,6 @@ function NewLot() {
                             <FieldDate id="1_contract_date" name="Contract Date"/>
                             <FieldText id="1_section" name={"Section"}/>
                             <FieldText id="1_lot_number" name={"Lot Number"} placeholder="write a lot #"/>
-                            <FieldDropDown name={"Product"} data={["shiva", "reddy"]}/>
-                            <FieldDropDown name={"Elevation"} data={["shiva", "reddy"]}/>
                         </CardContent>
                     </Card>
 
@@ -181,8 +175,6 @@ function NewLot() {
                             <FieldDate id="1_contract_date" name="Contract Date"/>
                             <FieldText id="1_section" name={"Section"}/>
                             <FieldText id="1_lot_number" name={"Lot Number"} placeholder="write a lot #"/>
-                            <FieldDropDown name={"Product"} data={["shiva", "reddy"]}/>
-                            <FieldDropDown name={"Elevation"} data={["shiva", "reddy"]}/>
                         </CardContent>
                     </Card>
 
@@ -199,9 +191,11 @@ function NewLot() {
 
                 </div>
 
-                <Button variant="primary" className="w-1/5">
-                    submit
-                </Button>
+                <div className="my-4 flex justify-center items-center">
+                    <Button variant="primary" className="w-1/5">
+                        submit
+                    </Button>
+                </div>
 
 
             </div>
