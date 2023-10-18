@@ -21,6 +21,7 @@ module.exports = {
         DEFAULT: "var(--border-0)",
         b0: "var(--border-0)",
         b1: "var(--border-1)",
+        b2: "var(--border-2)",
       },
       colors: {
         // input: "var(--input)",

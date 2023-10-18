@@ -41,7 +41,7 @@ function Calendar({
         ),
         day_selected:
           "bg-zinc-900 text-zinc-50 hover:bg-zinc-900 hover:text-zinc-50 focus:bg-zinc-900 focus:text-zinc-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50 dark:hover:text-zinc-900 dark:focus:bg-zinc-50 dark:focus:text-zinc-900",
-        day_today: "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50",
+        day_today: "bg-zinc-100 text dark:bg-zinc-800 dark:text-zinc-50",
         day_outside: "text-zinc-500 opacity-50 dark:text-zinc-400",
         day_disabled: "text-zinc-500 opacity-50 dark:text-zinc-400",
         day_range_middle:

@@ -18,13 +18,13 @@ const FieldDate = (props: Iprops) => {
         <div key={props.id} className="flex items-center py-2">
             <div className="flex-1 flex flex-grow items-center">
                 <Label className="text-lg font-medium cursor-pointer" htmlFor={props.id}>{props.name}</Label>
-                <div className="flex-grow border-t ml-4"></div>
+                <div className="flex-grow border-t border-b0 ml-4"></div>
             </div>
             <div className="flex-1" id={props.id}>
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
-                            variant={"inverted"}
+                            variant={"outline"}
                             className={cn(
                                 "justify-start text-left font-normal",
                                 !date && "text-muted-foreground"
@@ -39,7 +39,6 @@ const FieldDate = (props: Iprops) => {
                             mode="single"
                             selected={date}
                             onSelect={setDate}
-                            initialFocus
                         />
                     </PopoverContent>
                 </Popover>

@@ -66,7 +66,7 @@ function NewLot() {
 
     return (
         <MainLayout>
-            <div className="border rounded pb-4 bg-default-bg1">
+            <div className="border rounded bg-default-bg1">
                 <div className="epc-header rounded rounded-b-none py-2 border-b">
                     <div className="border-r">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
@@ -84,7 +84,7 @@ function NewLot() {
                     </div>
                 </div>
 
-                <div id="new-lot-form-container" className="rounded-lg rounded-t-none bg-default-bg1">
+                <div id="new-lot-form-container" className="rounded-lg rounded-t-none bg-default-bg2">
 
                     {/* 1: Lot Info */}
                     <Card className="new-lot-section" id="new-lot-form-lot-info">
@@ -93,6 +93,7 @@ function NewLot() {
                             <CardDescription>Lot's identity Information</CardDescription>
                         </CardHeader>
                         <CardContent>
+                            <FieldDropDown id="1_contract_type" name={"Contract Type"} data={["SPEC", "Permit & Hold", "Contract"]}/>
                             <FieldToggle id="1_finished"
                                          name="Finished"
                                          isChecked={newLotData.lot_status_finished}
@@ -189,12 +190,9 @@ function NewLot() {
 
                 </div>
 
-                <div className="my-4 flex justify-center items-center">
-                    <Button variant="primary" className="w-1/5">
-                        submit
-                    </Button>
+                <div className="py-6 flex justify-center items-center bg-default-bg2">
+                    <Button variant="primary" className="w-1/5">SUBMIT</Button>
                 </div>
-
 
             </div>
         </MainLayout>

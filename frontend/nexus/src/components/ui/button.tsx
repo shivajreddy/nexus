@@ -10,7 +10,7 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default: "bg-button-bg2 text-button-fg0 hover:bg-button-bg1",
-                inverted: "border border- bg-default-bg1 hover:bg-button-bg0 hover:text-default-bg1",
+                inverted: "border border-zinc-200 bg-default-bg1 hover:bg-button-bg0 hover:text-default-bg1",
                 primary: "bg-primary-bg0 text-primary-fg0 hover:bg-primary-bg1",
                 primaryInverted: "border border-primary text-primary-bg0 hover:bg-primary hover:text-primary-fg0",
                 destructive: "bg-destructive-bg0 text-destructive-fg0 hover:bg-destructive-bg1",
