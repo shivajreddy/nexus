@@ -120,7 +120,6 @@ function NewLot() {
                         <CardContent>
                             <FieldDropDown id="2_drafter" name={"Drafter"} data={["shiva", "reddy"]}/>
                             <FieldDate id="2_assigned" name="Assigned"/>
-                            <FieldDate id="2_expected" name="Expected"/>
                         </CardContent>
                     </Card>
 
@@ -133,8 +132,8 @@ function NewLot() {
                             </CardHeader>
                             <CardContent>
                                 <FieldDropDown id="3_engineer" name={"Engineer"} data={["shiva", "reddy"]}/>
-                                <FieldDate id="3_assigned" name="Assigned"/>
-                                <FieldDate id="3_expected" name="Expected"/>
+                                <FieldDate id="3_sent" name="Sent"/>
+                                <FieldDate id="3_received" name="Received"/>
                             </CardContent>
                         </Card>
 
@@ -147,7 +146,6 @@ function NewLot() {
                             <CardContent>
                                 <FieldDropDown id="4_plat_engineer" name={"Plat Engineer"} data={["shiva", "reddy"]}/>
                                 <FieldDate id="4_assigned" name="Assigned"/>
-                                <FieldDate id="4_expected" name="Expected"/>
                             </CardContent>
                         </Card>
                     </div>

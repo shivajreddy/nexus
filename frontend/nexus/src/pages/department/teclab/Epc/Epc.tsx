@@ -13,9 +13,7 @@ import "@/assets/pages/Epc/Epc.css"
 import {rowData, columnDefinitions} from "./demoData.ts";
 import {BsPlusCircleFill} from "react-icons/bs";
 import {useNavigate} from "react-router-dom";
-import {MdClearAll, MdOutlineStorage} from "react-icons/md";
 import {CgMenuGridO} from "react-icons/cg";
-import React from "react";
 import {Button} from "@components/ui/button.tsx";
 
 
@@ -68,7 +66,7 @@ function Epc() {
                     </div>
 
                     <div className="flex mx-10">
-                        {/* TODO: this should be role specific*/}
+                        {/* ? TODO: this should be role specific*/}
                         <div className="flex justify-center items-center">
                             <Button variant="outline" className="flex justify-center items-center"
                                     onClick={() => navigate('lot/new')}>

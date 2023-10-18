@@ -146,11 +146,9 @@ body {
         --destructive-fg-1: var(--mantle);
 
         /* + Borders +*/
-        /*--border-0: var(--border);*/
-        --border-0: var(--overlay0);
-        /*--border-1: var(--overlay1);*/
-        --border-1: var(--red);
-        --border-2: var(--border);
+        --border-0: var(--border);
+        --border-1: var(--overlay1);
+        --border-2: var(--overlay2);
     }
 
     /*:: Dark Theme ::*/
