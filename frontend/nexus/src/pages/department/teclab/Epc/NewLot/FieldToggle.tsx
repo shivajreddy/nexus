@@ -1,20 +1,23 @@
 import {Switch} from "@components/ui/switch.tsx";
 import {Label} from "@components/ui/label.tsx";
-import {Input} from "@components/ui/input.tsx";
+import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
+import React from "react";
 
 interface IProps {
     id: string;
     name: string;
     isChecked: boolean;
-    updateLotData: any;
+    // specific to lot form
+    pieceOfStateName: keyof INewLotData;
+    setNewLotData: React.Dispatch<React.SetStateAction<INewLotData>>;
 }
 
 const FieldToggle = (props: IProps) => {
 
-    function setNewFieldState() {
-        props.updateLotData(prevData => ({
+    function toggleFieldState() {
+        props.setNewLotData((prevData: INewLotData) => ({
             ...prevData,
-            lot_status_finished: !prevData.lot_status_finished
+            [props.pieceOfStateName]: !prevData[props.pieceOfStateName]
         }))
     }
 
@@ -27,7 +30,7 @@ const FieldToggle = (props: IProps) => {
             <div className="flex-1 flex items-center">
                 <Switch
                     checked={props.isChecked}
-                    onCheckedChange={setNewFieldState}
+                    onCheckedChange={toggleFieldState}
                 />
             </div>
         </div>

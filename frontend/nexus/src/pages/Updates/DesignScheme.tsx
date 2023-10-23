@@ -47,7 +47,7 @@ function DesignScheme() {
 
             <div className="w-[20%]">
                 <p>Inputs</p>
-                <Input className type="text"/>
+                <Input type="text"/>
             </div>
 
             <p className="font-bold text-4xl text-center m-4">Design Scheme</p>

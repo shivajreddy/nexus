@@ -61,8 +61,9 @@ function Epc() {
             <div className="epc-container rounded-md">
 
                 <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
-                    <div className="border-r">
+                    <div className="border-r flex items-center">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
+                        <p className="ml-4 font-semibold text-primary text-xl">Live</p>
                     </div>
 
                     <div className="flex mx-10">
