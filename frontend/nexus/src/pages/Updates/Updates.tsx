@@ -1,15 +1,11 @@
 import MainLayout from "@/templates/MainLayout"
-import NexusThemes from "./NexusThemes"
+import DesignScheme from "@pages/Updates/DesignScheme.tsx";
 
 function Updates() {
     return (
         <MainLayout>
             <div className="updates-page-container m-4">
-
-                <NexusThemes/>
-
-                <p> Going to test for a button</p>
-
+                <DesignScheme/>
             </div>
         </MainLayout>
     )

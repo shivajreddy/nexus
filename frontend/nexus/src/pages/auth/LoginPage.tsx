@@ -16,7 +16,6 @@ function LoginPage() {
             <div className="authorization-page">
                 <div className="authorization-body">
                     <div className="blob"></div>
-
                     <div
                         className="
           card
@@ -29,15 +28,16 @@ function LoginPage() {
                         <div
                             id="left-box"
                             className="hidden lg:flex
-            flex-col
-            justify-between
-            w-[50%]
-            p-6
-            py-10
-            rounded-l-[1rem]
-            items-center
-            select-none
-            pointer-events-none"
+                                        text-white
+                                        flex-col
+                                        justify-between
+                                        w-[50%]
+                                        p-6
+                                        py-10
+                                        rounded-l-[1rem]
+                                        items-center
+                                        select-none
+                                        pointer-events-none"
                         >
                             <img src={NVector} width="19%" alt="nexus-logo"/>
                             <div className="text-center">

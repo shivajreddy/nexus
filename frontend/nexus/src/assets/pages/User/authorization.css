@@ -1,7 +1,5 @@
 
 .authorization-body {
-
-
   height: calc(100vh - var(--navbar-top-height));
 
   display: flex;
@@ -40,7 +38,7 @@
   padding: 0;
   border-radius: 1rem;
   z-index: 10;
-  color: whitesmoke;
+  /*color: white;*/
 }
 
 .title {
@@ -57,9 +55,6 @@
   background: none;
   border: none;
   text-align: center;
-  font-size: 1rem;
-  color: whitesmoke;
-  background-color: #fa709a;
   padding: 0.8rem 1.8rem;
   border-radius: 2rem;
   cursor: pointer;

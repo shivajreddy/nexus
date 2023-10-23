@@ -12,8 +12,8 @@ function LoginCard({ isLoginPage, setIsLoginPage }: Iprops) {
 
   return (
     <div className="p-10 flex flex-col justify-center w-[100%]">
-      <p className="font-bold text-4xl">Log In</p>
-      <p>Pick up where you left off</p>
+      <p className="text-white font-bold text-4xl">Log In</p>
+      <p className="text-white">Pick up where you left off</p>
       <LoginForm isLoginPage={isLoginPage} setIsLoginPage={setIsLoginPage} />
     </div>
   );

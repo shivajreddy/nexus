@@ -35,7 +35,7 @@ const FormSchema = z.object({
 })
 
 
-function NexusThemes() {
+function DesignScheme() {
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -44,6 +44,11 @@ function NexusThemes() {
 
     return (
         <div className="nexus-update-post">
+
+            <div className="w-[20%]">
+                <p>Inputs</p>
+                <Input className type="text"/>
+            </div>
 
             <p className="font-bold text-4xl text-center m-4">Design Scheme</p>
 
@@ -185,10 +190,11 @@ function NexusThemes() {
                 </Form>
 
 
+
             </div>
 
         </div>
     )
 }
 
-export default NexusThemes
+export default DesignScheme

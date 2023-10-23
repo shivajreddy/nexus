@@ -11,10 +11,10 @@ function RegistrationCard({isLoginPage, setIsLoginPage}: Iprops) {
 
     // + call the department-api
     const {data, isLoading, error} = useGetAllDepartmentsQuery(undefined);
-    // console.log("data = ", data, isLoading, error)
+    console.error("data = ", data, isLoading, error)
 
     return (
-        <div className="p-10 flex flex-col justify-center w-[100%]">
+        <div className="text-white p-10 flex flex-col justify-center w-[100%]">
             <p className="font-bold text-4xl">Register</p>
             <p>Create your Nexus account</p>
             <RegistrationForm

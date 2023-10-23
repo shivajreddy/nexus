@@ -117,6 +117,14 @@ function RegistrationForm({
         setIsLoginPage(!isLoginPage);
     }
 
+    // + 5. Handle Enter key press
+    function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            form.handleSubmit(handleOnSubmit)();
+        }
+    }
+
     // + Render the form
     return (
         <Form {...form}>
@@ -130,12 +138,15 @@ function RegistrationForm({
                     render={({field}) => (
                         <FormItem>
                             <div className="flex pt-6 items-center h-10">
-                                <FormLabel className="text-white ">Your Work Email</FormLabel>
+                                <FormLabel >Your Work Email</FormLabel>
                                 <FormMessage
-                                    className="pl-4 text-white underline underline-offset-4 decoration-red-600 "/>
+                                    className="ml-4 underline underline-offset-4 decoration-red-600 "/>
                             </div>
                             <FormControl>
-                                <Input {...field} type="email"/>
+                                <Input
+                                    className="text-xl text-white bg-transparent"
+                                    onKeyDown={handleKeyPress}
+                                    {...field} type="email"/>
                             </FormControl>
                         </FormItem>
                     )}
@@ -147,12 +158,15 @@ function RegistrationForm({
                     render={({field}) => (
                         <FormItem>
                             <div className="flex pt-6 items-center h-10">
-                                <FormLabel className="text-white">Password</FormLabel>
+                                <FormLabel >Password</FormLabel>
                                 <FormMessage
-                                    className="pl-4 text-white underline underline-offset-4 decoration-red-600 "/>
+                                    className="ml-4 underline underline-offset-4 decoration-red-600 "/>
                             </div>
                             <FormControl>
-                                <Input placeholder="" {...field} type="password"/>
+                                <Input placeholder=""
+                                       className="text-xl text-white bg-transparent"
+                                       onKeyDown={handleKeyPress}
+                                       {...field} type="password"/>
                             </FormControl>
                             <FormDescription></FormDescription>
                         </FormItem>
@@ -165,12 +179,15 @@ function RegistrationForm({
                     render={({field}) => (
                         <FormItem>
                             <div className="flex pt-6 items-center h-10">
-                                <FormLabel className="text-white ">Re-Password</FormLabel>
+                                <FormLabel>Re-Password</FormLabel>
                                 <FormMessage
-                                    className="pl-4 text-white underline underline-offset-4 decoration-red-600 "/>
+                                    className="pl-4 underline underline-offset-4 decoration-red-600 "/>
                             </div>
                             <FormControl>
-                                <Input placeholder="" {...field} type="password"/>
+                                <Input placeholder=""
+                                       className="text-xl text-white bg-transparent"
+                                       onKeyDown={handleKeyPress}
+                                       {...field} type="password"/>
                             </FormControl>
                         </FormItem>
                     )}
@@ -182,13 +199,13 @@ function RegistrationForm({
                     render={({field}) => (
                         <FormItem>
                             <div className="flex pt-6 items-center h-10">
-                                <FormLabel className="text-white ">Your Department</FormLabel>
+                                <FormLabel>Your Department</FormLabel>
                                 <FormMessage
-                                    className="pl-4 text-white underline underline-offset-4 decoration-red-600 "/>
+                                    className="pl-4 underline underline-offset-4 decoration-red-600 "/>
                             </div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="text-xl text-white bg-transparent">
                                         <SelectValue placeholder="Select your Department"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -207,7 +224,7 @@ function RegistrationForm({
                 <div className="flex items-center pt-2">
                     <p>Already registered?</p>
                     <button
-                        className="pl-4 underline underline-offset-2"
+                        className="ml-4 underline underline-offset-2"
                         onClick={handleGoToRegistrationPage}
                     >
                         Log In
@@ -236,7 +253,7 @@ function RegistrationForm({
                                         <LoadingSpinner width={45}/>
                                         :
                                         registrationStatus === 'success' ?
-                                            <Alert variant="success">
+                                            <Alert variant="default">
                                                 <FaCheckSquare/>
                                                 <AlertTitle>Registration Successful</AlertTitle>
                                                 <AlertDescription>Click on the link sent to your email, to finish
@@ -253,7 +270,8 @@ function RegistrationForm({
                                                 </Alert>
                                                 :
                                                 <Button
-                                                    className="mt-8 w-[40%] self-center border-2 p-2 rounded-lg hover:shadow-lg "
+                                                    variant="inverted"
+                                                    className="bg-transparent text-white hover:text-white hover:bg-transparent"
                                                     type="submit"
                                                 >
                                                     Register

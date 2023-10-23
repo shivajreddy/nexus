@@ -20,6 +20,7 @@ import React, {useState} from "react";
 import {Alert, AlertDescription, AlertTitle} from "@components/ui/alert.tsx";
 import {BiError} from 'react-icons/bi'
 import LoadingSpinner from "@components/common/LoadingSpinner.tsx";
+import {Button} from "@components/ui/button.tsx";
 
 
 interface Iprops {
@@ -126,6 +127,14 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
         setIsLoginPage(!isLoginPage);
     }
 
+    // + 5. Handle Enter key press
+    function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            form.handleSubmit(handleOnSubmit)();
+        }
+    }
+
     // ! 4. Render the form
     return (
         <Form {...form}>
@@ -139,12 +148,15 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                     render={({field}) => (
                         <FormItem>
                             <div className="flex pt-6 items-center h-10">
-                                <FormLabel className="text-white ">Email</FormLabel>
+                                <FormLabel className="text-white">Email</FormLabel>
                                 <FormMessage
-                                    className="pl-4 text-white underline underline-offset-4 decoration-red-600 "/>
+                                    className="pl-4 underline underline-offset-4 decoration-red-600"/>
                             </div>
                             <FormControl>
-                                <Input placeholder="" type="email" {...field} />
+                                <Input className="text-xl text-white bg-transparent"
+                                       onKeyDown={handleKeyPress}
+                                       placeholder=""
+                                       type="email" {...field} />
                             </FormControl>
                         </FormItem>
                     )}
@@ -158,10 +170,13 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                             <div className="flex pt-6 items-center h-10">
                                 <FormLabel className="text-white ">Password</FormLabel>
                                 <FormMessage
-                                    className="pl-4 text-white underline underline-offset-4 decoration-red-600 "/>
+                                    className="pl-4 underline underline-offset-4 decoration-red-600 "/>
                             </div>
                             <FormControl>
-                                <Input placeholder="" type="password" {...field} />
+                                <Input className="text-xl text-white bg-transparent"
+                                       onKeyDown={handleKeyPress}
+                                       placeholder=""
+                                       type="password" {...field} />
                             </FormControl>
                         </FormItem>
                     )}
@@ -170,9 +185,9 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
 
                 <div className="flex flex-col justify-center">
                     <div className="flex items-center p-2">
-                        <p>Don't have an account? </p>
+                        <p className="font-normal text-white">Don't have an account? </p>
                         <button
-                            className="pl-4 underline underline-offset-2"
+                            className="ml-2 text-white underline"
                             onClick={handleGoToRegistrationPage}
                         >
                             Sign Up
@@ -188,12 +203,13 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                             : isLoading
                                 ? <LoadingSpinner width={30}/>
                                 :
-                                <button
-                                    className="border-2 p-2 px-8 rounded-lg hover:shadow-lg "
+                                <Button
+                                    className="bg-transparent text-white hover:text-white hover:bg-transparent"
+                                    variant="inverted"
                                     type="submit"
                                 >
                                     Login
-                                </button>
+                                </Button>
                         }
                     </div>
                 </div>
