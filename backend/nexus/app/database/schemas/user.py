@@ -23,5 +23,3 @@ class NewUserSchema(BaseModel):
     name: str = ""
     email: str = ""
     verified: bool = False
-
-

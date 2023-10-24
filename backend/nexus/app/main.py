@@ -1,7 +1,7 @@
 from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
-from app.database.database import connect_mongodb
+from app.database.database import connect_mongodb, department_data_coll, users_coll
 from app.router.security.auth import router as auth_router
 from app.router.company.eagle import router as eagle_router
 from app.router.public import router as public_router
@@ -44,3 +44,19 @@ async def app_init():
 @app.get("/api/healthchecker")
 def root():
     return {"message": "Hello World"}
+
+
+# :: SETUP DATABASE :: #
+@app.get("/setup-database")
+def setup_database():
+    # + set up collections
+    # + 'department_data' collection
+    department_data_coll.create_index('department_name', unique=True)
+
+    # + 'users' collection
+    users_coll.create_index('username', unique=True)
+    return {"done setting up department data"}
+
+    # + 'eagle_data' collection
+
+    # + 'projects' collection
