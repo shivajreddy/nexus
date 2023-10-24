@@ -30,4 +30,3 @@ async def get_all_users(
         data = {k: v for (k, v) in doc.items() if k != "_id"}
         result.append(data)
     return result
-

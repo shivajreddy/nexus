@@ -14,6 +14,7 @@ db = client[database_name]
 eagle_data_coll = db["eagle-data"]
 users_coll = db["users"]
 projects_coll = db["projects"]
+department_data_coll = db["department_data"]
 
 
 def connect_mongodb():
@@ -22,4 +23,3 @@ def connect_mongodb():
         print("Database Connection: ✅")
     except Exception as e:
         print("Database Connection: ❌", e)
-

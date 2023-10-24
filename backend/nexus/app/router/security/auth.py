@@ -54,30 +54,6 @@ async def create_user(payload: NewUserSchema):
 
     return {"result": "email_sent_successfully"}
 
-    # # create JWTs -> access-token & refresh-token
-    # access_token = create_access_token(data=new_user)
-    #
-    # refresh_token = create_refresh_token(data=new_user)
-    #
-    # # add refresh_token to document
-    # user_coll.update_one(
-    #     {"_id": inserted_id},
-    #     {"$set": {**new_user.model_dump(),
-    #               "refresh_token": refresh_token,
-    #               "email_verification_key" : email_verification_key
-    #               }},
-    # )
-
-    # response = JSONResponse(content={
-    #     "access_token": access_token,
-    #     "token_type": "Bearer",
-    # })
-    #
-    # response.set_cookie(
-    #     key="refresh_token", value=refresh_token, httponly=True, max_age=86400
-    # )
-    # return response
-
 
 @router.post("/login")
 async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):

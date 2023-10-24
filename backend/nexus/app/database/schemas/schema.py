@@ -46,4 +46,3 @@ class AccessTokenData(BaseModel):
 
 class EagleDepartment(BaseException):
     department_name: str
-

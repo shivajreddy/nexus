@@ -2,8 +2,8 @@ from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 from app.database.database import connect_mongodb
-from app.router.auth import router as auth_router
-from app.router.eagle import router as eagle_router
+from app.router.security.auth import router as auth_router
+from app.router.company.eagle import router as eagle_router
 from app.router.public import router as public_router
 from app.router.department.teclab.epc import router as epc_router
 
