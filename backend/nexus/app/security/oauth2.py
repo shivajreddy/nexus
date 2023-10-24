@@ -6,7 +6,8 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from pydantic import ValidationError
 
 from app.settings.config import settings
-from app.database.schemas.schema import AccessTokenData, RefreshTokenData, User
+from app.database.schemas.user import User
+from app.database.schemas.security import RefreshTokenData, AccessTokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

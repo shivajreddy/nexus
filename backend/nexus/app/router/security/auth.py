@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from app.database.database import users_coll
 from app.email.setup import send_email_with_verification_key
 from app.security.oauth2 import create_access_token, create_refresh_token, verify_refresh_token, get_current_user_data
-from app.database.schemas.schema import User, NewUserSchema
+from app.database.schemas.user import User, NewUserSchema
 from app.security.utils import hash_password, verify_password
 
 

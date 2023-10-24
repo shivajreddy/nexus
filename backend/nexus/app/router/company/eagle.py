@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from app.database.database import eagle_data_coll, users_coll
 from app.security.oauth2 import get_current_user_data
-from app.database.schemas.schema import User
+from app.database.schemas.user import User
 
 """
 API endpoint related to company data
