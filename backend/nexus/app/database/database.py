@@ -1,7 +1,7 @@
 import certifi
 from pymongo import MongoClient
 
-from app.config import settings
+from app.settings.config import settings
 
 client = MongoClient(settings.MONGODB_URL, tlsCAFile=certifi.where())
 
@@ -13,6 +13,7 @@ db = client[database_name]
 # :: name of collections
 eagle_data_coll = db["eagle-data"]
 users_coll = db["users"]
+projects_coll = db["projects"]
 
 
 def connect_mongodb():

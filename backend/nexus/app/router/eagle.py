@@ -2,9 +2,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.database import db, eagle_data_coll, users_coll
-from app.oauth2 import get_current_user_data
-from app.schema import User
+from app.database.database import eagle_data_coll, users_coll
+from app.security.oauth2 import get_current_user_data
+from app.database.schemas.schema import User
 
 """
 API endpoint related to company data
@@ -31,27 +31,3 @@ async def get_all_users(
         result.append(data)
     return result
 
-
-@router.get("/test")
-async def testing_protected_route(
-        current_user_data: Annotated[User, Depends(get_current_user_data)]
-):
-    return f"you are, {current_user_data}"
-
-
-sample_data = {
-    # "_id": 1,
-    "table_name": "departments",
-    "data": [
-        {"department_name": "TEC Lab"},
-        {"department_name": "Sales"},
-        {"department_name": "Warranty"},
-        {"department_name": "Design"},
-    ]
-}
-
-
-@router.get('/setup')
-def set_up_eagle_data_coll():
-    # :: goal is to set up eagle-data collection
-    eagle_data_coll.insert_one(sample_data)

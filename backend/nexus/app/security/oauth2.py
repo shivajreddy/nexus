@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
 from pydantic import ValidationError
 
-from app.config import settings
-from app.schema import AccessTokenData, RefreshTokenData, User
+from app.settings.config import settings
+from app.database.schemas.schema import AccessTokenData, RefreshTokenData, User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

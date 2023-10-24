@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from app.database import eagle_data_coll
+from app.database.database import eagle_data_coll
 
 """
 All public end points

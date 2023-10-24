@@ -8,13 +8,24 @@ import FieldDate from "@pages/department/teclab/Epc/NewLot/FieldDate.tsx";
 import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
 import FieldDropDown from "@pages/department/teclab/Epc/NewLot/FieldDropDown.tsx";
 import {Textarea} from "@components/ui/textarea.tsx";
-import React, {useState} from "react";
+import {useEffect, useState} from "react";
 import "@assets/pages/Epc/NewLot.css"
 import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
+import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 
 
 function NewLot() {
     const navigate = useNavigate();
+    const axios = useAxiosPrivate()
+
+    // + Fetch the data
+    useEffect(()=>{
+        async function getData(){
+            const response = await axios.get('/teclab/epc')
+            console.log("response = ", response);
+        }
+        getData();
+    }, [])
 
     // New Lot Form State
     const [newLotData, setNewLotData] = useState<INewLotData>({
@@ -116,11 +127,11 @@ function NewLot() {
                                          setNewLotData={setNewLotData}
                             />
                             <FieldDate id="1_contract_date" name="Contract Date"/>
-                            <FieldText id="1_community"
-                                       name={"Community"}
-                                       fieldText={newLotData.community_name}
-                                       pieceOfStateName="community_name"
-                                       setNewLotData={setNewLotData}
+                            <FieldDropDown id="1_community"
+                                           name={"Community"}
+                                           data={["shiva", "reddy"]}
+                                           pieceOfStateName="community_name"
+                                           setNewLotData={setNewLotData}
                             />
                             <FieldText id="1_section"
                                        name={"Section"}

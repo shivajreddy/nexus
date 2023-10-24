@@ -1,6 +1,6 @@
 from email.message import EmailMessage
 from fastapi import HTTPException
-from app.config import settings
+from app.settings.config import settings
 import smtplib
 
 
