@@ -11,10 +11,10 @@ database_name = settings.DATABASE_NAME
 db = client[database_name]
 
 # :: name of collections
-eagle_data_coll = db["eagle-data"]
 users_coll = db["users"]
-projects_coll = db["projects"]
+eagle_data_coll = db["eagle-data"]
 department_data_coll = db["department_data"]
+projects_coll = db["projects"]
 
 
 def connect_mongodb():

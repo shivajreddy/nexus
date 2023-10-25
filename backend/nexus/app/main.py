@@ -1,7 +1,7 @@
 from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
-from app.database.database import connect_mongodb, department_data_coll, users_coll, eagle_data_coll
+from app.database.database import connect_mongodb, department_data_coll, users_coll, eagle_data_coll, projects_coll
 from app.database.setup_data.eagle_data import eagle_data_coll_initial_data
 from app.router.security.auth import router as auth_router
 from app.router.company.eagle import router as eagle_router
@@ -47,23 +47,27 @@ def root():
     return {"message": "Hello World"}
 
 
-# :: SETUP DATABASE :: #
+# :: SETUP DATABASE (DROPS IF PRE-EXISTING COLLECTIONS) :: #
 @app.get("/setup-database")
 def setup_database():
-    # + 'department_data' collection
-    department_data_coll.create_index('department_name', unique=True)
-
     # + 'users' collection
+    users_coll.drop()
     users_coll.create_index('username', unique=True)
+    # users_coll.insert_many()
 
     # + 'eagle_data' collection
+    eagle_data_coll.drop()
     eagle_data_coll.create_index('table_name', unique=True)
     eagle_data_coll.insert_many(eagle_data_coll_initial_data)
 
-    # + 'dept_teclab' department co
-
-    # + 'dept_sales'
+    # + 'department_data' collection
+    department_data_coll.drop()
+    department_data_coll.create_index('department_name', unique=True)
+    # department_data_coll.insert_many()    # + 'dept_teclab' department
+    # department_data_coll.insert_many()    # + 'dept_sales'
 
     # + 'projects' collection
+    projects_coll.drop()
+    # projects_coll.insert_many()
 
     return {"All database collections are setup successfully"}

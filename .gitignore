@@ -14,5 +14,5 @@
 **/.env.dev
 **/.env.test
 **/.env.prod
-**/setup_data/*
+**/eagle_data.py
 
