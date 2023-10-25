@@ -143,24 +143,27 @@ def refresh(request: Request):
     new_access_token = create_access_token(data=user)
     print("✅ new_access_token", new_access_token)
 
+    # + check if the user has verified their account
+    security_data = user_doc.get("security", {})
+
     user = User(
         # **user_doc
         username=user_doc["username"],
         security=UserSecurityDetails(
-            hashed_password=user_doc["hashed_password"],
-            roles=user_doc["roles"],
+            hashed_password=security_data["hashed_password"],
+            roles=security_data["roles"],
             verified=True,
-            created_at=user_doc["created_at"],
+            created_at=security_data["created_at"],
         )
     )
 
     return {
         "status": "success",
-        "new_access_token": new_access_token,
-        "roles": user.roles,
         "username": user.username,
+        "new_access_token": new_access_token,
+        "roles": user.security.roles,
         "department": "",
-        "team": "",
+        "team": ""
     }
 
 

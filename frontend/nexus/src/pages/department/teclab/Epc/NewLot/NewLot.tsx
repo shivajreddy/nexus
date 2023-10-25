@@ -21,8 +21,15 @@ function NewLot() {
     // + Fetch the data
     useEffect(()=>{
         async function getData(){
-            const response = await axios.get('/teclab/epc')
-            console.log("response = ", response);
+            const all_communities = await axios.get('/eagle/communities')
+            const all_products = await axios.get('/eagle/core-models')
+            const all_elevations = await axios.get('/department/teclab/elevations')
+            const all_drafters = await axios.get('/department/teclab/drafters')
+            const all_engineers = await axios.get('/eagle/engineers')
+            const all_plat_engineers = await axios.get('/eagle/plat-engineers')
+            const all_counties = await axios.get('/eagle/counties')
+
+            console.log(all_communities, all_products, all_elevations, all_drafters, all_engineers, all_plat_engineers, all_counties);
         }
         getData();
     }, [])

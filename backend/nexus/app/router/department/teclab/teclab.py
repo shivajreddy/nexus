@@ -15,13 +15,24 @@ TECLAB endpoint
 router = APIRouter(prefix="/department/teclab")
 
 
-@router.get('/setup-teclab')
-async def setup_teclab():
-    pass
+@router.get('/')
+def test_teclab():
+    return {"hi"}
 
 
-@router.get('/setup-department-data')
-async def setup_departments():
-    department_data_coll.create_index('department_name', unique=True)
-    users_coll.create_index('username', unique=True)
-    return {"done setting up department data"}
+@router.get('/elevations', dependencies=[Depends(get_current_user_data)])
+def get_all_elevation_names():
+    teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    return teclab_doc["data"]["elevations"]["all_elevation_names"]
+
+
+@router.get('/drafters', dependencies=[Depends(get_current_user_data)])
+def get_all_drafters_names():
+    teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    all_teams = teclab_doc["data"]["teams"]
+    drafting_team = None
+    for team in all_teams:
+        if team["team_name"] == "Drafting":
+            drafting_team = team
+    return drafting_team["team_members"]
+

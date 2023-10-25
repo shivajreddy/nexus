@@ -17,8 +17,31 @@ def get_all_departments():
     return all_departments
 
 
-@router.get(path='/communities', dependencies=[Depends(get_current_user_data)])
+@router.get('/communities', dependencies=[Depends(get_current_user_data)])
 def get_all_communities():
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
-    all_communities = communities_doc["all_communities"]
-    return all_communities
+    return communities_doc["all_communities"]
+
+
+@router.get('/engineers', dependencies=[Depends(get_current_user_data)])
+def get_all_engineers():
+    engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    return engineers_doc["all_engineers"]
+
+
+@router.get('/plat-engineers', dependencies=[Depends(get_current_user_data)])
+def get_all_plat_engineers():
+    plat_engineers_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    return plat_engineers_doc["all_plat_engineer_names"]
+
+
+@router.get('/counties', dependencies=[Depends(get_current_user_data)])
+def get_all_counties():
+    counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    return counties_doc["all_counties"]
+
+
+@router.get('/core-models', dependencies=[Depends(get_current_user_data)])
+def get_all_core_models():
+    core_models_doc = eagle_data_coll.find_one({"table_name": "core_models"})
+    return core_models_doc["all_core_model_names"]

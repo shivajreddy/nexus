@@ -9,8 +9,8 @@ from app.router.users.users import router as users_router
 from app.router.security.auth import router as auth_router
 from app.router.eagle.eagle import router as eagle_router
 from app.router.public import router as public_router
-from app.router.department.teclab.epc import router as epc_router
-
+from app.router.department.teclab.teclab import router as teclab_router
+from app.router.department.teclab.epc import router as teclab_epc_router
 
 app = FastAPI(
     title="Nexus",
@@ -44,7 +44,8 @@ async def app_init():
     app.include_router(eagle_router)
     app.include_router(public_router)
     app.include_router(users_router)
-    app.include_router(epc_router)
+    app.include_router(teclab_router)
+    app.include_router(teclab_epc_router)
 
 
 @app.get("/api/healthchecker")
