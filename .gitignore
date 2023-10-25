@@ -1,12 +1,18 @@
-**/node_modules/
-
-**/venv/
-**/__pycache__/
+# Project ignore files and folders
 **/.idea/
 **/.DS_Store
 
+
+# Frontend ignore files and folders
+**/node_modules/
+
+
+# Backend ignore files and folders
+**/__pycache__/
+**/venv/
 **/.env
 **/.env.dev
 **/.env.test
 **/.env.prod
+**/setup_data/*
 
