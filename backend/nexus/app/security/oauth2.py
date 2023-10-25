@@ -17,7 +17,7 @@ def create_access_token(data: User) -> str:
 
     access_token_payload = AccessTokenData(
         username=data.username,
-        roles=data.roles,
+        roles=data.security.roles,
         created_at=datetime.utcnow().isoformat(),
         exp=expire.replace(tzinfo=timezone.utc),
     )
@@ -27,7 +27,6 @@ def create_access_token(data: User) -> str:
         settings.ACCESS_TOKEN_SECRET,
         algorithm=settings.JWT_ALGORITHM,
     )
-
     return encoded_jwt
 
 

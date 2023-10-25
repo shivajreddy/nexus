@@ -17,8 +17,8 @@ def get_all_departments_unprotected():
             status_code=status.HTTP_204_NO_CONTENT, detail="Document is empty"
         )
 
-    all_departments = departments_doc["data"]
-    all_department_names = []
-    for item in all_departments:
-        all_department_names.append(item["department_name"])
-    return all_department_names
+    all_departments_names = departments_doc["departments_names"]
+    # all_department_names = []
+    # for item in all_departments:
+    #     all_department_names.append(item["department_name"])
+    return all_departments_names

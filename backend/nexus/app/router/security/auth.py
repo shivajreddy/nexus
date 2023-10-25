@@ -9,9 +9,8 @@ from starlette.responses import JSONResponse
 from app.database.database import users_coll
 from app.email.setup import send_email_with_verification_key
 from app.security.oauth2 import create_access_token, create_refresh_token, verify_refresh_token, get_current_user_data
-from app.database.schemas.user import User, NewUserSchema
+from app.database.schemas.user import User, NewUserSchema, UserSecurityDetails
 from app.security.utils import hash_password, verify_password
-
 
 router = APIRouter(prefix="/auth")
 
@@ -29,13 +28,13 @@ async def create_user(payload: NewUserSchema):
     # create new User object
     new_user = User(
         username=payload.username,
-        hashed_password=hash_password(payload.plain_password),  # Hash the password
+        security=UserSecurityDetails(hashed_password=hash_password(payload.plain_password))
     )
-    # set roles, other properties
-    new_user.roles = [101]
-    new_user.created_at = datetime.utcnow().isoformat()
 
-    new_user.verified = False     # add verified status to false.
+    # set security details
+    new_user.security.roles = [101]
+    new_user.security.created_at = datetime.utcnow().isoformat()
+    new_user.security.verified = False  # add verified status to false.
 
     # + send verification email
     email_verification_key = secrets.token_urlsafe(16)  # create a secret key, to email them for verifying email
@@ -48,9 +47,14 @@ async def create_user(payload: NewUserSchema):
     inserted_id = users_coll.insert_one(new_user.model_dump()).inserted_id
     users_coll.update_one(
         {"_id": inserted_id},
-        {"$set": {**new_user.model_dump(),
-                  "email_verification_key": email_verification_key
-                  }})
+        {
+            "$set":
+                {
+                    **new_user.model_dump(),
+                    "email_verification_key": email_verification_key
+                }
+        }
+    )
 
     return {"result": "email_sent_successfully"}
 
@@ -68,7 +72,8 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
         )
 
     # + check if the user has verified their account
-    if not user_doc.get("verified"):
+    security_data = user_doc.get("security", {})
+    if not security_data.get("verified", {}):
         raise HTTPException(
             status_code=status.HTTP_412_PRECONDITION_FAILED,
             detail={
@@ -78,7 +83,7 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
             })
 
     # + evaluate password
-    if not verify_password(form_data.password, user_doc.get("hashed_password")):
+    if not verify_password(form_data.password, security_data.get("hashed_password")):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Wrong Password"
         )
@@ -87,23 +92,25 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
     user = User(
         # **user_doc
         username=user_doc["username"],
-        hashed_password=user_doc["hashed_password"],
-        roles=user_doc["roles"],
-        verified=True,
-        created_at=user_doc["created_at"],
+        security=UserSecurityDetails(
+            hashed_password=security_data["hashed_password"],
+            roles=security_data["roles"],
+            verified=True,
+            created_at=security_data["created_at"]
+        ),
     )
 
     access_token = create_access_token(data=user)
     refresh_token = create_refresh_token(data=user)
 
     # + update refresh_token in the document
-    users_coll.update_one(user_doc, {"$set": {"refresh_token": refresh_token}})
+    users_coll.update_one(user_doc, {"$set": {"security.refresh_token": refresh_token}})
 
     # + send user data and accessToken in response body
     response = JSONResponse(content={
         "status": "success",
         "access_token": access_token,
-        "roles": user.roles,
+        "roles": user.security.roles,
         "username": user.username,
         "department": "",
         "team": "",
@@ -139,10 +146,12 @@ def refresh(request: Request):
     user = User(
         # **user_doc
         username=user_doc["username"],
-        hashed_password=user_doc["hashed_password"],
-        roles=user_doc["roles"],
-        verified=True,
-        created_at=user_doc["created_at"],
+        security=UserSecurityDetails(
+            hashed_password=user_doc["hashed_password"],
+            roles=user_doc["roles"],
+            verified=True,
+            created_at=user_doc["created_at"],
+        )
     )
 
     return {
@@ -204,17 +213,17 @@ async def forgot_password_confirmation(secret_key: str):
 
 
 @router.get("/confirm-registration/{username}/{email_verification_key}")
-async def confirm_registration(request:Request, username: str, email_verification_key: str):
+async def confirm_registration(request: Request, username: str, email_verification_key: str):
     print("given username:", username)
     print("given key:", email_verification_key)
 
     #  + validate username and email_verification_key
     user_doc = users_coll.find_one({"username": username})
-    if not user_doc:        # user doesn't exist in DB
+    if not user_doc:  # user doesn't exist in DB
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="User email doesn't exist"
         )
-    if user_doc.get("verified"):      # check if the user has already verified their account
+    if user_doc.get("verified"):  # check if the user has already verified their account
         return JSONResponse(
             status_code=status.HTTP_304_NOT_MODIFIED,
             content={"result": "account already verified"},
@@ -224,7 +233,7 @@ async def confirm_registration(request:Request, username: str, email_verificatio
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Wrong verification key")
 
     # + Set the verified status to True and delete the email_verification_key
-    users_coll.update_one({"_id": user_doc["_id"]}, {"$set": {"verified": True},
+    users_coll.update_one({"_id": user_doc["_id"]}, {"$set": {"security.verified": True},
                                                      "$unset": {"email_verification_key": ""}})
 
     return {"result": "account successfully verified. Please login with your credentials"}
@@ -242,5 +251,3 @@ async def update_password(
 
     # save the hashed password to db
     new_hashed_password = hash_password(new_plain_password)
-
-

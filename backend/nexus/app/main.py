@@ -2,11 +2,13 @@ from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 from app.database.database import connect_mongodb, department_data_coll, users_coll, eagle_data_coll, projects_coll
-from app.database.setup_data.eagle_data import eagle_data_coll_initial_data
+from app.database.setup_data.eagle_data import eagle_data_coll_initial_data, users_coll_initial_data
+
 from app.router.security.auth import router as auth_router
 from app.router.company.eagle import router as eagle_router
 from app.router.public import router as public_router
 from app.router.department.teclab.epc import router as epc_router
+
 
 app = FastAPI(
     title="Nexus",
@@ -53,7 +55,7 @@ def setup_database():
     # + 'users' collection
     users_coll.drop()
     users_coll.create_index('username', unique=True)
-    # users_coll.insert_many()
+    users_coll.insert_many(users_coll_initial_data)
 
     # + 'eagle_data' collection
     eagle_data_coll.drop()
