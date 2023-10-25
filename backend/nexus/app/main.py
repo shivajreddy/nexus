@@ -2,10 +2,12 @@ from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 from app.database.database import connect_mongodb, department_data_coll, users_coll, eagle_data_coll, projects_coll
-from app.database.setup_data.eagle_data import eagle_data_coll_initial_data, users_coll_initial_data
+from app.database.setup_data.eagle_data import eagle_data_coll_initial_data, department_data_coll_initial_data, \
+    projects_coll_initial_data
 
+from app.router.users.users import router as users_router
 from app.router.security.auth import router as auth_router
-from app.router.company.eagle import router as eagle_router
+from app.router.eagle.eagle import router as eagle_router
 from app.router.public import router as public_router
 from app.router.department.teclab.epc import router as epc_router
 
@@ -41,6 +43,7 @@ async def app_init():
     app.include_router(auth_router)  # + include router's
     app.include_router(eagle_router)
     app.include_router(public_router)
+    app.include_router(users_router)
     app.include_router(epc_router)
 
 
@@ -55,7 +58,7 @@ def setup_database():
     # + 'users' collection
     users_coll.drop()
     users_coll.create_index('username', unique=True)
-    users_coll.insert_many(users_coll_initial_data)
+    # users_coll.insert_many(users_coll_initial_data)
 
     # + 'eagle_data' collection
     eagle_data_coll.drop()
@@ -65,11 +68,10 @@ def setup_database():
     # + 'department_data' collection
     department_data_coll.drop()
     department_data_coll.create_index('department_name', unique=True)
-    # department_data_coll.insert_many()    # + 'dept_teclab' department
-    # department_data_coll.insert_many()    # + 'dept_sales'
+    department_data_coll.insert_many(department_data_coll_initial_data)
 
     # + 'projects' collection
     projects_coll.drop()
-    # projects_coll.insert_many()
+    projects_coll.insert_many(projects_coll_initial_data)
 
     return {"All database collections are setup successfully"}

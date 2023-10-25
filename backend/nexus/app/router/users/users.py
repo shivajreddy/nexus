@@ -2,25 +2,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.database.database import eagle_data_coll, users_coll
+from app.database.database import users_coll
 from app.security.oauth2 import get_current_user_data
 from app.database.schemas.user import User
 
 """
-API endpoint related to company data
+API endpoint related to users data
 """
 
-router = APIRouter(prefix="/eagle")
+router = APIRouter(prefix="/users")
 
 
-@router.get('/departments')
-def get_all_departments(current_user_data: Annotated[User, Depends(get_current_user_data)]):
-    departments_doc = eagle_data_coll.find_one({"table_name": "departments"})
-    all_departments = departments_doc["data"]
-    return all_departments
-
-
-@router.get("/users")
+@router.get("/all")
 async def get_all_users(
         current_user_data: Annotated[User, Depends(get_current_user_data)]
 ):

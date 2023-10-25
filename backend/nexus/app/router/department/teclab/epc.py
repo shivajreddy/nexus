@@ -40,7 +40,7 @@ sample_dept_specific_sales = DepartmentSpecificSales(
 sample_project = Project(
     project_uid="PV-05-1",
 
-    # company-wide-data
+    # eagle-wide-data
     contract_date=datetime.datetime.utcnow().isoformat(),
 
     # department-specific-data
@@ -49,6 +49,7 @@ sample_project = Project(
 )
 
 
+# this would look at the projects documents in the projects collection
 @router.get('/get')
 def get_collection():
     result = []
@@ -56,12 +57,3 @@ def get_collection():
         data = {k: v for (k, v) in doc.items() if k != "_id"}
         result.append(data)
     return {"all": result}
-
-
-
-@router.get('/setup')
-def set_up_projects_collection():
-    department_data_coll.insert_one()
-    # projects_coll.insert_one(sample_project.model_dump())
-
-    return {"done"}

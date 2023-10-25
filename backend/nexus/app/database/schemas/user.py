@@ -13,6 +13,8 @@ class UserSecurityDetails(BaseModel):
 class User(BaseModel):
     username: str
     security: 'UserSecurityDetails'
+    # department: str = ""
+    # teams: [str] = []
 
 
 class NewUserSchema(BaseModel):

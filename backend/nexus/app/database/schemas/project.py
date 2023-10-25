@@ -12,7 +12,7 @@ Each of the document is the giant data structure that will hold every data point
 class Project(BaseModel):
     project_uid: str
 
-    # company-wide-data
+    # eagle-wide-data
     contract_date: str
 
     # department-specific-data
