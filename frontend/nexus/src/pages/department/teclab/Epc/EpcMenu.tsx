@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/popover";
 import {FaInfoCircle} from "react-icons/fa";
 import {MdOutlineStorage} from "react-icons/md";
+import {useNavigate} from "react-router-dom";
 
 
 function EpcMenu() {
+    const navigate = useNavigate();
     return (
         <div style={{position: "absolute", right: "2em"}}>
             {/*<div style={{}}>*/}
@@ -28,7 +30,13 @@ function EpcMenu() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent className="flex flex-col justify-center items-center">
-                    <SheetHeader></SheetHeader>
+                    <SheetHeader>Menu</SheetHeader>
+                    <Separator/>
+
+                    <div>
+                        <Button onClick={()=>navigate('/epc/edit-newlot-form-data')}>Edit Form Data</Button>
+                    </div>
+
                     <p>Download current view</p>
                     <div className="flex justify-center items-center">
                         <Button className="w-[10rem]">Download CSV</Button>

@@ -12,6 +12,7 @@ import React, {useEffect, useState} from "react";
 import "@assets/pages/Epc/NewLot.css"
 import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
+import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
 
 
 function NewLot() {
@@ -119,6 +120,7 @@ function NewLot() {
                                 <p className="pr-2"><TiArrowBack/></p>
                                 Back to EPC
                             </Button>
+                            <EpcMenu/>
                         </div>
                     </div>
                 </div>

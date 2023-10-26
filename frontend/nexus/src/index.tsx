@@ -30,6 +30,7 @@ import TecLabHome from "./pages/department/teclab/TecLabHome";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
 import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
 import NewLot from "@pages/department/teclab/Epc/NewLot/NewLot.tsx";
+import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -51,6 +52,7 @@ const router = createBrowserRouter(
                     <Route path="epc">
                         <Route index element={<Epc/>}/>
                         <Route path="lot/new" element={<NewLot/>}/>
+                        <Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>
                     </Route>
 
                     <Route path="pipeline" element={<Pipeline/>}/>

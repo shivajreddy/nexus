@@ -23,12 +23,12 @@ interface IProps {
 
 const FieldDropDown = (props: IProps) => {
 
-    function handleChange(e: string){
+    function handleChange(e: string) {
         console.log("e = ", e);
         props.setNewLotData((prevLotData: INewLotData) => {
             return {
                 ...prevLotData,
-                [props.pieceOfStateName] : e
+                [props.pieceOfStateName]: e
             }
         })
     }
@@ -44,8 +44,8 @@ const FieldDropDown = (props: IProps) => {
                     <SelectTrigger>
                         <SelectValue placeholder="Choose a value"/>
                     </SelectTrigger>
-                    <SelectContent >
-                        <SelectGroup>
+                    <SelectContent>
+                        <SelectGroup className="max-h-40 overflow-y-scroll">
                             {props.data.map(val => <SelectItem key={val} value={val}>{val}</SelectItem>)}
                         </SelectGroup>
                     </SelectContent>
