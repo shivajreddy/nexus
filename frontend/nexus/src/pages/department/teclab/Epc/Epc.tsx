@@ -22,7 +22,7 @@ const defaultColumnSettings = {
     filter: true,
     resizable: false,
     width: 120,
-    searchable: true,
+    // searchable: true,
     // wrapText: true,
     // wrapText: false
     wrapHeaderText: true,

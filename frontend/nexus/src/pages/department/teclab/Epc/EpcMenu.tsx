@@ -24,10 +24,10 @@ function EpcMenu() {
 
             <Sheet>
                 <SheetTrigger>
-                    <Button variant="outline">
+                    <div className="flex items-center border border-b1 p-1.5 rounded-md">
                         <p className="pr-2"><MdOutlineStorage/></p>
                         Menu
-                    </Button>
+                    </div>
                 </SheetTrigger>
                 <SheetContent className="flex flex-col justify-center items-center">
                     <SheetHeader>Menu</SheetHeader>
@@ -43,15 +43,13 @@ function EpcMenu() {
                         <Popover>
                             <PopoverTrigger className="pl-2">
                                 <div>
-                                    {" "}
-                                    <FaInfoCircle size={"1.2rem"}/>{" "}
+                                    <FaInfoCircle size={"1.2rem"}/>
                                 </div>
                             </PopoverTrigger>
                             <PopoverContent>
                                 <p>
-                                    {" "}
                                     To convert the CSV file into Excel file, Open the CSV file in
-                                    Excel.{" "}
+                                    Excel.
                                 </p>
                                 <br/>
                                 <p className="text-sm">
@@ -73,8 +71,7 @@ function EpcMenu() {
                         <Popover>
                             <PopoverTrigger className="pl-2">
                                 <div>
-                                    {" "}
-                                    <FaInfoCircle size={"1.2rem"}/>{" "}
+                                    <FaInfoCircle size={"1.2rem"}/>
                                 </div>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -90,8 +87,7 @@ function EpcMenu() {
                         <Popover>
                             <PopoverTrigger className="pl-2">
                                 <div>
-                                    {" "}
-                                    <FaInfoCircle size={"1.2rem"}/>{" "}
+                                    <FaInfoCircle size={"1.2rem"}/>
                                 </div>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -106,8 +102,7 @@ function EpcMenu() {
                         <Popover>
                             <PopoverTrigger className="pl-2">
                                 <div>
-                                    {" "}
-                                    <FaInfoCircle size={"1.2rem"}/>{" "}
+                                    <FaInfoCircle size={"1.2rem"}/>
                                 </div>
                             </PopoverTrigger>
                             <PopoverContent>
