@@ -44,7 +44,7 @@ const FieldDropDown = (props: IProps) => {
                     <SelectTrigger>
                         <SelectValue placeholder="Choose a value"/>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent >
                         <SelectGroup>
                             {props.data.map(val => <SelectItem key={val} value={val}>{val}</SelectItem>)}
                         </SelectGroup>

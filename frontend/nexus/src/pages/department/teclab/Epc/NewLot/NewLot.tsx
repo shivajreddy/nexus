@@ -8,7 +8,7 @@ import FieldDate from "@pages/department/teclab/Epc/NewLot/FieldDate.tsx";
 import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
 import FieldDropDown from "@pages/department/teclab/Epc/NewLot/FieldDropDown.tsx";
 import {Textarea} from "@components/ui/textarea.tsx";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import "@assets/pages/Epc/NewLot.css"
 import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
@@ -18,20 +18,37 @@ function NewLot() {
     const navigate = useNavigate();
     const axios = useAxiosPrivate()
 
-    // + Fetch the data
-    useEffect(()=>{
-        async function getData(){
-            const all_communities = await axios.get('/eagle/communities')
-            const all_products = await axios.get('/eagle/core-models')
-            const all_elevations = await axios.get('/department/teclab/elevations')
-            const all_drafters = await axios.get('/department/teclab/drafters')
-            const all_engineers = await axios.get('/eagle/engineers')
-            const all_plat_engineers = await axios.get('/eagle/plat-engineers')
-            const all_counties = await axios.get('/eagle/counties')
+    const [data, setData] = useState({
+        "all_communities": [],
+        "all_products": [],
+        "all_elevations": [],
+        "all_drafters": [],
+        "all_engineers": [],
+        "all_plat_engineers": [],
+        "all_counties": []
+    })
 
-            console.log(all_communities, all_products, all_elevations, all_drafters, all_engineers, all_plat_engineers, all_counties);
+    // + Fetch the data
+    useEffect(() => {
+        async function getData() {
+            const communitiesResponse = await axios.get('/eagle/communities');
+            const productsResponse = await axios.get('/eagle/core-models');
+            const elevationsResponse = await axios.get('/department/teclab/elevations');
+            const draftersResponse = await axios.get('/department/teclab/drafters');
+            const engineersResponse = await axios.get('/eagle/engineers');
+            const platEngineersResponse = await axios.get('/eagle/plat-engineers');
+            const countiesResponse = await axios.get('/eagle/counties');
+            setData({
+                all_communities: communitiesResponse.data,
+                all_products: productsResponse.data,
+                all_elevations: elevationsResponse.data,
+                all_drafters: draftersResponse.data,
+                all_engineers: engineersResponse.data,
+                all_plat_engineers: platEngineersResponse.data,
+                all_counties: countiesResponse.data
+            })
         }
-        getData();
+        getData().then(()=>{});
     }, [])
 
     // New Lot Form State
@@ -79,7 +96,7 @@ function NewLot() {
     });
 
     // + new form submit
-    function handleSubmit(e) {
+    function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         console.log("😄 NewLotData=", newLotData);
     }
@@ -136,7 +153,7 @@ function NewLot() {
                             <FieldDate id="1_contract_date" name="Contract Date"/>
                             <FieldDropDown id="1_community"
                                            name={"Community"}
-                                           data={["shiva", "reddy"]}
+                                           data={data.all_communities}
                                            pieceOfStateName="community_name"
                                            setNewLotData={setNewLotData}
                             />
@@ -154,13 +171,13 @@ function NewLot() {
                             />
                             <FieldDropDown id="1_product"
                                            name={"Product"}
-                                           data={["shiva", "reddy"]}
+                                           data={data.all_communities}
                                            pieceOfStateName="product_name"
                                            setNewLotData={setNewLotData}
                             />
                             <FieldDropDown id="1_elevation"
                                            name={"Elevation"}
-                                           data={["shiva", "reddy"]}
+                                           data={data.all_elevations}
                                            pieceOfStateName="elevation_name"
                                            setNewLotData={setNewLotData}
                             />
@@ -176,7 +193,7 @@ function NewLot() {
                         <CardContent>
                             <FieldDropDown id="2_drafter"
                                            name={"Drafter"}
-                                           data={["shiva", "reddy"]}
+                                           data={data.all_drafters}
                                            pieceOfStateName="drafting_drafter"
                                            setNewLotData={setNewLotData}
                             />
@@ -195,7 +212,7 @@ function NewLot() {
                             <CardContent>
                                 <FieldDropDown id="3_engineer"
                                                name={"Engineer"}
-                                               data={["shiva", "reddy"]}
+                                               data={data.all_engineers}
                                                pieceOfStateName="engineering_engineer"
                                                setNewLotData={setNewLotData}
                                 />
@@ -213,7 +230,7 @@ function NewLot() {
                             <CardContent>
                                 <FieldDropDown id="4_plat_engineer"
                                                name={"Plat Engineer"}
-                                               data={["shiva", "reddy"]}
+                                               data={data.all_plat_engineers}
                                                pieceOfStateName="plat_engineer"
                                                setNewLotData={setNewLotData}
                                 />
@@ -232,7 +249,7 @@ function NewLot() {
                         <CardContent>
                             <FieldDropDown id="5_county_name"
                                            name={"County Name"}
-                                           data={["shiva", "reddy"]}
+                                           data={data.all_counties}
                                            pieceOfStateName="permitting_county_name"
                                            setNewLotData={setNewLotData}
                             />
