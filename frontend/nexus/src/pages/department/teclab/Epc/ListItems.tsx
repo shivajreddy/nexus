@@ -1,10 +1,11 @@
-import { useState } from "react";
+import {useState} from "react";
 import ListItem from "./ListItem.tsx";
 import NewListItem from "./NewListItem.tsx";
 import {v4 as uuid} from 'uuid';
+import {Command, CommandEmpty, CommandInput, CommandList} from "@components/ui/command.tsx";
 
 
-interface IItem{
+interface IItem {
     id: string;
     data: string;
 }
@@ -12,43 +13,44 @@ interface IItem{
 
 function ListItems() {
     const [items, setItems] = useState([
-        { id: uuid(), data: "task 1" },
-        { id: uuid(), data: "task 2" }
+        {id: uuid(), data: "task 1"},
+        {id: uuid(), data: "task 2"}
     ]);
 
-    const create = (newTodo: IItem) => {
-        console.log(newTodo);
-        setItems([...items, newTodo]);
+    const create = (newItem: IItem) => {
+        console.log(newItem);
+        setItems([...items, newItem]);
     };
 
     const remove = (id: string) => {
-        setItems(items.filter(todo => todo.id !== id));
+        setItems(items.filter(item => item.id !== id));
     };
 
     const update = (id: string, updateItem: string) => {
-        const updatedTodos = items.map(todo => {
-            if (todo.id === id) {
-                return { ...todo, task: updateItem };
+        const updatedItems = items.map(item => {
+            if (item.id === id) {
+                return {...item, task: updateItem};
             }
-            return todo;
+            return item;
         });
-        setItems(updatedTodos);
+        setItems(updatedItems);
     };
 
-    const todosList = items.map(todo => (
-        <ListItem
-            key={todo.id}
-            item={todo}
-            update={update}
-            remove={remove}
-        />
+    const allItems = items.map(item => (
+            <ListItem key={item.id} item={item} remove={remove} update={update}/>
     ));
 
     return (
         <div>
             <p className="text-xl">ITEM LIST OF: {}</p>
-            <div>{todosList}</div>
-            <NewListItem createTodo={create} />
+            <Command className="rounded-lg border shadow-md h-140">
+                <CommandInput placeholder="Search..."/>
+                <CommandList>
+                    <CommandEmpty>No results found.</CommandEmpty>
+                    {allItems}
+                </CommandList>
+            </Command>
+            <NewListItem createItem={create}/>
         </div>
     );
 }

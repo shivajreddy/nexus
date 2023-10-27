@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import {HiPencilAlt} from "react-icons/hi";
 import {MdDelete} from "react-icons/md";
+import {CommandItem} from "@components/ui/command.tsx";
+import {Button} from "@components/ui/button.tsx";
 
 
 interface IListItem {
@@ -11,49 +13,56 @@ interface IListItem {
 
 function ListItem({item, remove, update}: IListItem) {
     const [isEditing, setIsEditing] = useState(false);
-    const [data, setData] = useState(item.data);
+    const [value, setValue] = useState(item.data);
+    console.log("logging: ", value)
 
-    const handleClick = (evt: any) => {
-        remove(evt.target.id);
-    };
     const toggleFrom = () => {
         setIsEditing(!isEditing);
     };
     const handleUpdate = (evt: React.FormEvent<HTMLFormElement>) => {
         evt.preventDefault();
-        update(item.id, data);
+        update(item.id, value);
         toggleFrom();
     };
     const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-        setData(evt.target.value);
+        setValue(evt.target.value);
     };
 
     let result;
     if (isEditing) {
         result = (
-            <div>
-                <form onSubmit={handleUpdate}>
-                    <input onChange={handleChange} value={data} type="text"/>
-                    <button>Save</button>
-                </form>
-            </div>
+            <form onSubmit={handleUpdate}>
+                <input onChange={handleChange} value={value} type="text"/>
+                <button>Save</button>
+            </form>
         );
     } else {
         result = (
-            <div className="flex items-center">
-                <p>{data}</p>
-                <div >
-                    <button onClick={toggleFrom}>
-                        <HiPencilAlt/>
-                    </button>
-                    <button onClick={handleClick}>
-                        <MdDelete/>
-                    </button>
-                </div>
-            </div>
+            <CommandItem className="flex items-center rounded-lg border border-b0 m-2 p-4 max-w-lg">
+                <Button variant="outline" onClick={toggleFrom}>
+                    <HiPencilAlt/>
+                </Button>
+                <span>{value}</span>
+                <Button variant="outline" onClick={() => remove(item.id)}>
+                    <MdDelete/>
+                </Button>
+            </CommandItem>
         );
     }
     return result;
 }
 
 export default ListItem;
+
+
+/*
+<span className="text-xl">{value}</span>
+<div >
+    <button onClick={toggleFrom}>
+        <HiPencilAlt/>
+    </button>
+    <button onClick={()=>{remove(item.id)}}>
+        <MdDelete/>
+    </button>
+</div>
+*/
