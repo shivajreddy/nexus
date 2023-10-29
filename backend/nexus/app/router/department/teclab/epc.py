@@ -14,13 +14,7 @@ TECLAB/EPC endpoint
 router = APIRouter(prefix="/department/teclab/epc")
 
 
-@router.get('/')
-async def test_epc(
-        current_user_data: Annotated[User, Depends(get_current_user_data)]
-):
-    return {"testing epc route ok"}
-
-
+# TODO
 # this would look at the projects documents in the projects collection
 @router.get('/live')
 def get_collection():
@@ -31,8 +25,6 @@ def get_collection():
     return {"all": result}
 
 
-
-@router.get('/elevations', dependencies=[Depends(get_current_user_data)])
-def get_all_core_models():
-    core_models_doc = eagle_data_coll.find_one({"table_name": "core_models"})
-    return core_models_doc["all_core_model_names"]
+@router.patch('/')
+def update_lot(lot_code: str):
+    return {"successfully updated"}
