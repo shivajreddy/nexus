@@ -8,6 +8,14 @@ Key -> 'department_name'
 
 
 # :: TEC-LAB ::
+class Product(BaseModel):
+    product_name: str
+
+
+class UpdateProduct(BaseModel):
+    target_product_name: str
+    new_product_name: str
+
 
 class CoreModel(BaseModel):
     core_model_name: str
