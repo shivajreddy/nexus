@@ -7,19 +7,24 @@ Key -> 'department_name'
 """
 
 
-class DepartmentSpecificData(BaseModel):
-    department_name: str
-    department_data: any
-
-
 # :: TEC-LAB ::
 
-class A(BaseModel):
-    pass
+class CoreModel(BaseModel):
+    core_model_name: str
 
 
-class CommunityName(BaseModel):
-    community_name: str
+class UpdateCoreModel(BaseModel):
+    target_core_model_name: str
+    new_core_model_name: str
+
+
+class Elevations(BaseModel):
+    elevation_name: str
+
+
+class UpdateElevation(BaseModel):
+    target_elevation_name: str
+    new_elevation_name: str
 
 
 # :: SALES ::
