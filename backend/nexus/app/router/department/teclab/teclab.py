@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.database.database import projects_coll, department_data_coll, users_coll, eagle_data_coll
-from app.database.schemas.department_data import CoreModel, UpdateCoreModel, Product, UpdateProduct
+from app.database.schemas.department_data import CoreModel, UpdateCoreModel, Product, UpdateProduct, Elevation, \
+    UpdateElevation
 from app.database.schemas.project import Project, DepartmentSpecificTecLab, DepartmentSpecificSales
 from app.security.oauth2 import get_current_user_data, HasRequiredRoles
 from app.database.schemas.user import User
@@ -86,7 +87,6 @@ def delete_product(product: Product):
     return {"result": f"Product '{product.product_name}' deleted successfully"}
 
 
-
 # :: core-models ::
 @router.get('/core-models', dependencies=[Depends(get_current_user_data)])
 def get_all_core_models():
@@ -97,84 +97,74 @@ def get_all_core_models():
     return all_core_models_names
 
 
-# add a new core-model
-@router.post("/core-models", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
-def add_new_core_model(new_core_model: CoreModel):
-    teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
-
-    core_models = teclab_doc["data"]["core_models"]
-    all_core_models_names = core_models["all_core_models_names"]
-
-    new_core_model_name = new_core_model.core_model_name
-    if new_core_model_name in all_core_models_names:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=f"{new_core_model_name} already exists"
-        )
-
-    # Update the document by pushing  new counties name into the array
-    # ? TODO -
-    department_data_coll.update_one({"department_name": "TEC Lab"},
-                                    {}
-                                    )
-    eagle_data_coll.update_one(
-        {"table_name": "counties"},
-        {"$push": {"all_core_models_names": new_core_model_name}}
-    )
-    core_models_doc = eagle_data_coll.find_one({"table_name": "counties"})
-    all_core_models_names = core_models_doc["all_core_models_names"]
-    return {"added": all_core_models_names}
-
-
-# update a county
-@router.patch("/counties", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
-def delete_county(target_county: UpdateCoreModel):
-    counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
-    all_counties_names = counties_doc["all_counties_names"]
-
-    target_county_name = target_county.target_county_name
-    if target_county_name not in all_counties_names:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=f"'{target_county_name}' doesn't exists"
-        )
-        # Find the index of the target county name in the array
-    index_to_update = all_counties_names.index(target_county_name)
-
-    # Update the county name at the specified index
-    eagle_data_coll.update_one(
-        {"table_name": "counties"},
-        {"$set": {f"all_counties_names.{index_to_update}": target_county.new_county_name}},
-    )
-
-    counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
-    all_counties_names = counties_doc["all_counties_names"]
-    return {"Updated. now": all_counties_names}
-
-
-# delete a county
-@router.delete("/counties", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
-def delete_county(target_county: CoreModel):
-    counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
-    all_counties_names = counties_doc["all_counties_names"]
-
-    target_county_name = target_county.county_name
-    if target_county_name not in all_counties_names:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=f"{target_county_name} doesn't exists"
-        )
-    eagle_data_coll.update_one(
-        {"table_name": "counties"},
-        {"$pull": {"all_counties_names": target_county_name}}
-    )
-    counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
-    all_counties_names = counties_doc["all_counties_names"]
-    return {"deleted. now": all_counties_names}
-
-
 # :: elevations ::
 @router.get('/elevations', dependencies=[Depends(get_current_user_data)])
 def get_all_elevation_names():
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
     return teclab_doc["data"]["elevations"]["all_elevation_names"]
+
+
+@router.post('/elevations', dependencies=[Depends(get_current_user_data)])
+def add_new_elevation(new_elevation: Elevation):
+    teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+
+    elevations = teclab_doc["data"]["elevations"]
+    all_elevations_names = elevations["all_elevations_names"]
+
+    if new_elevation.elevation_name in all_elevations_names:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=f"{new_elevation.elevation_name} already exists"
+        )
+
+    # Step 2: Update the MongoDB document
+    department_data_coll.update_one(
+        {"department_name": "TEC Lab"},
+        {"$push": {"data.elevations.all_elevations_names": new_elevation.elevation_name}}
+    )
+    return {"result": f"Elevation '{new_elevation.elevation_name}' added successfully"}
+
+
+@router.patch('/elevations', dependencies=[Depends(get_current_user_data)])
+def update_elevation(elevation: UpdateElevation):
+    teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+
+    elevations = teclab_doc["data"]["elevations"]
+    all_elevations_names = elevations["all_elevations_names"]
+
+    if elevation.target_elevation_name not in all_elevations_names:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=f"{elevation.target_elevation_name} doesn't exist"
+        )
+
+    # find the index of the target
+    index_to_update = all_elevations_names.index(elevation.target_elevation_name)
+
+    department_data_coll.update_one(
+        {"department_name": "TEC Lab"},
+        {"$set": {f"data.elevations.all_elevations_names.{index_to_update}": elevation.target_elevation_name}}
+    )
+
+    return {"result": f"Elevation '{elevation.target_elevation_name}' updated successfully"}
+
+
+@router.delete('/elevations', dependencies=[Depends(get_current_user_data)])
+def delete_elevation(elevation: Elevation):
+    teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+
+    elevations = teclab_doc["data"]["elevations"]
+    all_elevations_names = elevations["all_elevations_names"]
+
+    if elevation.target_elevation_name not in all_elevations_names:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=f"{elevation.target_elevation_name} doesn't exist"
+        )
+
+    # Step 2: Update the MongoDB document
+    department_data_coll.update_one(
+        {"department_name": "TEC Lab"},
+        {"$pull": {"data.elevations.all_elevations_names": elevation.elevation_name}}
+    )
+    return {"result": f"Elevation '{elevation.elevation_name}' deleted successfully"}
 
 
 # :: drafters ::

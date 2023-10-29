@@ -26,7 +26,7 @@ class UpdateCoreModel(BaseModel):
     new_core_model_name: str
 
 
-class Elevations(BaseModel):
+class Elevation(BaseModel):
     elevation_name: str
 
 
