@@ -1,7 +1,9 @@
+from typing import List, Annotated
+
 from fastapi import APIRouter, Depends
 
 from app.database.database import eagle_data_coll
-from app.security.oauth2 import get_current_user_data
+from app.security.oauth2 import get_current_user_data, HasRequiredRoles
 
 """
 API endpoint related to eagle data
@@ -10,6 +12,7 @@ API endpoint related to eagle data
 router = APIRouter(prefix="/eagle")
 
 
+# :: /departments
 @router.get(path='/departments', dependencies=[Depends(get_current_user_data)])
 def get_all_departments():
     departments_doc = eagle_data_coll.find_one({"table_name": "departments"})
@@ -17,10 +20,19 @@ def get_all_departments():
     return all_departments
 
 
+# :: /communities
 @router.get('/communities', dependencies=[Depends(get_current_user_data)])
 def get_all_communities():
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
     return communities_doc["all_communities"]
+
+
+@router.post("/communities", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
+def add_new_community():
+    communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+
+    # verify new entry is unique
+    return {"added for now"}
 
 
 @router.get('/engineers', dependencies=[Depends(get_current_user_data)])

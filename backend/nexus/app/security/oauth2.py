@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import List
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -116,5 +117,19 @@ def verify_refresh_token(given_token) -> RefreshTokenData:
     return refresh_token_data
 
 
+# Dependency to check if user is logged in(has auth token) and token is valid
 def get_current_user_data(token: str = Depends(oauth2_scheme)) -> AccessTokenData:
     return verify_access_token(token)
+
+
+# Callable class to check if the user has the required roles
+class HasRequiredRoles:
+    def __init__(self, required_roles: List[int] = []):
+        self.required_roles = required_roles
+
+    def __call__(self, user_data: AccessTokenData = Depends(get_current_user_data)):
+        current_user_roles = user_data.roles
+        for required_role in self.required_roles:
+            if required_role not in current_user_roles:
+                raise HTTPException(status_code=403, detail="You don't have access to this resource")
+        return True
