@@ -19,8 +19,6 @@ import UiErrorPage from "@/pages/common/UiErrorPage";
 import LoginPage from "@/pages/auth/LoginPage";
 import AuthRequired from "@/features/auth/AuthRequired";
 import PublicHomePage from "@/pages/public/PublicHomePage";
-import TecLabPageTest1 from "./pages/department/teclab/TecLabPageTest1";
-import TecLabPageTest2 from "./pages/department/teclab/TecLabPageTest2";
 import SalesPageTest1 from "./pages/department/sales/SalesPageTest1";
 import SalesPageTest2 from "./pages/department/sales/SalesPageTest2";
 import AuthTecLab from "./pages/department/teclab/AuthTecLab";
@@ -63,8 +61,6 @@ const router = createBrowserRouter(
                     {/* Testing role specific page */}
                     <Route path="/teclab" element={<AuthTecLab/>}>
                         <Route index element={<TecLabHome/>}/> {/* This is the homepage for /teclab */}
-                        <Route path="page1" element={<TecLabPageTest1/>}/>
-                        <Route path="page2" element={<TecLabPageTest2/>}/>
                     </Route>
 
                     <Route path="sales" element={<AuthSales/>}>

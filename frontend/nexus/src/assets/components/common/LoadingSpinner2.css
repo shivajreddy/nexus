@@ -1,0 +1,57 @@
+.loadingspinner2-container {
+
+    --spinner-hue: 210;
+    --spinner-size: 100px;
+    --spinner-border: 10px;
+    --spinner-speed: 1s;
+    --spinner-blur: var(--spinner-border);
+
+
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: hsl(var(--spinner-hue) 50% 8%);
+
+}
+
+.loader {
+    width: var(--spinner-border);
+    aspect-ratio: 1;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    --y: calc((var(--spinner-size) * -0.5) + (var(--spinner-border) * 0.5));
+    transform:
+            rotate(0deg)
+            translateY(var(--y));
+    animation: spin var(--spinner-speed) infinite linear;
+}
+
+.loader::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--spinner-border) * -0.5);
+    border-radius: 50%;
+    background: white;
+    filter: blur(var(--spinner-blur));
+    z-index: -1;
+}
+
+.loader::after {
+    content: "";
+    width: var(--spinner-size);
+    aspect-ratio: 1;
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    translate: -50% 0;
+    background: conic-gradient(white, hsl(var(--spinner-hue), 100%, 70%), hsl(var(--spinner-hue), 100%, 10%), transparent 65%);
+    border-radius: 50%;
+    mask: radial-gradient(
+            transparent calc(((var(--spinner-size) * 0.5) - var(--spinner-border)) - 1px),
+            white calc((var(--spinner-size) * 0.5) - var(--spinner-border)));
+}
+
+@keyframes spin {
+    to { transform: rotate(-360deg) translateY(var(--y)); }
+}

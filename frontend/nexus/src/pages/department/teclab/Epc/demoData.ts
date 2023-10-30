@@ -55,7 +55,6 @@ const columnDefinitions = [
     {
         headerName: 'Notes', field: 'notes'
     },
-
 ];
 
 const sampleRowData = {

@@ -1,4 +1,5 @@
 import csv
+import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -103,8 +104,9 @@ def migrate_epc():
     # Print the list of dictionaries
     result = []
     for item in data_list:
-        temp_project_id = item.community + "-" + item.section_number + "-" + item.lot_number + "-" + str(
-            item.contract_date)
+        temp_project_id = str(uuid.uuid4())
+        # temp_project_id = item.community + "-" + item.section_number + "-" + item.lot_number + "-" + str(
+        #     item.contract_date)
         epc_lot = NewEPCLot(project_uid=temp_project_id, epc_data=item)
         result.append(epc_lot)
 
@@ -119,7 +121,10 @@ def get_all_lots():
     result = []
     for doc in list(projects_coll.find()):
         project = {k: v for (k, v) in doc.items() if k != "_id"}
-        result.append(project["epc_data"])
+        final_object = {"project_uid": doc["project_uid"]}
+        final_object.update(project["epc_data"])
+        result.append(final_object)
+        # result.append(project["epc_data"])
     return result
 
 

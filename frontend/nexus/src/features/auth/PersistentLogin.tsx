@@ -3,7 +3,7 @@ import useRefreshToken from "@hooks/useRefreshToken.ts";
 import {useEffect, useState} from "react";
 import {useAppSelector} from "@redux/hooks.ts";
 import {selectAuthState} from "@/features/auth/authSlice.ts";
-import LoadingSpinner from "@components/common/LoadingSpinner.tsx";
+import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 
 
 function PersistentLogin() {
@@ -43,7 +43,9 @@ function PersistentLogin() {
         <>
             {isLoading ?
                 <div className="flex flex-col justify-center items-center min-w-100 min-h-[100vh] border">
-                    <LoadingSpinner width={50}/>
+                    {/*<LoadingSpinner width={50}/>*/}
+                    {/*<LoadingProgress/>*/}
+                    <LoadingSpinner2/>
                 </div>
                 :
                 <Outlet/>
