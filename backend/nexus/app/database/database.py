@@ -15,7 +15,6 @@ users_coll = db["users"]
 eagle_data_coll = db["eagle-data"]
 department_data_coll = db["department_data"]
 projects_coll = db["projects"]
-epc_coll = db["epc"]
 
 
 def connect_mongodb():

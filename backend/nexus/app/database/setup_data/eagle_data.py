@@ -253,6 +253,38 @@ Any thing that has to do with a house, then that data should be inside this.
 projects_coll_initial_data = [
     {
         "project_uid": "RB-05-06",
+        "epc_data": {
+            "finished": "false",
+            "community": "",
+            "section_number": "",
+            "lot_number": "",
+            "contract_date": "",
+            "contract_type": "",
+            "lot_status_finished": "false",
+            "lot_status_released": "false",
+            "product_name": "",
+            "elevation_name": "",
+
+            "drafting_drafter": "",
+            "drafting_assigned_on": "",
+            "drafting_finished": "",
+
+            "engineering_engineer": "",
+            "engineering_sent": "",
+            "engineering_received": "",
+
+            "plat_engineer": "",
+            "plat_sent": "",
+            "plat_received": "",
+
+            "permitting_county_name": "",
+            "permitting_submitted": "",
+            "permitting_received": "",
+
+            "bbp_posted": "",
+
+            "notes": ""
+        },
         "contract_type": "Contract",
         "contract_date": "",
         "drafting": {
@@ -273,8 +305,6 @@ description: Teclab's epc
 """
 epc_coll_initial_data = [
     {
-
+        "community": ""
     }
 ]
-
-
