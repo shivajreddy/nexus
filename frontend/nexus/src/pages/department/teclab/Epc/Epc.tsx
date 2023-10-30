@@ -22,7 +22,6 @@ import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
 import {Skeleton} from "@components/ui/skeleton.tsx";
-import {LoadingProgress} from "@components/common/LoadingProgress.tsx";
 
 
 const defaultColumnSettings = {
@@ -128,7 +127,7 @@ function Epc() {
 
     // TODO: specify the type of the Lot object. which should be parallel to EPCLot from python
     const [fetchLotDataStatus, setFetchLotDataStatus] = useState<'loading' | 'failed' | 'success'>('loading');
-    const[fetchErrorDetails, setFetchErrorDetails] = useState('');
+    const [fetchErrorDetails, setFetchErrorDetails] = useState('');
     const [lotData, setLotData] = useState([]);
 
     const [columnDefinitions, setColumnDefinitions] = useState(columnDefinitionsData)
@@ -169,7 +168,7 @@ function Epc() {
                 }));
                 setLotData(transformedData);
                 setFetchLotDataStatus('success');
-            } catch (e: any ) {
+            } catch (e: any) {
                 console.log("ERROR=", e);
                 setFetchErrorDetails(String(e));
                 setFetchLotDataStatus('failed');
@@ -224,8 +223,6 @@ function Epc() {
     }, [loadEditorControls, columnDefinitions])
 
 
-    // @ts-ignore
-    // @ts-ignore
     return (
         <MainLayout>
             <div className="epc-container rounded-md">
@@ -267,11 +264,14 @@ function Epc() {
                     </div>
                 </div>
                 {fetchLotDataStatus === 'loading' ?
-                    <div className="flex items-center space-x-4">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="space-y-2">
-                            <Skeleton className="h-4 w-[250px]" />
-                            <Skeleton className="h-4 w-[200px]" />
+                    <div
+                        id="nexus-epc-grid-container"
+                        className="flex flex-col justify-center items-center"
+                    >
+                        <div className="space-y-4 m-8">
+                            {[...Array(30)].map((_, index) => (
+                                <Skeleton key={index} className="rounded-full h-4 w-[80vw]"/>
+                            ))}
                         </div>
                     </div>
                     : fetchLotDataStatus === 'failed' ?
@@ -281,7 +281,7 @@ function Epc() {
                         >
                             <p className="font-semibold text-destructive text-xl">Error fetching data</p>
                             <p>{fetchErrorDetails}</p>
-                            <p >(If issue persists contact TEC Lab)</p>
+                            <p>(If issue persists contact TEC Lab)</p>
                             <Button className="m-4">Reload</Button>
                         </div>
                         :
@@ -294,7 +294,6 @@ function Epc() {
                                 columnDefs={columnDefinitions}
                                 gridOptions={gridOptions}
                             />
-
                         </div>
                 }
 
