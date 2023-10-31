@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.database.database import projects_coll
 from app.database.schemas.department_data import NewEPCLot, UpdateEPCLot, EPCData
+from app.database.schemas.project import Project, TecLabProjectData, SalesProjectData
 from app.security.oauth2 import get_current_user_data
 from app.database.schemas.user import User
 
@@ -145,22 +146,24 @@ def get_lot_with_project_uid(project_uid: str):
     return target_project["epc_data"]
 
 
-@router.post('/new')
+@router.post('/new', dependencies=[Depends(get_current_user_data)])
 def new_lot_to_epc(lot_data: NewEPCLot):
-    # check for duplicate project-codes
-    for doc in list(projects_coll.find()):
-        project = {k: v for (k, v) in doc.items() if k != "_id"}
-        if project["project_uid"] == lot_data.project_uid:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=f"{lot_data.project_uid} already exists"
-            )
+    # 1. create project_uid
+    new_project_uid = uuid.uuid4()
+    new_project: Project = Project(
+        project_uid=str(new_project_uid),
+        teclab_data=TecLabProjectData(epc_data=lot_data.epc_data),
+        sales_data=SalesProjectData()
+    )
 
-    projects_coll.insert_one(lot_data.model_dump())
+    # 2. Add to database
+    # projects_coll.insert_one(new_project.model_dump())
+    print(type(new_project.teclab_data.epc_data.contract_date))
 
-    return {"successfully added new lot"}
+    return {"successfully added new project": new_project}
 
 
-@router.patch('/edit')
+@router.patch('/edit', dependencies=[Depends(get_current_user_data)])
 def update_lot(lot_data: UpdateEPCLot):
     # Check if the project exists
     project_query = {"project_uid": lot_data.project_uid}

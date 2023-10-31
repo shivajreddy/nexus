@@ -136,8 +136,8 @@ function Epc() {
         const get_lots_data_from_server = async () => {
             try {
                 const response = await axios.get('/department/teclab/epc/live');
-                console.log("response=", response);
-                console.log("response.data=", response.data);
+                // console.log("response=", response);
+                // console.log("response.data=", response.data);
                 // setLotData(response.data);
                 const backendData = response.data;
 

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.database import projects_coll, department_data_coll, users_coll, eagle_data_coll
 from app.database.schemas.department_data import CoreModel, UpdateCoreModel, Product, UpdateProduct, Elevation, \
     UpdateElevation
-from app.database.schemas.project import Project, DepartmentSpecificTecLab, DepartmentSpecificSales
+from app.database.schemas.project import Project, TecLabProjectData, SalesProjectData
 from app.security.oauth2 import get_current_user_data, HasRequiredRoles
 from app.database.schemas.user import User
 
@@ -101,7 +101,7 @@ def get_all_core_models():
 @router.get('/elevations', dependencies=[Depends(get_current_user_data)])
 def get_all_elevation_names():
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
-    return teclab_doc["data"]["elevations"]["all_elevation_names"]
+    return teclab_doc["data"]["elevations"]["all_elevations_names"]
 
 
 @router.post('/elevations', dependencies=[Depends(get_current_user_data)])

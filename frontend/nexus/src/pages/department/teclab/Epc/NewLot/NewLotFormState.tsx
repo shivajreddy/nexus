@@ -1,43 +1,40 @@
 // + This should align with FastAPI modal schema
+type EPCData = {
+    // status
+    lot_status_finished: boolean;
+    lot_status_released: boolean;
 
-type INewLotData = {
-    // Lot-info
-    contract_type: string,
-    lot_status_finished: boolean,
-    lot_status_released: boolean,
-    contract_date?: Date,
-    community_name: string;
-    section_number: string;
-    lot_number: string;
-    product_name: string;
-    elevation_name: string;
+    // lot-info
+    community?: string;
+    section_number?: string;
+    lot_number?: string;
+    contract_date?: string;
+    contract_type?: string;
+    product_name?: string;
+    elevation_name?: string;
 
     // Drafting
-    drafting_drafter: string;
-    drafting_dread_line?: Date;
-    drafting_finished?: Date;
+    drafting_drafter?: string;
+    drafting_assigned_on?: string;
+    drafting_finished?: string;
 
     // Engineering
-    engineering_engineer: string;
-    engineering_sent?: Date;
-    engineering_expected?: Date;
-    engineering_received?: Date;
+    engineering_engineer?: string;
+    engineering_sent?: string;
+    engineering_received?: string;
 
     // Plat
-    plat_engineer: string;
-    plat_sent?: Date;
-    plat_expected?: Date;
-    plat_received?: Date;
+    plat_engineer?: string;
+    plat_sent?: string;
+    plat_received?: string;
 
-    //Permitting
-    permitting_county_name: string;
-    permitting_expected_submit?: Date;
-    permitting_submitted?: Date;
-    permitting_received?: Date;
+    // Permitting
+    permitting_county_name?: string;
+    permitting_submitted?: string;
+    permitting_received?: string;
 
-    // Build By Plans
-    bbp_expected_post?: Date;
-    bbp_posted?: Date;
+    // BBP
+    bbp_posted?: string;
 
     // Notes
     notes?: string;
@@ -45,5 +42,5 @@ type INewLotData = {
 
 
 export {
-    type INewLotData,
+    type EPCData,
 }

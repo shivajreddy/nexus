@@ -7,46 +7,34 @@ import {
     SelectValue
 } from "@components/ui/select.tsx";
 import {Label} from "@components/ui/label.tsx";
-import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
-import React from "react";
 
 
 interface IProps {
     id: string;
     name: string;
-    data: string[];
-    // specific to lot form
-    pieceOfStateName: keyof INewLotData;
-    setNewLotData: React.Dispatch<React.SetStateAction<INewLotData>>;
+    dropdownData: string[];
+    value?: string;
+    onUpdate: (chosenString: string) => void;
 }
 
 
 const FieldDropDown = (props: IProps) => {
-
-    function handleChange(e: string) {
-        console.log("e = ", e);
-        props.setNewLotData((prevLotData: INewLotData) => {
-            return {
-                ...prevLotData,
-                [props.pieceOfStateName]: e
-            }
-        })
-    }
+    console.log("all props at FieldDropDown=", props);
 
     return (
         <div key={props.id} className="flex items-center py-2">
             <div className="flex-1 flex flex-grow items-center">
-                <Label className="text-lg font-medium cursor-pointer" htmlFor={props.id}>{props.name}</Label>
+                <Label className="text-lg font-medium cursor-pointer">{props.name}</Label>
                 <div className="flex-grow border-t ml-4"></div>
             </div>
-            <div className="flex-1">
-                <Select onValueChange={handleChange}>
+            <div className="flex-1 text-primary">
+                <Select value={props.value} onValueChange={(selectedValue)=>props.onUpdate(selectedValue)}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Choose a value"/>
+                        <SelectValue placeholder={"choose"} />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup className="max-h-40 overflow-y-scroll">
-                            {props.data.map(val => <SelectItem key={val} value={val}>{val}</SelectItem>)}
+                            {props.dropdownData.map(val => <SelectItem key={val} value={val}>{val}</SelectItem>)}
                         </SelectGroup>
                     </SelectContent>
                 </Select>

@@ -10,7 +10,7 @@ import FieldDropDown from "@pages/department/teclab/Epc/NewLot/FieldDropDown.tsx
 import {Textarea} from "@components/ui/textarea.tsx";
 import React, {useEffect, useState} from "react";
 import "@assets/pages/Epc/NewLot.css"
-import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
+import {EPCData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
 
@@ -19,7 +19,7 @@ function NewLot() {
     const navigate = useNavigate();
     const axios = useAxiosPrivate()
 
-    const [data, setData] = useState({
+    const [formData, setFormData] = useState({
         "all_communities": [],
         "all_products": [],
         "all_elevations": [],
@@ -29,17 +29,17 @@ function NewLot() {
         "all_counties": []
     })
 
-    // + Fetch the data
+    // + Fetch the formData
     useEffect(() => {
         async function getData() {
             const communitiesResponse = await axios.get('/eagle/communities');
-            const productsResponse = await axios.get('/eagle/core-models');
+            const productsResponse = await axios.get('/department/teclab/products');
             const elevationsResponse = await axios.get('/department/teclab/elevations');
             const draftersResponse = await axios.get('/department/teclab/drafters');
             const engineersResponse = await axios.get('/eagle/engineers');
             const platEngineersResponse = await axios.get('/eagle/plat-engineers');
             const countiesResponse = await axios.get('/eagle/counties');
-            setData({
+            setFormData({
                 all_communities: communitiesResponse.data,
                 all_products: productsResponse.data,
                 all_elevations: elevationsResponse.data,
@@ -49,57 +49,68 @@ function NewLot() {
                 all_counties: countiesResponse.data
             })
         }
-        getData().then(()=>{});
+        getData();
     }, [])
+    console.log("formData = ", formData);
 
     // New Lot Form State
-    const [newLotData, setNewLotData] = useState<INewLotData>({
-        // Lot-info
-        contract_type: "",
+    const [newLotState, setNewLotState] = useState<EPCData>({
+
+        // status
         lot_status_finished: false,
         lot_status_released: false,
-        contract_date: undefined,
-        community_name: "",
-        section_number: "",
+
+        // Lot-info
+        contract_type: "",
+        contract_date: "",
+        community: "",
+        section_number: "existing-section",
         lot_number: "",
         product_name: "",
         elevation_name: "",
 
         // Drafting
         drafting_drafter: "",
-        drafting_dread_line: undefined,
-        drafting_finished: undefined,
+        drafting_assigned_on: "",
+        drafting_finished: "",
 
         // Engineering
         engineering_engineer: "",
-        engineering_sent: undefined,
-        engineering_expected: undefined,
-        engineering_received: undefined,
+        engineering_sent: "",
+        engineering_received: "",
 
         // Plat
         plat_engineer: "",
-        plat_sent: undefined,
-        plat_expected: undefined,
-        plat_received: undefined,
+        plat_sent: "",
+        plat_received: "",
 
         //Permitting
         permitting_county_name: "",
-        permitting_expected_submit: undefined,
-        permitting_submitted: undefined,
-        permitting_received: undefined,
+        permitting_submitted: "",
+        permitting_received: "",
 
         // Build By Plans
-        bbp_expected_post: undefined,
-        bbp_posted: undefined,
+        bbp_posted: "",
 
         // Notes
         notes: ""
     });
 
+
+    function handleStateChange(pieceOfStateName: keyof EPCData, newValue: any) {
+        setNewLotState((prevLotData) => {
+            return {
+                ...prevLotData,
+                [pieceOfStateName]: newValue
+            }
+        })
+    }
+
+
     // + new form submit
     function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
-        console.log("😄 NewLotData=", newLotData);
+        console.log("😄 NewLotData=", newLotState);
     }
 
 
@@ -136,151 +147,149 @@ function NewLot() {
                         <CardContent>
                             <FieldDropDown id="1_contract_type"
                                            name={"Contract Type"}
-                                           data={["SPEC", "Permit & Hold", "Contract"]}
-                                           pieceOfStateName="contract_type"
-                                           setNewLotData={setNewLotData}
+                                           dropdownData={["SPEC", "Permit & Hold", "Contract"]}
+                                           value={newLotState.contract_type}
+                                           onUpdate={(chosenString)=>handleStateChange('contract_type', chosenString)}
                             />
-                            <FieldToggle id="1_finished"
-                                         name="Finished"
-                                         isChecked={newLotData.lot_status_finished}
-                                         pieceOfStateName="lot_status_finished"
-                                         setNewLotData={setNewLotData}
-                            />
-                            <FieldToggle id="1_released"
-                                         name="Released"
-                                         isChecked={newLotData.lot_status_released}
-                                         pieceOfStateName="lot_status_released"
-                                         setNewLotData={setNewLotData}
-                            />
-                            <FieldDate id="1_contract_date" name="Contract Date"/>
-                            <FieldDropDown id="1_community"
-                                           name={"Community"}
-                                           data={data.all_communities}
-                                           pieceOfStateName="community_name"
-                                           setNewLotData={setNewLotData}
-                            />
+                            {/*<FieldToggle id="1_finished"*/}
+                            {/*             name="Finished"*/}
+                            {/*             isChecked={newLotState.lot_status_finished}*/}
+                            {/*             pieceOfStateName="lot_status_finished"*/}
+                            {/*             setNewLotData={setNewLotState}*/}
+                            {/*/>*/}
+                            {/*<FieldToggle id="1_released"*/}
+                            {/*             name="Released"*/}
+                            {/*             isChecked={newLotState.lot_status_released}*/}
+                            {/*             pieceOfStateName="lot_status_released"*/}
+                            {/*             setNewLotData={setNewLotState}*/}
+                            {/*/>*/}
+                            {/*<FieldDate id="1_contract_date" name="Contract Date"/>*/}
+                            {/*<FieldDropDown id="1_community"*/}
+                            {/*               name={"Community"}*/}
+                            {/*               dropdownData={formData.all_communities}*/}
+                            {/*               value={newLotState.community}*/}
+                            {/*               onUpdate={(e) => handleStateChange('community', e)}*/}
+                            {/*/>*/}
                             <FieldText id="1_section"
                                        name={"Section"}
-                                       fieldText={newLotData.section_number}
-                                       pieceOfStateName="section_number"
-                                       setNewLotData={setNewLotData}
+                                       value={newLotState.section_number}
+                                       onUpdate={(e) => handleStateChange('section_number', e.target.value)}
                             />
                             <FieldText id="1_lot_number"
                                        name={"Lot Number"}
-                                       fieldText={newLotData.lot_number}
-                                       pieceOfStateName="section_number"
-                                       setNewLotData={setNewLotData}
+                                       value={newLotState.lot_number}
+                                       onUpdate={(e) => handleStateChange('lot_number', e.target.value)}
                             />
                             <FieldDropDown id="1_product"
                                            name={"Product"}
-                                           data={data.all_communities}
-                                           pieceOfStateName="product_name"
-                                           setNewLotData={setNewLotData}
+                                           dropdownData={formData.all_products}
+                                           value={newLotState.product_name}
+                                           onUpdate={(chosenString) => handleStateChange('product_name', chosenString)}
                             />
-                            <FieldDropDown id="1_elevation"
-                                           name={"Elevation"}
-                                           data={data.all_elevations}
-                                           pieceOfStateName="elevation_name"
-                                           setNewLotData={setNewLotData}
-                            />
+                            {/*<FieldDropDown id="1_elevation"*/}
+                            {/*               name={"Elevation"}*/}
+                            {/*               data={formData.all_elevations}*/}
+                            {/*               pieceOfStateName="elevation_name"*/}
+                            {/*               setNewLotData={setNewLotState}*/}
+                            {/*/>*/}
                         </CardContent>
                     </Card>
 
-                    {/* 2: Drafting */}
-                    <Card className="new-lot-section" id="new-lot-form-drafting">
-                        <CardHeader>
-                            <CardTitle>Drafting</CardTitle>
-                            <CardDescription>Drafter and their time information</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <FieldDropDown id="2_drafter"
-                                           name={"Drafter"}
-                                           data={data.all_drafters}
-                                           pieceOfStateName="drafting_drafter"
-                                           setNewLotData={setNewLotData}
-                            />
-                            <FieldDate id="2_assigned" name="Assigned On"/>
-                            <FieldDate id="2_finished" name="Finished On"/>
-                        </CardContent>
-                    </Card>
+                    {/*/!* 2: Drafting *!/*/}
+                    {/*<Card className="new-lot-section" id="new-lot-form-drafting">*/}
+                    {/*    <CardHeader>*/}
+                    {/*        <CardTitle>Drafting</CardTitle>*/}
+                    {/*        <CardDescription>Drafter and their time information</CardDescription>*/}
+                    {/*    </CardHeader>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <FieldDropDown id="2_drafter"*/}
+                    {/*                       name={"Drafter"}*/}
+                    {/*                       data={formData.all_drafters}*/}
+                    {/*                       pieceOfStateName="drafting_drafter"*/}
+                    {/*                       setNewLotData={setNewLotState}*/}
+                    {/*        />*/}
+                    {/*        <FieldDate id="2_assigned" name="Assigned On"/>*/}
+                    {/*        <FieldDate id="2_finished" name="Finished On"/>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
 
-                    <div className="new-lot-section">
-                        {/* 3: Engineering */}
-                        <Card className="mb-4" id="new-lot-form-engineering">
-                            <CardHeader>
-                                <CardTitle>Engineering</CardTitle>
-                                <CardDescription>Engineer and their time information</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <FieldDropDown id="3_engineer"
-                                               name={"Engineer"}
-                                               data={data.all_engineers}
-                                               pieceOfStateName="engineering_engineer"
-                                               setNewLotData={setNewLotData}
-                                />
-                                <FieldDate id="3_sent" name="Sent On"/>
-                                <FieldDate id="3_received" name="Received On"/>
-                            </CardContent>
-                        </Card>
+                    {/*<div className="new-lot-section">*/}
+                    {/*    /!* 3: Engineering *!/*/}
+                    {/*    <Card className="mb-4" id="new-lot-form-engineering">*/}
+                    {/*        <CardHeader>*/}
+                    {/*            <CardTitle>Engineering</CardTitle>*/}
+                    {/*            <CardDescription>Engineer and their time information</CardDescription>*/}
+                    {/*        </CardHeader>*/}
+                    {/*        <CardContent>*/}
+                    {/*            <FieldDropDown id="3_engineer"*/}
+                    {/*                           name={"Engineer"}*/}
+                    {/*                           data={formData.all_engineers}*/}
+                    {/*                           pieceOfStateName="engineering_engineer"*/}
+                    {/*                           setNewLotData={setNewLotState}*/}
+                    {/*            />*/}
+                    {/*            <FieldDate id="3_sent" name="Sent On"/>*/}
+                    {/*            <FieldDate id="3_received" name="Received On"/>*/}
+                    {/*        </CardContent>*/}
+                    {/*    </Card>*/}
 
-                        {/* 4: Plat*/}
-                        <Card className="mt-4" id="new-lot-form-plat">
-                            <CardHeader>
-                                <CardTitle>Plat Engineer</CardTitle>
-                                <CardDescription>Plat-Engineer and their time information</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <FieldDropDown id="4_plat_engineer"
-                                               name={"Plat Engineer"}
-                                               data={data.all_plat_engineers}
-                                               pieceOfStateName="plat_engineer"
-                                               setNewLotData={setNewLotData}
-                                />
-                                <FieldDate id="4_sent" name="Sent on"/>
-                                <FieldDate id="4_received" name="Received on"/>
-                            </CardContent>
-                        </Card>
-                    </div>
+                    {/*    /!* 4: Plat*!/*/}
+                    {/*    <Card className="mt-4" id="new-lot-form-plat">*/}
+                    {/*        <CardHeader>*/}
+                    {/*            <CardTitle>Plat Engineer</CardTitle>*/}
+                    {/*            <CardDescription>Plat-Engineer and their time information</CardDescription>*/}
+                    {/*        </CardHeader>*/}
+                    {/*        <CardContent>*/}
+                    {/*            <FieldDropDown id="4_plat_engineer"*/}
+                    {/*                           name={"Plat Engineer"}*/}
+                    {/*                           data={formData.all_plat_engineers}*/}
+                    {/*                           pieceOfStateName="plat_engineer"*/}
+                    {/*                           setNewLotData={setNewLotState}*/}
+                    {/*            />*/}
+                    {/*            <FieldDate id="4_sent" name="Sent on"/>*/}
+                    {/*            <FieldDate id="4_received" name="Received on"/>*/}
+                    {/*        </CardContent>*/}
+                    {/*    </Card>*/}
+                    {/*</div>*/}
 
-                    {/* 5: Permitting */}
-                    <Card className="new-lot-section" id="new-lot-form-permitting">
-                        <CardHeader>
-                            <CardTitle>Permitting</CardTitle>
-                            <CardDescription>Permitting details</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <FieldDropDown id="5_county_name"
-                                           name={"County Name"}
-                                           data={data.all_counties}
-                                           pieceOfStateName="permitting_county_name"
-                                           setNewLotData={setNewLotData}
-                            />
-                            <FieldDate id="5_sent" name="Sent on"/>
-                            <FieldDate id="5_received" name="Received on"/>
-                        </CardContent>
-                    </Card>
+                    {/*/!* 5: Permitting *!/*/}
+                    {/*<Card className="new-lot-section" id="new-lot-form-permitting">*/}
+                    {/*    <CardHeader>*/}
+                    {/*        <CardTitle>Permitting</CardTitle>*/}
+                    {/*        <CardDescription>Permitting details</CardDescription>*/}
+                    {/*    </CardHeader>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <FieldDropDown id="5_county_name"*/}
+                    {/*                       name={"County Name"}*/}
+                    {/*                       data={formData.all_counties}*/}
+                    {/*                       pieceOfStateName="permitting_county_name"*/}
+                    {/*                       setNewLotData={setNewLotState}*/}
+                    {/*        />*/}
+                    {/*        <FieldDate id="5_sent" name="Sent on"/>*/}
+                    {/*        <FieldDate id="5_received" name="Received on"/>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
 
-                    {/* 6: Build By Plans*/}
-                    <Card className="new-lot-section" id="new-lot-form-bbp">
-                        <CardHeader>
-                            <CardTitle>Build By Plans</CardTitle>
-                            <CardDescription>BBP details</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <FieldDate id="6_bbp" name="Posted on"/>
-                        </CardContent>
-                    </Card>
+                    {/*/!* 6: Build By Plans*!/*/}
+                    {/*<Card className="new-lot-section" id="new-lot-form-bbp">*/}
+                    {/*    <CardHeader>*/}
+                    {/*        <CardTitle>Build By Plans</CardTitle>*/}
+                    {/*        <CardDescription>BBP details</CardDescription>*/}
+                    {/*    </CardHeader>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <FieldDate id="6_bbp" name="Posted on"/>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
 
-                    {/* 7: Notes */}
-                    <Card className="new-lot-section" id="new-lot-form-notes">
-                        <CardHeader>
-                            <CardTitle>Notes</CardTitle>
-                            <CardDescription>[TEC-Lab only]Notes about the lot</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Textarea placeholder="Notes aboue the lot"/>
-                        </CardContent>
-                    </Card>
+                    {/*/!* 7: Notes *!/*/}
+                    {/*<Card className="new-lot-section" id="new-lot-form-notes">*/}
+                    {/*    <CardHeader>*/}
+                    {/*        <CardTitle>Notes</CardTitle>*/}
+                    {/*        <CardDescription>[TEC-Lab only]Notes about the lot</CardDescription>*/}
+                    {/*    </CardHeader>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <Textarea placeholder="Notes aboue the lot"/>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
 
                 </div>
 

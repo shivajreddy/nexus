@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel
+
+from app.database.schemas.department_data import EPCData
 
 """
 Schema for `project`
@@ -13,21 +15,18 @@ class Project(BaseModel):
     project_uid: str
 
     # eagle-wide-data
-    contract_date: str
+    contract_type: Optional[Literal["SPEC", "Permit Hold", "Contract"]] = None
+    contract_date: Optional[datetime] = None
 
     # department-specific-data
-    dept_pvt_teclab: 'DepartmentSpecificTecLab'
-    dept_pvt_sales: 'DepartmentSpecificSales'
+    teclab_data: 'TecLabProjectData'
+    sales_data: 'SalesProjectData'
 
 
-class DepartmentSpecificTecLab(BaseModel):
-    contract_type: Literal["SPEC", "Permit Hold", "Contract"]
-    drafter: str
-    assigned_on: str
-    finished_on: str
+class TecLabProjectData(BaseModel):
+    epc_data: 'EPCData'
 
 
-class DepartmentSpecificSales(BaseModel):
-    salesman: str
-    selections_finished_on: datetime
-
+class SalesProjectData(BaseModel):
+    salesman: Optional[str] = None
+    selections_finished_on: Optional[datetime] = None

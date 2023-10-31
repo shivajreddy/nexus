@@ -80,7 +80,7 @@ class EPCData(BaseModel):
 
 
 class NewEPCLot(BaseModel):
-    project_uid: str
+    # project_uid: str
 
     epc_data: EPCData
 

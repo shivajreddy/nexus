@@ -4,16 +4,34 @@ import {cn} from "@/lib/utils.ts";
 import {Calendar as CalendarIcon} from "lucide-react";
 import {format} from "date-fns";
 import {Calendar} from "@components/ui/calendar.tsx";
-import {useState} from "react";
+import React from "react";
 import {Label} from "@components/ui/label.tsx";
+import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 
-interface Iprops {
+interface IProps {
     id: string;
     name: string;
+    // specific to lot form
+    value?: any;
+    pieceOfStateName: keyof INewLotData;
+    setNewLotData: React.Dispatch<React.SetStateAction<INewLotData>>;
 }
 
-const FieldDate = (props: Iprops) => {
-    const [date, setDate] = useState<Date | undefined>(new Date());
+const FieldDate = (props: IProps) => {
+
+    // const [date, setDate] = useState<Date | undefined>(new Date());
+    // const [date, setDate] = useState<Date | undefined>(undefined);
+
+    function handleOnSelect(e: any){
+        console.log("handleOnSelect for date: ", e);
+        props.setNewLotData((prevLotData: INewLotData) => {
+            return {
+                ...prevLotData,
+                [props.pieceOfStateName] : e
+            }
+        })
+    }
+
     return (
         <div key={props.id} className="flex items-center py-2">
             <div className="flex-1 flex flex-grow items-center">
@@ -27,23 +45,22 @@ const FieldDate = (props: Iprops) => {
                             variant={"outline"}
                             className={cn(
                                 "justify-start text-left font-normal",
-                                !date && "text-muted-foreground"
+                                !props.value && "text-muted-foreground"
                             )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4"/>
-                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                            {props.value ? format(props.value, "PPP") : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
                         <Calendar
                             mode="single"
-                            selected={date}
-                            onSelect={setDate}
+                            selected={props.value}
+                            onSelect={handleOnSelect}
                         />
                     </PopoverContent>
                 </Popover>
             </div>
-
         </div>
     );
 };

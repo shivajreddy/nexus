@@ -252,59 +252,48 @@ Any thing that has to do with a house, then that data should be inside this.
 """
 projects_coll_initial_data = [
     {
-        "project_uid": "RB-05-06",
-        "epc_data": {
-            "finished": "false",
-            "community": "",
-            "section_number": "",
-            "lot_number": "",
-            "contract_date": "",
-            "contract_type": "",
-            "lot_status_finished": "false",
-            "lot_status_released": "false",
-            "product_name": "",
-            "elevation_name": "",
+        "project_uid": "TESTING",
 
-            "drafting_drafter": "",
-            "drafting_assigned_on": "",
-            "drafting_finished": "",
+        # company-wide data
+        "contract_type": None,
+        "contract_date": None,
 
-            "engineering_engineer": "",
-            "engineering_sent": "",
-            "engineering_received": "",
-
-            "plat_engineer": "",
-            "plat_sent": "",
-            "plat_received": "",
-
-            "permitting_county_name": "",
-            "permitting_submitted": "",
-            "permitting_received": "",
-
-            "bbp_posted": "",
-
-            "notes": ""
+        # department specific data
+        # TEC LAB
+        "teclab": {
+            "epc_data": {
+                "finished": None,
+                "community": None,
+                "section_number": None,
+                "lot_number": None,
+                "contract_date": None,
+                "contract_type": None,
+                "lot_status_finished": None,
+                "lot_status_released": None,
+                "product_name": None,
+                "elevation_name": None,
+                "drafting_drafter": None,
+                "drafting_assigned_on": None,
+                "drafting_finished": None,
+                "engineering_engineer": None,
+                "engineering_sent": None,
+                "engineering_received": None,
+                "plat_engineer": None,
+                "plat_sent": None,
+                "plat_received": None,
+                "permitting_county_name": None,
+                "permitting_submitted": None,
+                "permitting_received": None,
+                "bbp_posted": None,
+                "notes": None
+            },
         },
-        "contract_type": "Contract",
-        "contract_date": "",
-        "drafting": {
-            "drafter": "S.Reddy",
-            "assigned_on": "",
-            "finished_on": ""
-        },
+
+        # department specific data
+        # SALES
         "sales": {
             "sales_agent": "J.Goldschmidt",
             "selections_finished_on": ""
         },
-    }
-]
-
-"""
-collection: epc
-description: Teclab's epc
-"""
-epc_coll_initial_data = [
-    {
-        "community": ""
     }
 ]

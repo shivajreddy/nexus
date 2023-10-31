@@ -35,7 +35,7 @@ function EditLot() {
     useEffect(() => {
         async function getData() {
             const communitiesResponse = await axios.get('/eagle/communities');
-            const productsResponse = await axios.get('/eagle/core-models');
+            const productsResponse = await axios.get('/department/teclab/core-models');
             const elevationsResponse = await axios.get('/department/teclab/elevations');
             const draftersResponse = await axios.get('/department/teclab/drafters');
             const engineersResponse = await axios.get('/eagle/engineers');
@@ -175,13 +175,13 @@ function EditLot() {
                             />
                             <FieldText id="1_section"
                                        name={"Section"}
-                                       fieldText={newLotData.section_number}
+                                       value={newLotData.section_number}
                                        pieceOfStateName="section_number"
                                        setNewLotData={setNewLotData}
                             />
                             <FieldText id="1_lot_number"
                                        name={"Lot Number"}
-                                       fieldText={newLotData.lot_number}
+                                       value={newLotData.lot_number}
                                        pieceOfStateName="section_number"
                                        setNewLotData={setNewLotData}
                             />

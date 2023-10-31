@@ -103,7 +103,7 @@ def delete_community(target_community: Community):
 @router.get('/engineers', dependencies=[Depends(get_current_user_data)])
 def get_all_engineers():
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
-    return engineers_doc["all_engineers"]
+    return engineers_doc["all_engineers_names"]
 
 
 # add a new engineer
@@ -178,7 +178,7 @@ def delete_engineer(target_engineer: Engineer):
 @router.get('/plat-engineers', dependencies=[Depends(get_current_user_data)])
 def get_all_plat_engineers():
     plat_engineers_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
-    return plat_engineers_doc["all_plat_engineer_names"]
+    return plat_engineers_doc["all_plat_engineers_names"]
 
 
 # add a new plat-engineer
@@ -252,7 +252,7 @@ def delete_plat_engineer(target_plat_engineer: PlatEngineer):
 @router.get('/counties', dependencies=[Depends(get_current_user_data)])
 def get_all_counties():
     counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
-    return counties_doc["all_counties"]
+    return counties_doc["all_counties_names"]
 
 
 # add a new county
