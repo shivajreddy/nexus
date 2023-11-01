@@ -155,7 +155,7 @@ def get_lot_with_project_uid(project_uid: str):
             status_code=status.HTTP_404_NOT_FOUND, detail=f"{project_uid} not found"
         )
 
-    return target_project["epc_data"]
+    return target_project["teclab_data"]["epc_data"]
 
 
 @router.post('/new', dependencies=[Depends(get_current_user_data)])
@@ -179,8 +179,7 @@ def new_lot_to_epc(lot_data: NewEPCLot):
 @router.patch('/edit', dependencies=[Depends(get_current_user_data)])
 def update_lot(lot_data: UpdateEPCLot):
     # Check if the project exists
-    project_query = {"project_uid": lot_data.project_uid}
-    existing_project = projects_coll.find_one(project_query)
+    existing_project = projects_coll.find_one({"project_uid": lot_data.project_uid})
 
     if not existing_project:
         raise HTTPException(
@@ -190,14 +189,19 @@ def update_lot(lot_data: UpdateEPCLot):
 
     # update the content in DB
     # Create an update query based on non-null fields in lot_data
-    update_fields = {}
-    for key, value in lot_data.epc_data.dict(exclude_unset=True).items():
-        update_fields[f"epc_data.{key}"] = value
+    # update_fields = {}
+    # for key, value in lot_data.epc_data.model_dump(exclude_unset=True).items():
+    #     update_fields[f"teclab.epc_data.{key}"] = value
+    # print("update_fields=", update_fields)
 
     # Update the project in the database
-    projects_coll.update_one(
-        project_query,
-        {"$set": update_fields}
+    result = projects_coll.update_one(
+        {"project_uid": lot_data.project_uid},
+        {"$set": {"teclab.epc_data": lot_data.epc_data.model_dump()}}
     )
+
+    print("result=", result)
+    print("Matched Count:", result.matched_count)
+    print("Modified Count:", result.modified_count)
 
     return {"message": f"Project {lot_data.project_uid} updated successfully"}

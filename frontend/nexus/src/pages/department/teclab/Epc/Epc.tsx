@@ -128,7 +128,7 @@ function Epc() {
     // TODO: specify the type of the Lot object. which should be parallel to EPCLot from python
     const [fetchLotDataStatus, setFetchLotDataStatus] = useState<'loading' | 'failed' | 'success'>('loading');
     const [fetchErrorDetails, setFetchErrorDetails] = useState('');
-    const [lotData, setLotData] = useState([]);
+    const [allEPCLots, setAllEPCLots] = useState([]);
 
     const [columnDefinitions, setColumnDefinitions] = useState(columnDefinitionsData)
 
@@ -166,7 +166,7 @@ function Epc() {
                     county: item.permitting_county_name,
                     notes: item.notes,
                 }));
-                setLotData(transformedData);
+                setAllEPCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
                 console.log("ERROR=", e);
@@ -196,14 +196,15 @@ function Epc() {
                             cellClass: ["editor-only"],
                             headerTooltip: "Edit Lot",
                             cellRenderer: (params: any) => {
-                                return (<button
-                                        className="flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"
+                                return (
+                                    <a
+                                        // href={`edit/${params.data.project_uid}`}
+                                        className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
                                         data-id={params.data.id}
-                                        // onClick={()=>console.log("params.data.project_uid=", params.data.project_uid)}
                                         onClick={() => navigate(`edit/${params.data.project_uid}`)}
                                     >
                                         <PiPencilSimpleFill/>
-                                    </button>
+                                    </a>
                                 )
                             },
                         }
@@ -290,7 +291,7 @@ function Epc() {
                             className="ag-theme-alpine ag-theme-nexus"
                         >
                             <AgGridReact
-                                rowData={lotData}
+                                rowData={allEPCLots}
                                 columnDefs={columnDefinitions}
                                 gridOptions={gridOptions}
                             />
