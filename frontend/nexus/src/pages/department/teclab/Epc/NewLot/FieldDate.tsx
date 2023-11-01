@@ -4,33 +4,17 @@ import {cn} from "@/lib/utils.ts";
 import {Calendar as CalendarIcon} from "lucide-react";
 import {format} from "date-fns";
 import {Calendar} from "@components/ui/calendar.tsx";
-import React from "react";
 import {Label} from "@components/ui/label.tsx";
-import {INewLotData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
+
 
 interface IProps {
     id: string;
     name: string;
-    // specific to lot form
-    value?: any;
-    pieceOfStateName: keyof INewLotData;
-    setNewLotData: React.Dispatch<React.SetStateAction<INewLotData>>;
+    value?: Date;
+    onUpdate: (chosenDate?: Date) => void;
 }
 
 const FieldDate = (props: IProps) => {
-
-    // const [date, setDate] = useState<Date | undefined>(new Date());
-    // const [date, setDate] = useState<Date | undefined>(undefined);
-
-    function handleOnSelect(e: any){
-        console.log("handleOnSelect for date: ", e);
-        props.setNewLotData((prevLotData: INewLotData) => {
-            return {
-                ...prevLotData,
-                [props.pieceOfStateName] : e
-            }
-        })
-    }
 
     return (
         <div key={props.id} className="flex items-center py-2">
@@ -38,14 +22,14 @@ const FieldDate = (props: IProps) => {
                 <Label className="text-lg font-medium cursor-pointer" htmlFor={props.id}>{props.name}</Label>
                 <div className="flex-grow border-t border-b0 ml-4"></div>
             </div>
-            <div className="flex-1" id={props.id}>
+            <div className="flex-1 flex-grow" id={props.id}>
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
                             variant={"outline"}
                             className={cn(
-                                "justify-start text-left font-normal",
-                                !props.value && "text-muted-foreground"
+                                "justify-start text-left font-semibold text-primary w-full",
+                                !props.value && "text-muted-foreground font-normal w-full"
                             )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4"/>
@@ -56,7 +40,7 @@ const FieldDate = (props: IProps) => {
                         <Calendar
                             mode="single"
                             selected={props.value}
-                            onSelect={handleOnSelect}
+                            onSelect={(newValue) => props.onUpdate(newValue)}
                         />
                     </PopoverContent>
                 </Popover>

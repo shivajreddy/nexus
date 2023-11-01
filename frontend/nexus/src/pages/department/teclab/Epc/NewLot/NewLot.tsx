@@ -13,6 +13,7 @@ import "@assets/pages/Epc/NewLot.css"
 import {EPCData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
+import {makeIssue} from "zod";
 
 
 function NewLot() {
@@ -49,50 +50,22 @@ function NewLot() {
                 all_counties: countiesResponse.data
             })
         }
-        getData();
+
+        getData().then(() => {
+        });
     }, [])
-    console.log("formData = ", formData);
 
     // New Lot Form State
     const [newLotState, setNewLotState] = useState<EPCData>({
 
         // status
-        lot_status_finished: false,
-        lot_status_released: false,
+        lot_status_finished: true,
+        // lot_status_released: false,
 
         // Lot-info
-        contract_type: "",
-        contract_date: "",
-        community: "",
-        section_number: "existing-section",
+        section_number: "",
         lot_number: "",
-        product_name: "",
-        elevation_name: "",
 
-        // Drafting
-        drafting_drafter: "",
-        drafting_assigned_on: "",
-        drafting_finished: "",
-
-        // Engineering
-        engineering_engineer: "",
-        engineering_sent: "",
-        engineering_received: "",
-
-        // Plat
-        plat_engineer: "",
-        plat_sent: "",
-        plat_received: "",
-
-        //Permitting
-        permitting_county_name: "",
-        permitting_submitted: "",
-        permitting_received: "",
-
-        // Build By Plans
-        bbp_posted: "",
-
-        // Notes
         notes: ""
     });
 
@@ -111,6 +84,25 @@ function NewLot() {
     function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         console.log("😄 NewLotData=", newLotState);
+        const makeServerRequest = async () => {
+            try {
+                const response = await axios.post('/department/teclab/epc/new',
+                    {
+                        "epc_data": newLotState
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                )
+                console.log("Response=", response);
+            } catch (e) {
+                console.error("Error sending post request", e);
+            }
+        }
+        makeServerRequest().then(() => {
+        });
     }
 
 
@@ -149,27 +141,29 @@ function NewLot() {
                                            name={"Contract Type"}
                                            dropdownData={["SPEC", "Permit & Hold", "Contract"]}
                                            value={newLotState.contract_type}
-                                           onUpdate={(chosenString)=>handleStateChange('contract_type', chosenString)}
+                                           onUpdate={(newValue) => handleStateChange('contract_type', newValue)}
                             />
-                            {/*<FieldToggle id="1_finished"*/}
-                            {/*             name="Finished"*/}
-                            {/*             isChecked={newLotState.lot_status_finished}*/}
-                            {/*             pieceOfStateName="lot_status_finished"*/}
-                            {/*             setNewLotData={setNewLotState}*/}
-                            {/*/>*/}
-                            {/*<FieldToggle id="1_released"*/}
-                            {/*             name="Released"*/}
-                            {/*             isChecked={newLotState.lot_status_released}*/}
-                            {/*             pieceOfStateName="lot_status_released"*/}
-                            {/*             setNewLotData={setNewLotState}*/}
-                            {/*/>*/}
-                            {/*<FieldDate id="1_contract_date" name="Contract Date"/>*/}
-                            {/*<FieldDropDown id="1_community"*/}
-                            {/*               name={"Community"}*/}
-                            {/*               dropdownData={formData.all_communities}*/}
-                            {/*               value={newLotState.community}*/}
-                            {/*               onUpdate={(e) => handleStateChange('community', e)}*/}
-                            {/*/>*/}
+                            <FieldToggle id="1_finished"
+                                         name="Finished"
+                                         isChecked={newLotState.lot_status_finished}
+                                         onUpdate={()=>handleStateChange('lot_status_finished', !newLotState.lot_status_finished)}
+                            />
+                            <FieldToggle id="1_released"
+                                         name="Released"
+                                         isChecked={newLotState.lot_status_released}
+                                         onUpdate={()=>handleStateChange('lot_status_released', !newLotState.lot_status_released)}
+                            />
+                            <FieldDate id="1_contract_date"
+                                       name="Contract Date"
+                                       value={newLotState.contract_date}
+                                       onUpdate={(newValue) => handleStateChange('contract_date', newValue)}
+                            />
+                            <FieldDropDown id="1_community"
+                                           name={"Community"}
+                                           dropdownData={formData.all_communities}
+                                           value={newLotState.community}
+                                           onUpdate={(newValue) => handleStateChange('community', newValue)}
+                            />
                             <FieldText id="1_section"
                                        name={"Section"}
                                        value={newLotState.section_number}
@@ -184,14 +178,14 @@ function NewLot() {
                                            name={"Product"}
                                            dropdownData={formData.all_products}
                                            value={newLotState.product_name}
-                                           onUpdate={(chosenString) => handleStateChange('product_name', chosenString)}
+                                           onUpdate={(newValue) => handleStateChange('product_name', newValue)}
                             />
-                            {/*<FieldDropDown id="1_elevation"*/}
-                            {/*               name={"Elevation"}*/}
-                            {/*               data={formData.all_elevations}*/}
-                            {/*               pieceOfStateName="elevation_name"*/}
-                            {/*               setNewLotData={setNewLotState}*/}
-                            {/*/>*/}
+                            <FieldDropDown id="1_elevation"
+                                           name={"Elevation"}
+                                           dropdownData={formData.all_elevations}
+                                           value={newLotState.elevation_name}
+                                           onUpdate={(newValue)=>handleStateChange('elevation_name', newValue)}
+                            />
                         </CardContent>
                     </Card>
 

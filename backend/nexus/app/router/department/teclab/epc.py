@@ -152,13 +152,15 @@ def new_lot_to_epc(lot_data: NewEPCLot):
     new_project_uid = uuid.uuid4()
     new_project: Project = Project(
         project_uid=str(new_project_uid),
+        contract_type=lot_data.epc_data.contract_type,
+        contract_date=lot_data.epc_data.contract_date,
         teclab_data=TecLabProjectData(epc_data=lot_data.epc_data),
         sales_data=SalesProjectData()
     )
 
     # 2. Add to database
-    # projects_coll.insert_one(new_project.model_dump())
-    print(type(new_project.teclab_data.epc_data.contract_date))
+    # doc_id = projects_coll.insert_one(new_project.model_dump())
+    # print(doc_id)
 
     return {"successfully added new project": new_project}
 

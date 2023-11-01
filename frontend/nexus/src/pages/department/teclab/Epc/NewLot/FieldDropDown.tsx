@@ -14,23 +14,21 @@ interface IProps {
     name: string;
     dropdownData: string[];
     value?: string;
-    onUpdate: (chosenString: string) => void;
+    onUpdate: (newValue: string) => void;
 }
 
 
 const FieldDropDown = (props: IProps) => {
-    console.log("all props at FieldDropDown=", props);
-
     return (
         <div key={props.id} className="flex items-center py-2">
             <div className="flex-1 flex flex-grow items-center">
                 <Label className="text-lg font-medium cursor-pointer">{props.name}</Label>
                 <div className="flex-grow border-t ml-4"></div>
             </div>
-            <div className="flex-1 text-primary">
-                <Select value={props.value} onValueChange={(selectedValue)=>props.onUpdate(selectedValue)}>
-                    <SelectTrigger>
-                        <SelectValue placeholder={"choose"} />
+            <div className="flex-1 text-primary font-semibold  ">
+                <Select value={props.value} onValueChange={(newValue)=>props.onUpdate(newValue)}>
+                    <SelectTrigger >
+                        <SelectValue placeholder={""} />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup className="max-h-40 overflow-y-scroll">

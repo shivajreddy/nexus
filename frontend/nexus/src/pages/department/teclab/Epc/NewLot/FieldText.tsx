@@ -26,7 +26,7 @@ const FieldText = (props: IProps) => {
                 <Input
                     id={props.id}
                     type="string"
-                    className="text-primary"
+                    className="text-primary font-semibold"
                     placeholder={props.placeholder}
                     value={props.value}
                     onChange={(e) => props.onUpdate(e)}
