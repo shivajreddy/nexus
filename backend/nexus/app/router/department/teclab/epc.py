@@ -1,6 +1,7 @@
 import csv
 import uuid
 from datetime import datetime
+from typing import List
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
@@ -108,8 +109,14 @@ def migrate_epc():
         temp_project_id = str(uuid.uuid4())
         # temp_project_id = item.community + "-" + item.section_number + "-" + item.lot_number + "-" + str(
         #     item.contract_date)
-        epc_lot = NewEPCLot(project_uid=temp_project_id, epc_data=item)
-        result.append(epc_lot)
+
+        project = Project(project_uid=temp_project_id,
+                          created_at=datetime.now(),
+                          contract_type=item.contract_type,
+                          contract_date=item.contract_date,
+                          teclab_data=TecLabProjectData(epc_data=item),
+                          sales_data=SalesProjectData())
+        result.append(project)
 
     for every_item in result:
         projects_coll.insert_one(every_item.model_dump())
@@ -117,16 +124,21 @@ def migrate_epc():
     return {"FINISHED MIGRATING"}
 
 
-@router.get('/live', dependencies=[Depends(get_current_user_data)])
+@router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
 def get_all_lots():
-    result = []
-    for doc in list(projects_coll.find()):
-        project = {k: v for (k, v) in doc.items() if k != "_id"}
-        final_object = {"project_uid": doc["project_uid"]}
-        final_object.update(project["epc_data"])
-        result.append(final_object)
-        # result.append(project["epc_data"])
-    return result
+    try:
+        result = []
+        for doc in projects_coll.find().sort("created_at", -1):
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            final_object = {"project_uid": doc["project_uid"]}
+            if "teclab_data" in project and "epc_data" in project["teclab_data"]:
+                final_object.update(project["teclab_data"]["epc_data"])
+                result.append(final_object)
+            else:
+                print("doc without epc_data", project)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
 @router.get('/get/{project_uid}', dependencies=[Depends(get_current_user_data)])
@@ -150,17 +162,16 @@ def get_lot_with_project_uid(project_uid: str):
 def new_lot_to_epc(lot_data: NewEPCLot):
     # 1. create project_uid
     new_project_uid = uuid.uuid4()
-    new_project: Project = Project(
-        project_uid=str(new_project_uid),
-        contract_type=lot_data.epc_data.contract_type,
-        contract_date=lot_data.epc_data.contract_date,
-        teclab_data=TecLabProjectData(epc_data=lot_data.epc_data),
-        sales_data=SalesProjectData()
-    )
+    new_project: Project = Project(project_uid=str(new_project_uid),
+                                   created_at=datetime.now(),
+                                   contract_type=lot_data.epc_data.contract_type,
+                                   contract_date=lot_data.epc_data.contract_date,
+                                   teclab_data=TecLabProjectData(epc_data=lot_data.epc_data),
+                                   sales_data=SalesProjectData())
 
     # 2. Add to database
-    # doc_id = projects_coll.insert_one(new_project.model_dump())
-    # print(doc_id)
+    doc_id = projects_coll.insert_one(new_project.model_dump())
+    print(doc_id)
 
     return {"successfully added new project": new_project}
 

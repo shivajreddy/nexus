@@ -150,7 +150,7 @@ function Epc() {
                     contract_date: item.contract_date ? format(new Date(item.contract_date), 'MM/dd/yyyy') : null,
                     product: item.product_name,
                     elevation: item.elevation_name,
-                    // Format date and handle null values as needed for other date fields
+                    // Format date and handle null values as needed for another date fields
                     drafting_assigned_on_date: item.drafting_assigned_on ? format(new Date(item.drafting_assigned_on), 'MM/dd/yyyy') : null,
                     drafting_finished_date: item.drafting_finished ? format(new Date(item.drafting_finished), 'MM/dd/yyyy') : null,
                     engineering_sent: item.engineering_sent ? format(new Date(item.engineering_sent), 'MM/dd/yyyy') : null,

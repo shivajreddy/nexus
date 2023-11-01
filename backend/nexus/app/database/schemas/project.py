@@ -12,7 +12,9 @@ Each of the document is the giant data structure that will hold every data point
 
 
 class Project(BaseModel):
+    # project-info
     project_uid: str
+    created_at: datetime
 
     # eagle-wide-data
     contract_type: Optional[Literal["SPEC", "Permit Hold", "Contract"]] = None

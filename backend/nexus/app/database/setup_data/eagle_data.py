@@ -5,6 +5,8 @@ collection: users
 schema's:
 description:
 """
+from datetime import datetime
+
 # users_coll_initial_data = [
 #     {
 #         "username": "1test@eagleofva.com",
@@ -252,7 +254,9 @@ Any thing that has to do with a house, then that data should be inside this.
 """
 projects_coll_initial_data = [
     {
+        # Project-Info
         "project_uid": "TESTING",
+        "created_at": datetime.now(),
 
         # company-wide data
         "contract_type": None,
@@ -262,19 +266,18 @@ projects_coll_initial_data = [
         # TEC LAB
         "teclab": {
             "epc_data": {
-                "finished": None,
+                "lot_status_finished": None,
+                "lot_status_released": None,
                 "community": None,
                 "section_number": None,
                 "lot_number": None,
                 "contract_date": None,
                 "contract_type": None,
-                "lot_status_finished": None,
-                "lot_status_released": None,
                 "product_name": None,
                 "elevation_name": None,
                 "drafting_drafter": None,
                 "drafting_assigned_on": None,
-                "drafting_finished": None,
+                "drafting_finished_on": None,
                 "engineering_engineer": None,
                 "engineering_sent": None,
                 "engineering_received": None,

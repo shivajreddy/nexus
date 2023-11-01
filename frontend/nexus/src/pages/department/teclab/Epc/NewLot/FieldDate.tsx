@@ -11,7 +11,7 @@ interface IProps {
     id: string;
     name: string;
     value?: Date;
-    onUpdate: (chosenDate?: Date) => void;
+    onUpdate: (newDate?: Date) => void;
 }
 
 const FieldDate = (props: IProps) => {
