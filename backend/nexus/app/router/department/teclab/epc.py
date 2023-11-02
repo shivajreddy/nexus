@@ -187,17 +187,10 @@ def update_lot(lot_data: UpdateEPCLot):
             detail=f"{lot_data.project_uid} doesn't exist"
         )
 
-    # update the content in DB
-    # Create an update query based on non-null fields in lot_data
-    # update_fields = {}
-    # for key, value in lot_data.epc_data.model_dump(exclude_unset=True).items():
-    #     update_fields[f"teclab.epc_data.{key}"] = value
-    # print("update_fields=", update_fields)
-
     # Update the project in the database
     result = projects_coll.update_one(
         {"project_uid": lot_data.project_uid},
-        {"$set": {"teclab.epc_data": lot_data.epc_data.model_dump()}}
+        {"$set": {"teclab_data.epc_data": lot_data.epc_data.model_dump()}}
     )
 
     print("result=", result)
