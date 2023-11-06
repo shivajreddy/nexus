@@ -1,6 +1,6 @@
 import RegistrationForm from "./RegistrationForm";
-// import {useGetAllDepartmentsQuery} from "@pages/auth/eagleApiSlice.ts";
-import React, {useEffect, useState} from "react";
+import {useGetAllDepartmentsQuery} from "@pages/auth/eagleApiSlice.ts";
+import React from "react";
 
 interface Iprops {
     isLoginPage: boolean;
@@ -10,16 +10,8 @@ interface Iprops {
 function RegistrationCard({isLoginPage, setIsLoginPage}: Iprops) {
 
     // + call the department-api
-    // const {data, isLoading, error} = useGetAllDepartmentsQuery(undefined);
-    // console.log(":) data = ", data, isLoading, error)
-
-    const [data, setData] = useState(undefined);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(()=>{
-
-        setIsLoading(false);
-    }, [])
+    const {data, isLoading, error} = useGetAllDepartmentsQuery(undefined);
+    // console.error("data = ", data, isLoading, error)
 
     return (
         <div className="text-white p-10 flex flex-col justify-center w-[100%]">
