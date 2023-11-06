@@ -1,5 +1,3 @@
-// export const BASE_URL = "http://34.139.78.157:8000";
-
 let baseUrl;
 
 if (import.meta.env.VITE_APP_ENV === 'development') {

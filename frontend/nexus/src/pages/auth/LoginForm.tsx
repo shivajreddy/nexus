@@ -50,10 +50,10 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            // useremail: "",
-            // password: "",
-            useremail: "test@tecofva.com",
-            password: "password123"
+            useremail: "",
+            password: "",
+            // useremail: "test@tecofva.com",
+            // password: "password123"
         },
     });
 
