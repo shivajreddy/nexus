@@ -37,10 +37,12 @@ app = FastAPI(
 #     "http://localhost",
 # ]
 
-origins = [
-    "http://34.139.78.157:3000",
-    "http://34.139.78.157",
-]
+# origins = [
+#     "http://34.139.78.157:3000",
+#     "http://34.139.78.157",
+# ]
+
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
