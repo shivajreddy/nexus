@@ -1,6 +1,14 @@
-// export const BASE_URL = "http://localhost:8000";
-// export const BASE_URL = "http://0.0.0.0:8000";
-export const BASE_URL = "http://34.139.78.157:8000";
+// export const BASE_URL = "http://34.139.78.157:8000";
+
+let baseUrl;
+
+if (import.meta.env.VITE_APP_ENV === 'development') {
+    baseUrl = import.meta.env.VITE_API_URL_DEV;
+} else {
+    baseUrl = import.meta.env.VITE_API_URL_PROD;
+}
+
+export const BASE_URL = baseUrl;
 
 
 // Auth related endpoints
