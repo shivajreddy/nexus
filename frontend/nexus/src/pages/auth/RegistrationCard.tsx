@@ -10,7 +10,7 @@ interface Iprops {
 function RegistrationCard({isLoginPage, setIsLoginPage}: Iprops) {
 
     // + call the department-api
-    const {data, isLoading, error} = useGetAllDepartmentsQuery(undefined);
+    const {data, isLoading } = useGetAllDepartmentsQuery(undefined);
     // console.error("data = ", data, isLoading, error)
 
     return (
