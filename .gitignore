@@ -8,6 +8,9 @@
 
 
 # Backend ignore files and folders
+backend/nexus/app/files/archive
+#backend/nexus/app/files/06-11-23-EagleBacklogTracker.csv
+
 **/__pycache__/
 **/venv/
 **/.env
