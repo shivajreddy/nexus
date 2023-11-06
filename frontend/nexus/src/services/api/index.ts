@@ -1,5 +1,6 @@
 // export const BASE_URL = "http://localhost:8000";
-export const BASE_URL = "http://0.0.0.0:8000";
+// export const BASE_URL = "http://0.0.0.0:8000";
+export const BASE_URL = "http://34.139.78.157:8000";
 
 
 // Auth related endpoints
