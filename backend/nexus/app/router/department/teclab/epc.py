@@ -2,6 +2,8 @@ import csv
 import os
 import uuid
 from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from typing import List
 
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -9,6 +11,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from app.database.database import projects_coll
 from app.database.schemas.department_data import NewEPCLot, UpdateEPCLot, EPCData
 from app.database.schemas.project import Project, TecLabProjectData, SalesProjectData
+from app.email.setup import send_email_with_given_message_and_attachment
 from app.security.oauth2 import get_current_user_data
 from app.database.schemas.user import User
 
@@ -201,11 +204,7 @@ def update_lot(lot_data: UpdateEPCLot):
     return {"message": f"Project {lot_data.project_uid} updated successfully"}
 
 
-import csv
-
-
-@router.get('/epc-status')
-def get_epc_status():
+def query_tracker_data():
     # puid | community | contract           |           spec+permit_hold |
     #                       /\                               /\
     #         to-be-drafted   under-process     to-be-drafted  under-process
@@ -224,12 +223,12 @@ def get_epc_status():
         ):
             filtered_lots.append(p_epc_data)
 
-    contract_waiting_drafting = []
-    contract_waiting_eng_or_plat = []
-    contract_waiting_to_send_permit = []
-    pm_waiting_drafting = []
-    pm_waiting_eng_or_plat = []
-    pm_waiting_to_send_permit = []
+    # contract_waiting_drafting = []
+    # contract_waiting_eng_or_plat = []
+    # contract_waiting_to_send_permit = []
+    # pm_waiting_drafting = []
+    # pm_waiting_eng_or_plat = []
+    # pm_waiting_to_send_permit = []
 
     result_data = {}
     """
@@ -242,24 +241,39 @@ def get_epc_status():
 
         if p.contract_type == 'Contract':
             if not p.drafting_finished:
-                contract_waiting_drafting.append(p)
+                # contract_waiting_drafting.append(p)
                 result_data[p.community][0] += 1
             elif not p.engineering_received or not p.plat_received:
-                contract_waiting_eng_or_plat.append(p)
+                # contract_waiting_eng_or_plat.append(p)
                 result_data[p.community][1] += 1
             elif not p.permitting_submitted:
-                contract_waiting_to_send_permit.append(p)
+                # contract_waiting_to_send_permit.append(p)
                 result_data[p.community][2] += 1
         else:
             if not p.drafting_finished:
-                pm_waiting_drafting.append(p)
+                # pm_waiting_drafting.append(p)
                 result_data[p.community][3] += 1
             elif not p.engineering_received or not p.plat_received:
-                pm_waiting_eng_or_plat.append(p)
+                # pm_waiting_eng_or_plat.append(p)
                 result_data[p.community][4] += 1
             elif not p.permitting_submitted:
-                pm_waiting_to_send_permit.append(p)
+                # pm_waiting_to_send_permit.append(p)
                 result_data[p.community][5] += 1
+
+    # sum the totals in each community
+    for k, v in result_data.items():
+        v.append(sum(v))
+
+    return filtered_lots, result_data
+
+
+import csv
+
+
+@router.get('/epc-status')
+def generate_send_csv():
+    # query the data
+    filtered_lots, result_data = query_tracker_data()
 
     # create the csv file
     today_date = datetime.now().strftime("%d-%m-%y")
@@ -280,13 +294,30 @@ def get_epc_status():
         for k, v in result_data.items():
             csv_writer.writerow([k] + v)
 
+    # create email with attachment
+    message = MIMEMultipart()
+    message['Subject'] = 'Eagle Backlog Tracker'
+    message['From'] = 'nexus@tecofva.com'
+    message['To'] = 'sreddy@tecofva.com'
+
+    # attach the csv file to message
+    with open(csv_filename, 'r') as file:
+        attachment = MIMEText(file.read())
+        attachment.add_header('Content-Disposition', 'attachment', filename=(today_date + "-EagleBacklogTracker.csv"))
+        message.attach(attachment)
+
+    send_email_with_given_message_and_attachment(
+        "sreddy@tecofva.com",
+        message
+    )
+
     return {
         "total": len(filtered_lots),
         "email_data": result_data,
-        f"contract_waiting_drafting: + {len(contract_waiting_drafting)}": contract_waiting_drafting,
-        f"contract_waiting_eng_or_plat: + {len(contract_waiting_eng_or_plat)}": contract_waiting_eng_or_plat,
-        f"contract_waiting_to_send_permit: + {len(contract_waiting_to_send_permit)}": contract_waiting_to_send_permit,
-        f"pm_waiting_drafting: + {len(pm_waiting_drafting)}": pm_waiting_drafting,
-        f"pm_waiting_eng_or_plat: + {len(pm_waiting_eng_or_plat)}": pm_waiting_eng_or_plat,
-        f"pm_waiting_to_send_permit: + {len(pm_waiting_to_send_permit)}": pm_waiting_to_send_permit
+        # f"contract_waiting_drafting: + {len(contract_waiting_drafting)}": contract_waiting_drafting,
+        # f"contract_waiting_eng_or_plat: + {len(contract_waiting_eng_or_plat)}": contract_waiting_eng_or_plat,
+        # f"contract_waiting_to_send_permit: + {len(contract_waiting_to_send_permit)}": contract_waiting_to_send_permit,
+        # f"pm_waiting_drafting: + {len(pm_waiting_drafting)}": pm_waiting_drafting,
+        # f"pm_waiting_eng_or_plat: + {len(pm_waiting_eng_or_plat)}": pm_waiting_eng_or_plat,
+        # f"pm_waiting_to_send_permit: + {len(pm_waiting_to_send_permit)}": pm_waiting_to_send_permit
     }
