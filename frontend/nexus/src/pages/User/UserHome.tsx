@@ -15,7 +15,7 @@ import {Button} from "@components/ui/button.tsx";
 
 function UserHome() {
     // Request for user details
-    const defaultName = "John Doe";
+    const defaultName = "Eric Eagle";
     const defaultJobTitle = "Eagle employee";
     const defaultEmail = "jdoe@eagleofva.com";
 
