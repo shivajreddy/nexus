@@ -49,13 +49,6 @@ origins = [
     "http://34.139.78.157:8000/",
 ]
 
-# origins = [
-#     "http://34.139.78.157:3000",
-#     "http://34.139.78.157",
-# ]
-
-# origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
