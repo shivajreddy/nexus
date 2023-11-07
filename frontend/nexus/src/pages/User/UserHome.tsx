@@ -73,7 +73,7 @@ function UserHome() {
                             <Button variant="primary">Update</Button>
                         </CardFooter>
                     </Card>
-                    <ThemeToggle/>
+                    {/*<ThemeToggle/>*/}
                 </div>
                 <Button variant="destructive" onClick={handleLogout}>Logout</Button>
             </div>

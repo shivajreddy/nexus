@@ -1,6 +1,7 @@
 import MainLayout from "@/templates/MainLayout"
 import {Button} from "@components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
+import {Chat} from "@pages/testing/Chat.tsx";
 
 function HomePage() {
 
@@ -9,12 +10,12 @@ function HomePage() {
     return (
         <MainLayout>
             <div className="home-page">
-                <h1> HomePage </h1>
+                <p className="text-2xl"> HomePage </p>
 
-                <Button onClick={() => navigate('/welcome')}>/Welcome</Button>
+                <Button onClick={() => navigate('/welcome')}>Go To Welcome Page</Button>
 
-                <p>User - home page</p>
-                <p> Testing alert component </p>
+                <Chat/>
+
             </div>
             <br/>
         </MainLayout>

@@ -13,7 +13,6 @@ from app.database.schemas.department_data import NewEPCLot, UpdateEPCLot, EPCDat
 from app.database.schemas.project import Project, TecLabProjectData, SalesProjectData
 from app.email.setup import send_email_with_given_message_and_attachment
 from app.security.oauth2 import get_current_user_data
-from app.database.schemas.user import User
 
 """
 TECLAB/EPC endpoint
@@ -267,9 +266,7 @@ def query_tracker_data():
     return filtered_lots, result_data
 
 
-import csv
-
-
+# Send Eagle back tracking email
 @router.get('/epc-status')
 def generate_send_csv():
     # query the data
@@ -299,6 +296,7 @@ def generate_send_csv():
     message['Subject'] = 'Eagle Backlog Tracker'
     message['From'] = 'nexus@tecofva.com'
     message['To'] = 'sreddy@tecofva.com'
+    message.attach(MIMEText('This is the body', 'plain'))
 
     # attach the csv file to message
     with open(csv_filename, 'r') as file:
