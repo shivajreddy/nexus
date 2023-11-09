@@ -17,7 +17,7 @@ class Project(BaseModel):
     created_at: datetime
 
     # eagle-wide-data
-    contract_type: Optional[Literal["SPEC", "Permit Hold", "Contract"]] = None
+    contract_type: Optional[Literal["SPEC", "Permit & Hold", "Contract"]] = None
     contract_date: Optional[datetime] = None
 
     # department-specific-data
