@@ -48,7 +48,7 @@ export function CheckboxReactHookFormMultiple(props: Iprops) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 my-2 p-2 border border-b1 rounded-md">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 my-2 p-2">
                 <FormField
                     control={form.control}
                     name="items"
@@ -56,14 +56,14 @@ export function CheckboxReactHookFormMultiple(props: Iprops) {
                         <FormItem>
                             <div className="mb-4">
                                 {
-                                    props.formLabel &&
-                                  <FormLabel className="text-base">{props.formLabel}</FormLabel>
+                                    // props.formLabel &&
+                                  // <FormLabel className="text-base">{props.formLabel}</FormLabel>
                                 }
                                 {
-                                    props.formDescription &&
-                                  <FormDescription>
-                                      {props.formDescription}
-                                  </FormDescription>
+                                  //   props.formDescription &&
+                                  // <FormDescription>
+                                  //     {props.formDescription}
+                                  // </FormDescription>
                                 }
                             </div>
                             {props.data.map((item) => (

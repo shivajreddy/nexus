@@ -1,73 +1,74 @@
 import {CheckboxReactHookFormMultiple} from "@pages/testing/CheckboxReactHookFormMultiple.tsx";
 import {Button} from "@components/ui/button.tsx";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@components/ui/card.tsx";
+import {ScrollArea} from "@components/ui/scroll-area.tsx";
 
 const MyComponent = () => {
 
     // const [products, setProducts] = useState<string[]>([]);
     const products = [
-        { id: "acton", label: "Acton" },
-        { id: "belmont", label: "Belmont" },
-        { id: "belmont_terrace", label: "Belmont Terrace" },
-        { id: "beverly", label: "Beverly" },
-        { id: "bradford", label: "Bradford" },
-        { id: "carlisle", label: "Carlisle" },
-        { id: "caroline", label: "Caroline" },
-        { id: "corvallis", label: "Corvallis" },
-        { id: "easton", label: "Easton" },
-        { id: "fulton", label: "Fulton" },
-        { id: "fulton_terrace", label: "Fulton Terrace" },
-        { id: "grayson", label: "Grayson" },
-        { id: "hadley", label: "Hadley" },
-        { id: "hartford_ii", label: "Hartford II" },
-        { id: "hartford_terrace", label: "Hartford Terrace" },
-        { id: "hawthorne", label: "Hawthorne" },
-        { id: "helena", label: "Helena" },
-        { id: "laurel", label: "Laurel" },
-        { id: "linden_iii", label: "Linden III" },
-        { id: "linden_terrace", label: "Linden Terrace" },
-        { id: "malvern", label: "Malvern" },
-        { id: "manchester", label: "Manchester" },
-        { id: "manchester_duplex", label: "Manchester Duplex" },
-        { id: "newport", label: "Newport" },
-        { id: "park", label: "Park" },
-        { id: "raleigh", label: "Raleigh" },
-        { id: "rowland", label: "Rowland" },
-        { id: "savannah", label: "Savannah" },
-        { id: "stamford", label: "Stamford" },
-        { id: "wellington_ii", label: "Wellington II" },
-        { id: "westfield", label: "Westfield" },
-        { id: "westminster", label: "Westminster" },
-        { id: "cedar", label: "Cedar" },
-        { id: "azalea", label: "Azalea" },
-        { id: "magnolia", label: "Magnolia" },
-        { id: "cason", label: "Cason" },
-        { id: "longleaf", label: "Longleaf" },
-        { id: "linden_iv", label: "Linden IV" },
-        { id: "bellavue", label: "Bellavue" },
-        { id: "clarion", label: "Clarion" },
-        { id: "none", label: "NONE" },
-        { id: "westmoreland", label: "Westmoreland" },
-        { id: "boulevard", label: "Boulevard" },
-        { id: "arlington", label: "Arlington" },
-        { id: "mckinney", label: "McKinney" },
-        { id: "bhc_18g", label: "BHC 18G" },
-        { id: "bhc_18h", label: "BHC 18H" },
-        { id: "bhc_22c", label: "BHC 22C" },
-        { id: "bhc_22e", label: "BHC 22E" },
-        { id: "bhc_22f", label: "BHC 22F" },
-        { id: "braddock", label: "Braddock" },
-        { id: "custom", label: "CUSTOM" },
-        { id: "old_oyster_retreat", label: "Old Oyster Retreat" },
-        { id: "the_palmetto", label: "The Palmetto" },
-        { id: "davidson", label: "Davidson" },
-        { id: "dianes_farmhouse", label: "Diane's Farmhouse" },
-        { id: "bhc_22b", label: "BHC 22B" },
-        { id: "bhc_22d", label: "BHC 22D" },
-        { id: "bhc_22g", label: "BHC 22G" },
-        { id: "brookline", label: "Brookline" },
-        { id: "millcreek", label: "Millcreek" },
-        { id: "highland", label: "Highland" },
+        {id: "acton", label: "Acton"},
+        {id: "belmont", label: "Belmont"},
+        {id: "belmont_terrace", label: "Belmont Terrace"},
+        {id: "beverly", label: "Beverly"},
+        {id: "bradford", label: "Bradford"},
+        {id: "carlisle", label: "Carlisle"},
+        {id: "caroline", label: "Caroline"},
+        {id: "corvallis", label: "Corvallis"},
+        {id: "easton", label: "Easton"},
+        {id: "fulton", label: "Fulton"},
+        {id: "fulton_terrace", label: "Fulton Terrace"},
+        {id: "grayson", label: "Grayson"},
+        {id: "hadley", label: "Hadley"},
+        {id: "hartford_ii", label: "Hartford II"},
+        {id: "hartford_terrace", label: "Hartford Terrace"},
+        {id: "hawthorne", label: "Hawthorne"},
+        {id: "helena", label: "Helena"},
+        {id: "laurel", label: "Laurel"},
+        {id: "linden_iii", label: "Linden III"},
+        {id: "linden_terrace", label: "Linden Terrace"},
+        {id: "malvern", label: "Malvern"},
+        {id: "manchester", label: "Manchester"},
+        {id: "manchester_duplex", label: "Manchester Duplex"},
+        {id: "newport", label: "Newport"},
+        {id: "park", label: "Park"},
+        {id: "raleigh", label: "Raleigh"},
+        {id: "rowland", label: "Rowland"},
+        {id: "savannah", label: "Savannah"},
+        {id: "stamford", label: "Stamford"},
+        {id: "wellington_ii", label: "Wellington II"},
+        {id: "westfield", label: "Westfield"},
+        {id: "westminster", label: "Westminster"},
+        {id: "cedar", label: "Cedar"},
+        {id: "azalea", label: "Azalea"},
+        {id: "magnolia", label: "Magnolia"},
+        {id: "cason", label: "Cason"},
+        {id: "longleaf", label: "Longleaf"},
+        {id: "linden_iv", label: "Linden IV"},
+        {id: "bellavue", label: "Bellavue"},
+        {id: "clarion", label: "Clarion"},
+        {id: "none", label: "NONE"},
+        {id: "westmoreland", label: "Westmoreland"},
+        {id: "boulevard", label: "Boulevard"},
+        {id: "arlington", label: "Arlington"},
+        {id: "mckinney", label: "McKinney"},
+        {id: "bhc_18g", label: "BHC 18G"},
+        {id: "bhc_18h", label: "BHC 18H"},
+        {id: "bhc_22c", label: "BHC 22C"},
+        {id: "bhc_22e", label: "BHC 22E"},
+        {id: "bhc_22f", label: "BHC 22F"},
+        {id: "braddock", label: "Braddock"},
+        {id: "custom", label: "CUSTOM"},
+        {id: "old_oyster_retreat", label: "Old Oyster Retreat"},
+        {id: "the_palmetto", label: "The Palmetto"},
+        {id: "davidson", label: "Davidson"},
+        {id: "dianes_farmhouse", label: "Diane's Farmhouse"},
+        {id: "bhc_22b", label: "BHC 22B"},
+        {id: "bhc_22d", label: "BHC 22D"},
+        {id: "bhc_22g", label: "BHC 22G"},
+        {id: "brookline", label: "Brookline"},
+        {id: "millcreek", label: "Millcreek"},
+        {id: "highland", label: "Highland"},
     ];
 
     const locationCategories = [
@@ -128,11 +129,27 @@ const MyComponent = () => {
             {/*<p className="font-bold text-2xl text-center">TAKE A C.O.R - LEAVE A C.O.R</p>*/}
 
             <div className="selection-section">
-                <CheckboxReactHookFormMultiple
-                    data={products}
-                    formLabel="1. Choose the list of products"
-                    formDescription="Choosing none will search in all products"
-                />
+                <p className="text-base">1. Choose the list of products</p>
+                <p className="text-sm text-zinc-500">Choosing none will search in all products</p>
+                {/*<ScrollArea className="h-72 w-48 rounded-md border border-b1 border-b-0">*/}
+                {/*    <CheckboxReactHookFormMultiple*/}
+                {/*        data={products}*/}
+                {/*        formLabel=""*/}
+                {/*        formDescription=""*/}
+                {/*    />*/}
+                {/*</ScrollArea>*/}
+                <div className="h-72 2-48 rounded-md border border-b1 border-b-0 rounded-bl-none rounded-br-none">
+                    <p>test selection</p>
+                </div>
+                <div className="flex items-center border border-red-600">
+                    <div className="p-2 h-11 bg-pink-300 border border-b2 rounded-bl-md">
+                        <p className="">chosen</p>
+                    </div>
+                    <div className="flex py-2 border border-b1 rounded-br-md items-center">
+                        <div className="border border-b2 mx-2 px-2">option1</div>
+                        <div className="border border-b2 mx-2 px-2">loooooooooong option1</div>
+                    </div>
+                </div>
             </div>
 
             <div className="selection-section">
