@@ -5,9 +5,7 @@
 
 import Navbar from "@/templates/Navbar"
 // import SideBar from "@templates/SideBar"
-import MainLayoutBody from "@templates/MainLayoutBody"
 import {ReactNode} from "react";
-import "@assets/templates/mainlayout.css"
 import BaseThemeContainer from "@templates/BaseThemeContainer.tsx";
 
 
@@ -19,14 +17,9 @@ function MainLayout({children}: IProps) {
 
     return (
         <BaseThemeContainer>
-            <div className="main-layout">
-                <Navbar/>
-                <div className="main-layout-container">
-                    {/*<SideBar/>*/}
-                    <MainLayoutBody>
-                        {children}
-                    </MainLayoutBody>
-                </div>
+            <Navbar/>
+            <div className="m-4">
+            {children}
             </div>
         </BaseThemeContainer>
     )

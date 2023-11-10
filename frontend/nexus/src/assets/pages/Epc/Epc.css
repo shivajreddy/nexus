@@ -1,10 +1,9 @@
 /* :: ==========================  epc-page  ========================== */
 .epc-container {
-
     /*width: 100%;*/
-    height: 100%;
+    /*height: 100%;*/
 
-    /*--epc-header-height: 56px;*/
+    --epc-header-height: 56px;
 
     background-color: var(--bg-2);
 
@@ -32,14 +31,17 @@
     /* border: 2px dashed black; */
 }
 
+.epc-body {
+    height: calc(100vh - var(--epc-header-height) - 90px);
+}
+
 
 /* :: ==========================  epc-grid-home  ========================== */
 #nexus-epc-grid-container {
     /*#epc-grid-home {*/
-    width: 100%;
+    /*width: 100%;*/
     /*height: 100%;*/
-    height: calc(100% - var(--epc-header-height));
-
+    /*height: calc(100% - var(--epc-header-height));*/
     font-family: "Berkeley Mono", monospace;
 }
 
@@ -51,7 +53,6 @@
     --ag-cell-horizontal-padding: 10px;
 
     --ag-alpine-active-color: #b833e1;
-    --ag-row-hover-color: #b833e1;
     --ag-row-hover-column-color: #b833e1;
 
     /*--ag-grid-size: 4px;*/

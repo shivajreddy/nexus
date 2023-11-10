@@ -74,6 +74,9 @@ function UserHome() {
                         </CardFooter>
                     </Card>
                     {/*<ThemeToggle/>*/}
+                    <Button onClick={()=>navigate('/updates')}>
+                        Updates
+                    </Button>
                 </div>
                 <Button variant="destructive" onClick={handleLogout}>Logout</Button>
             </div>

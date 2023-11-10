@@ -63,7 +63,7 @@ const LinkWithToolTip = ({...item}: ISidebarItem) => {
                     <div className="item-name">
                         {item.name}
                         {item.isBeta &&
-                          <Badge className="badge" variant="secondaryInverted">Beta</Badge>
+                          <Badge className="badge" variant="secondary">Beta</Badge>
                         }
                     </div>
                 </NavLink>

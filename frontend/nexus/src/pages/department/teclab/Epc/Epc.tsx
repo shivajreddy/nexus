@@ -127,6 +127,7 @@ function Epc() {
 
     const [columnDefinitions, setColumnDefinitions] = useState(columnDefinitionsData)
 
+    // + Fetch all EPC lots
     useEffect(() => {
         const get_lots_data_from_server = async () => {
             try {
@@ -174,8 +175,10 @@ function Epc() {
     }, [])
 
     const [loadEditorControls, setLoadEditorControls] = useState<'loading' | 'failed' | 'success'>('loading');
+    // + Get the user roles
     useEffect(() => {
         try {
+            // TODO: why is this even in async ? remove if not needed
             async function get_current_user() {
                 const hasEditorRoles = hasRoles(userRoles, [101]);
                 if (hasEditorRoles) {
@@ -218,7 +221,6 @@ function Epc() {
         }
     }, [loadEditorControls, columnDefinitions])
 
-
     return (
         <MainLayout>
             {/*<div>*/}
@@ -239,7 +241,7 @@ function Epc() {
                     <div className="flex mx-10">
 
                         {hasRoles(userRoles, [101]) &&
-                          <div className="flex justify-center items-center">
+                          <div className="flex justify-center items-center bg-default-bg2">
                             <Button variant="outline" className="flex justify-center items-center"
                                     onClick={() => navigate('lot/new')}>
                               <p className="pr-2"><BsPlusCircleFill/></p>
@@ -248,7 +250,7 @@ function Epc() {
                           </div>
                         }
 
-                        <div className="flex justify-center items-center ml-8">
+                        <div className="flex justify-center items-center ml-8 bg-default-bg2">
                             <Button variant="outline" className="flex justify-center items-center"
                                     onClick={() => navigate('/epc/all-lots')}>
                                 <p className="pr-2"><CgMenuGridO/></p>
@@ -260,43 +262,46 @@ function Epc() {
 
                     </div>
                 </div>
-                {fetchLotDataStatus === 'loading' ?
-                    <div
-                        id="nexus-epc-grid-container"
-                        className="flex flex-col justify-center items-center"
-                    >
-                        <div className="space-y-4 m-8">
-                            {[...Array(30)].map((_, index) => (
-                                <Skeleton key={index} className="rounded-full h-4 w-[80vw]"/>
-                            ))}
-                        </div>
-                    </div>
-                    : fetchLotDataStatus === 'failed' ?
+                <div className="epc-body">
+                    {fetchLotDataStatus === 'loading' ?
                         <div
                             id="nexus-epc-grid-container"
                             className="flex flex-col justify-center items-center"
                         >
-                            <p className="font-semibold text-destructive text-xl">Error fetching data</p>
-                            <p>{fetchErrorDetails}</p>
-                            <p>(If issue persists contact TEC Lab)</p>
-                            <Button className="m-4">Reload</Button>
+                            <div className="space-y-4 m-8">
+                                {[...Array(30)].map((_, index) => (
+                                    <Skeleton key={index} className="rounded-full h-4 w-[80vw]"/>
+                                ))}
+                            </div>
                         </div>
-                        :
-                        <div>
-                            <p>loaded</p>
-                        </div>
-
-                        // <div
-                        //     id="nexus-epc-grid-container"
-                        //     className="ag-theme-alpine ag-theme-nexus"
-                        // >
-                        //     <AgGridReact
-                        //         rowData={allEPCLots}
-                        //         gridOptions={gridOptions}
-                        //         columnDefs={columnDefinitions}
-                        //     />
-                        // </div>
-                }
+                        : fetchLotDataStatus === 'failed' ?
+                            <div
+                                id="nexus-epc-grid-container"
+                                className="flex flex-col justify-center items-center"
+                            >
+                                <p className="font-semibold text-destructive text-xl">Error fetching data</p>
+                                <p>{fetchErrorDetails}</p>
+                                <p>(If issue persists contact TEC Lab)</p>
+                                <Button className="m-4">Reload</Button>
+                            </div>
+                            :
+                            // <EpcTest1/>
+                            <div
+                                // id="nexus-epc-grid-container"
+                                // className="ag-theme-alpine ag-theme-nexus"
+                                className="ag-theme-alpine"
+                                // style={{height: '100%'}}
+                                style={{height: '100%'}}
+                            >
+                                <AgGridReact
+                                    // rowData={rowData}
+                                    rowData={allEPCLots}
+                                    gridOptions={gridOptions}
+                                    columnDefs={columnDefinitions}
+                                />
+                            </div>
+                    }
+                </div>
 
             </div>
         </MainLayout>

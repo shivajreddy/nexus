@@ -24,7 +24,7 @@ function EpcMenu() {
 
             <Sheet>
                 <SheetTrigger>
-                    <div className="flex items-center border border-b1 p-1.5 rounded-md">
+                    <div className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md">
                         <p className="pr-2"><MdOutlineStorage/></p>
                         Menu
                     </div>

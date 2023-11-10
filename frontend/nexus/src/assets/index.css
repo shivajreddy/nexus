@@ -9,6 +9,7 @@
 }
 
 body {
+    overflow-y: scroll;
     position: relative;
     margin: 0;
 
@@ -43,8 +44,8 @@ body {
         line-height: 1.5;
         font-weight: 400;
 
-        --animation-duration: 200ms;
-        --animation-timing-curve: ease-in-out;
+        /*--animation-duration: 200ms;*/
+        /*--animation-timing-curve: ease-in-out;*/
 
         --navbar-top-height: 56px;
         /* --header-height: 56px; */

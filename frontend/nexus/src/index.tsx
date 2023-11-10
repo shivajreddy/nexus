@@ -11,7 +11,6 @@ import "@assets/index.css";
 import HomePage from "@/pages/HomePage/HomePage";
 import Epc from "@/pages/department/teclab/Epc/Epc";
 import Updates from "@pages/Updates/Updates";
-import Tasks from "@pages/Tasks/Tasks";
 import Pipeline from "@pages/Pipeline/Pipeline";
 import UserHome from "@pages/User/UserHome";
 import PageNotFound from "@/pages/common/PageNotFound";
@@ -30,6 +29,7 @@ import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
 import NewLot from "@pages/department/teclab/Epc/NewLot/NewLot.tsx";
 import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
 import EditLot from "@pages/department/teclab/Epc/EditLot/EditLot.tsx";
+import CoreDashboard from "@pages/department/sales/CoreDashboard.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -56,7 +56,7 @@ const router = createBrowserRouter(
                     </Route>
 
                     <Route path="pipeline" element={<Pipeline/>}/>
-                    <Route path="tasks" element={<Tasks/>}/>
+                    <Route path="core-dashboard" element={<CoreDashboard/>}/>
                     <Route path="updates" element={<Updates/>}/>
                     <Route path="user" element={<UserHome/>}/>
 

@@ -1,4 +1,3 @@
-import MainLayout from "@/templates/MainLayout";
 
 import {AgGridReact} from "ag-grid-react";
 
@@ -70,17 +69,13 @@ function EpcTest1() {
     }
 
     return (
-        <MainLayout>
-
-            <div className="ag-theme-alpine ag-theme-shiva1" style={{height: '100%'}}>
-                <AgGridReact
-                    rowData={rowData} animateRows={true}
-                    columnDefs={columnDefs}
-                    gridOptions={gridOptions}
-                />
-            </div>
-
-        </MainLayout>
+        <div className="ag-theme-alpine" style={{height: '100%'}}>
+            <AgGridReact
+                rowData={rowData} animateRows={true}
+                columnDefs={columnDefs}
+                gridOptions={gridOptions}
+            />
+        </div>
     )
 }
 

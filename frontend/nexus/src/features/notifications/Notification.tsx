@@ -1,15 +1,10 @@
 
 
-interface Iprops {
 
-}
-
-function Notification({ ...props }: Iprops) {
+function Notification() {
   return (
     <div className="notification-container">
-
-      <p>Sample Notification</p>
-
+      <p>No notification</p>
     </div>
   )
 }

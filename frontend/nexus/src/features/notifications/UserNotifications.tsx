@@ -11,15 +11,14 @@ import Notification from "./Notification"
 import { Separator } from "@/components/ui/separator"
 
 
-interface IProps { }
 
-function UserNotifications({ ...props }: IProps) {
+function UserNotifications() {
   return (
     <div className="user-notifications-container">
 
       <Sheet>
         <SheetTrigger asChild>
-          <div> <IoNotificationsOutline /> </div>
+          <div> <IoNotificationsOutline size="1.5em" /> </div>
         </SheetTrigger>
         <SheetContent>
           <SheetHeader>
@@ -29,7 +28,7 @@ function UserNotifications({ ...props }: IProps) {
           <br />
 
           <div className="all-notifications">
-            <Notification />
+            <Notification  />
           </div>
 
         </SheetContent>

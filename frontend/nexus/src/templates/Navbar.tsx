@@ -1,52 +1,110 @@
 import UserNotifications from "@/features/notifications/UserNotifications";
-import "@assets/templates/navbar.css"
 import {FaCircleUser} from "react-icons/fa6"
 import {NavLink, useNavigate} from "react-router-dom";
+import {ReactElement} from "react";
+import {FaRegCircle} from "react-icons/fa";
 
-// import {useAppDispatch} from "@/redux/hooks";
-// import {toggleSidebar_action} from "@/features/sidebar/sidebarSlice";
+import {BsCollection} from "react-icons/bs";
+// import {RiHome2Line} from "react-icons/ri";
 
 
 function Navbar() {
-
-    // const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    // function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
-    //     e.preventDefault();
-    //     dispatch(toggleSidebar_action())
-    // }
+    interface INavBarItem {
+        name: string,
+        link: string,
+        icon: ReactElement,
+        isBeta: boolean
+    }
+
+    // + Fetch the items based on user roles
+    const HardCodedNavBarItems: INavBarItem[] = [
+        // {
+        //     name: "Home",
+        //     link: "/",
+        //     icon: <RiHome2Line size="1.5em"/>,
+        //     isBeta: true,
+        // },
+        {
+            name: "EPC",
+            link: "/epc",
+            icon: <FaRegCircle size={"1.5em"}/>,
+            isBeta: true,
+        },
+        {
+            name: "CORD",
+            link: "/core-dashboard",
+            icon: <BsCollection size={"1.5em"}/>,
+            isBeta: true,
+        },
+    ]
+
+    const LinkWithToolTip = ({...props}: INavBarItem) => {
+        return (
+            <div className="px-4">
+                <NavLink to={props.link}
+                         key={props.name}>
+
+                    <div className="group relative w-max">
+                        <p className="px-6">{props.icon}</p>
+                        <span
+                            className="bg-default-bg1 rounded-md shadow-sm px-2 p-1 pointer-events-none absolute -bottom-9 left-2 w-max opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                            {props.name}
+                        </span>
+                    </div>
+
+                </NavLink>
+
+            </div>
+        )
+    }
 
     return (
-        <header className="top-navbar">
-            {/*<div>*/}
-            {/*    <button*/}
-            {/*        onClick={handleClick}*/}
-            {/*        className="sidebar-toggle-btn">*/}
-            {/*        <svg height="24" viewBox="0 0 24 24" width="24" focusable="false">*/}
-            {/*            <path d="M21 6H3V5h18v1zm0 5H3v1h18v-1zm0 6H3v1h18v-1z"></path>*/}
-            {/*        </svg>*/}
-            {/*    </button>*/}
-            {/*</div>*/}
+        <header
+            className="sticky top-0 z-50 w-full
+            border-b shadow-sm
+            bg-white bg-opacity-30 backdrop-filter backdrop-blur-lg
+            supports-[backdrop-filter]:bg-background/60"
+        >
+            <nav className="flex items-center p-2">
 
-            <div className="site-logo">
-                <button className="ml-4" onClick={() => navigate('/')}>
-                    <p className="font-bold text-3xl">Nexus</p>
-                </button>
-            </div>
-
-            <div className="menu">
-                {/* menu items here */}
-            </div>
-
-            <div className="user-controls">
-                <div className="user-notification">
-                    <UserNotifications/>
+                {/* :: Left Area* :: */}
+                <div className="flex-none px-6">
+                    <button className="" onClick={() => navigate('/')}>
+                        <p className="font-bold text-2xl m-0 p-0">NEXUS</p>
+                    </button>
                 </div>
-                <NavLink to="/user" className="user-avatar">
-                    <FaCircleUser/>
-                </NavLink>
-            </div>
+
+                {/* :: Center Area * :: */}
+                <div className="flex-auto nav-menu flex justify-center">
+
+                    {
+                        HardCodedNavBarItems.map((item) => (
+                            <LinkWithToolTip
+                                key={item.name}
+                                name={item.name}
+                                link={item.link}
+                                icon={item.icon}
+                                isBeta={item.isBeta}
+                                // sidebarIsOpen={sidebarStatusState}
+                            />
+                        ))
+                    }
+                </div>
+
+                {/* :: Right Area * :: */}
+                <div className="flex-none px-6 flex user-controls">
+                    <div className="user-notificationm px-12">
+                        <UserNotifications/>
+                    </div>
+                    <NavLink to="/user" className="user-avatar mr-8">
+                        <FaCircleUser size={"1.5em"}/>
+                    </NavLink>
+                </div>
+
+            </nav>
         </header>
     )
 }
