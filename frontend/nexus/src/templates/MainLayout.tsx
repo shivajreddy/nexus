@@ -4,7 +4,7 @@
 */
 
 import Navbar from "@/templates/Navbar"
-import SideBar from "@templates/SideBar"
+// import SideBar from "@templates/SideBar"
 import MainLayoutBody from "@templates/MainLayoutBody"
 import {ReactNode} from "react";
 import "@assets/templates/mainlayout.css"
@@ -19,18 +19,14 @@ function MainLayout({children}: IProps) {
 
     return (
         <BaseThemeContainer>
-
             <div className="main-layout">
-
                 <Navbar/>
-
                 <div className="main-layout-container">
-                    <SideBar/>
+                    {/*<SideBar/>*/}
                     <MainLayoutBody>
                         {children}
                     </MainLayoutBody>
                 </div>
-
             </div>
         </BaseThemeContainer>
     )

@@ -97,22 +97,17 @@ const columnDefinitionsData = [
 const gridOptions = {
     defaultColDef: defaultColumnSettings,
     columnDefs: columnDefinitionsData,
-
     // Group columns
     groupHeaderHeight: 40,
-
     // Label columns
     headerHeight: 30,
     // headerWidth: 30,
     // Floating filter
     floatingFiltersHeight: 50,
-
     // Pivoting, requires turning on pivot mode. Label columns
     pivotHeaderHeight: 100,
-
     // Pivoting, requires turning on pivot mode. Group columns
     pivotGroupHeaderHeight: 50,
-
     // sideBar: true,
     // suppressMenuHide: true
 }
@@ -226,6 +221,7 @@ function Epc() {
 
     return (
         <MainLayout>
+            {/*<div>*/}
             <div className="epc-container rounded-md">
 
                 <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
@@ -286,16 +282,20 @@ function Epc() {
                             <Button className="m-4">Reload</Button>
                         </div>
                         :
-                        <div
-                            id="nexus-epc-grid-container"
-                            className="ag-theme-alpine ag-theme-nexus"
-                        >
-                            <AgGridReact
-                                rowData={allEPCLots}
-                                columnDefs={columnDefinitions}
-                                gridOptions={gridOptions}
-                            />
+                        <div>
+                            <p>loaded</p>
                         </div>
+
+                        // <div
+                        //     id="nexus-epc-grid-container"
+                        //     className="ag-theme-alpine ag-theme-nexus"
+                        // >
+                        //     <AgGridReact
+                        //         rowData={allEPCLots}
+                        //         gridOptions={gridOptions}
+                        //         columnDefs={columnDefinitions}
+                        //     />
+                        // </div>
                 }
 
             </div>
