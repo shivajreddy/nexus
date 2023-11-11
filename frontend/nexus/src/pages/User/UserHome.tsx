@@ -73,7 +73,7 @@ function UserHome() {
                             <Button variant="primary">Update</Button>
                         </CardFooter>
                     </Card>
-                    {/*<ThemeToggle/>*/}
+                    <ThemeToggle/>
                     <Button onClick={()=>navigate('/updates')}>
                         Updates
                     </Button>

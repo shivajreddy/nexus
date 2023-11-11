@@ -13,6 +13,7 @@ import "@assets/pages/Epc/NewLot.css"
 import {EPCData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
+import FindProject from "@pages/Project/FindProject.tsx";
 
 
 function NewLot() {
@@ -104,7 +105,6 @@ function NewLot() {
         });
     }
 
-
     return (
         <MainLayout>
             <div className="border rounded bg-default-bg1">
@@ -126,6 +126,9 @@ function NewLot() {
                         </div>
                     </div>
                 </div>
+
+
+                <FindProject/>
 
                 <div id="new-lot-form-container" className="rounded-lg rounded-t-none bg-default-bg2">
 

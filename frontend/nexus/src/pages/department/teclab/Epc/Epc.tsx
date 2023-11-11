@@ -288,13 +288,11 @@ function Epc() {
                             // <EpcTest1/>
                             <div
                                 // id="nexus-epc-grid-container"
-                                // className="ag-theme-alpine ag-theme-nexus"
-                                className="ag-theme-alpine"
-                                // style={{height: '100%'}}
+                                className="ag-theme-alpine ag-theme-nexus"
+                                // className="ag-theme-alpine"
                                 style={{height: '100%'}}
                             >
                                 <AgGridReact
-                                    // rowData={rowData}
                                     rowData={allEPCLots}
                                     gridOptions={gridOptions}
                                     columnDefs={columnDefinitions}
