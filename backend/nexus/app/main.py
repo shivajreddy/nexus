@@ -12,6 +12,7 @@ from app.router.public import router as public_router
 from app.router.department.teclab.teclab import router as teclab_router
 from app.router.department.teclab.epc import router as teclab_epc_router
 from app.router.testing.test1 import router as testing_router
+from app.router.projects.projects import router as projects_router
 from app.sockets.sockets import sio_app
 
 app = FastAPI(
@@ -73,6 +74,7 @@ async def app_init():
     app.include_router(teclab_router)
     app.include_router(teclab_epc_router)
     app.include_router(testing_router)
+    app.include_router(projects_router)
 
 
 @app.get("/api/healthchecker")

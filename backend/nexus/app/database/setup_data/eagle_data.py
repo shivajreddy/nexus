@@ -307,7 +307,9 @@ projects_coll_initial_data = [
     {
         # Project-Info
         "project_uid": "TESTING",
+        # "project_id": "XXX-XXX-XXX",
         "created_at": datetime.now(),
+        # "created_by" : "",
 
         # company-wide data
         "contract_type": None,

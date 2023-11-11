@@ -32,3 +32,9 @@ class TecLabProjectData(BaseModel):
 class SalesProjectData(BaseModel):
     salesman: Optional[str] = None
     selections_finished_on: Optional[datetime] = None
+
+
+class TargetProject(BaseModel):
+    community: Optional[str] = None
+    section: Optional[str] = None
+    lot_number: Optional[str] = None

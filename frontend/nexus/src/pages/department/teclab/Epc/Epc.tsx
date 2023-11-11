@@ -224,9 +224,7 @@ function Epc() {
 
     return (
         <MainLayout>
-            {/*<div>*/}
             <div className="epc-container rounded-md">
-
                 <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
                     <div className="border-r flex items-center">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
@@ -240,15 +238,8 @@ function Epc() {
                     </div>
 
                     <div className="flex mx-10">
-
                         {hasRoles(userRoles, [101]) &&
                           <div className="flex justify-center items-center bg-default-bg2">
-                              {/*<Button variant="outline" className="flex justify-center items-center"*/}
-                              {/*        onClick={() => navigate('lot/new')}>*/}
-                              {/*  <p className="pr-2"><BsPlusCircleFill/></p>*/}
-                              {/*  Add New Lot*/}
-                              {/*</Button>*/}
-
                             <button
                               className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
                               onClick={() => navigate('lot/new')}
@@ -256,10 +247,8 @@ function Epc() {
                               <p className="pr-2"><BsPlusCircleFill/></p>
                               Add New Lot
                             </button>
-
                           </div>
                         }
-
                         <div className="flex justify-center items-center ml-8 bg-default-bg2">
                             <button
                                 className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
@@ -269,9 +258,7 @@ function Epc() {
                                 All Lots
                             </button>
                         </div>
-
                         <EpcMenu/>
-
                     </div>
                 </div>
                 <div className="epc-body">

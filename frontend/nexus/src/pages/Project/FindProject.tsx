@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
+import {data} from "autoprefixer";
 
 
 interface Iprops {
@@ -33,8 +34,17 @@ const FindProject = ({...props}: Iprops) => {
         });
     }, [])
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         props.setStatus('loading');
+        const response = await axios.post("/projects",
+            {
+                "community": community,
+                "section": section,
+                "lot_number": lotNumber
+            },
+            {headers: {"Content-Type": "application/json"}}
+        )
+        console.log("response for /projects: ", response);
     }
 
     return (
