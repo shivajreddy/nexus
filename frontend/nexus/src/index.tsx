@@ -30,6 +30,9 @@ import NewLot from "@pages/department/teclab/Epc/NewLot/NewLot.tsx";
 import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
 import EditLot from "@pages/department/teclab/Epc/EditLot/EditLot.tsx";
 import CoreDashboard from "@pages/department/sales/CoreDashboard.tsx";
+import EPCAll from "@pages/department/teclab/Epc/EPCAll.tsx";
+import FindProject from "@pages/Project/FindProject.tsx";
+import Projects from "@pages/Project/Projects.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -48,8 +51,16 @@ const router = createBrowserRouter(
                 <Route element={<AuthRequired/>}>
                     <Route path="/" element={<HomePage/>}/>
                     {/*<Route path="epc" element={<EpcTest1/>}/>*/}
+
+                    <Route path="projects">
+                        <Route index element={<Projects/>}/>
+                        <Route path="search" element={<FindProject/>}/>
+                        {/*<Route path="new" element={}/>*/}
+                    </Route>
+
                     <Route path="epc">
                         <Route index element={<Epc/>}/>
+                        <Route path="all-lots" element={<EPCAll/>}/>
                         <Route path="lot/new" element={<NewLot/>}/>
                         <Route path="edit/:project_uid" element={<EditLot/>}/>
                         <Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>

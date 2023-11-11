@@ -23,6 +23,7 @@ import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
 import {Skeleton} from "@components/ui/skeleton.tsx";
 import {MdOutlineStorage} from "react-icons/md";
+import {TiArrowBack} from "react-icons/ti";
 
 
 const defaultColumnSettings = {
@@ -114,7 +115,7 @@ const gridOptions = {
 }
 
 
-function Epc() {
+function EPCAll() {
     const navigate = useNavigate();
 
     const axios = useAxiosPrivate();
@@ -200,7 +201,7 @@ function Epc() {
                                         // href={`edit/${params.data.project_uid}`}
                                         className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
                                         data-id={params.data.id}
-                                        onClick={() => navigate(`edit/${params.data.project_uid}`)}
+                                        onClick={()=>navigate(`/epc/edit/${params.data.project_uid}`)}
                                     >
                                         <PiPencilSimpleFill/>
                                     </a>
@@ -235,43 +236,19 @@ function Epc() {
                             : fetchLotDataStatus === 'failed' ?
                                 <p className="ml-4 font-semibold text-destructive text-xl">Failed</p>
                                 :
-                                <p className="ml-4 font-semibold text-primary text-xl">Live</p>
+                                <p className="ml-4 font-semibold text-primary text-xl">All-Lots</p>
                         }
                     </div>
 
                     <div className="flex mx-10">
 
-                        {hasRoles(userRoles, [101]) &&
-                          <div className="flex justify-center items-center bg-default-bg2">
-                              {/*<Button variant="outline" className="flex justify-center items-center"*/}
-                              {/*        onClick={() => navigate('lot/new')}>*/}
-                              {/*  <p className="pr-2"><BsPlusCircleFill/></p>*/}
-                              {/*  Add New Lot*/}
-                              {/*</Button>*/}
-
-                            <button
-                              className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
-                              onClick={() => navigate('lot/new')}
-                            >
-                              <p className="pr-2"><BsPlusCircleFill/></p>
-                              Add New Lot
-                            </button>
-
-                          </div>
-                        }
-
-                        <div className="flex justify-center items-center ml-8 bg-default-bg2">
-                            <button
-                                className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
-                                onClick={() => navigate('/epc/all-lots')}
-                            >
-                                <p className="pr-2"><CgMenuGridO/></p>
-                                All Lots
-                            </button>
-                        </div>
+                        <Button variant="outline" className="flex justify-center items-center"
+                                onClick={() => navigate('/epc')}>
+                            <p className="pr-2"><TiArrowBack/></p>
+                            Back to EPC
+                        </Button>
 
                         <EpcMenu/>
-
                     </div>
                 </div>
                 <div className="epc-body">
@@ -317,4 +294,4 @@ function Epc() {
     );
 }
 
-export default Epc;
+export default EPCAll;

@@ -4,7 +4,7 @@ import {NavLink, useNavigate} from "react-router-dom";
 import {ReactElement} from "react";
 import {FaRegCircle} from "react-icons/fa";
 
-import {BsCollection} from "react-icons/bs";
+import {BsCollection, BsHouses} from "react-icons/bs";
 // import {RiHome2Line} from "react-icons/ri";
 
 
@@ -20,12 +20,12 @@ function Navbar() {
 
     // + Fetch the items based on user roles
     const HardCodedNavBarItems: INavBarItem[] = [
-        // {
-        //     name: "Home",
-        //     link: "/",
-        //     icon: <RiHome2Line size="1.5em"/>,
-        //     isBeta: true,
-        // },
+        {
+            name: "Projects",
+            link: "/projects",
+            icon: <BsHouses size="1.5em"/>,
+            isBeta: true,
+        },
         {
             name: "EPC",
             link: "/epc",
@@ -71,7 +71,7 @@ function Navbar() {
             <nav className="flex items-center p-2">
 
                 {/* :: Left Area* :: */}
-                <div className="flex-none px-6">
+                <div className="flex-none px-6 pr-24">
                     <button className="" onClick={() => navigate('/')}>
                         <p className="font-bold text-2xl m-0 p-0">NEXUS</p>
                     </button>
