@@ -18,11 +18,13 @@ const FieldDate = (props: IProps) => {
 
     return (
         <div key={props.id} className="flex items-center py-2">
-            <div className="flex-1 flex flex-grow items-center">
+            {/*<div className="flex-1 flex flex-grow items-center">*/}
+            <div className="basis-1/3 flex flex-grow items-center">
                 <Label className="text-lg font-medium cursor-pointer" htmlFor={props.id}>{props.name}</Label>
                 <div className="flex-grow border-t border-b0 ml-4"></div>
             </div>
-            <div className="flex-1 flex-grow" id={props.id}>
+            {/*<div className="flex-1 flex-grow" id={props.id}>*/}
+            <div className="basis-2/3 flex-grow" id={props.id}>
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button

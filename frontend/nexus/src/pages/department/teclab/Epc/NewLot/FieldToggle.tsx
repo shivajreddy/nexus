@@ -12,11 +12,13 @@ const FieldToggle = (props: IProps) => {
 
     return (
         <div className="flex items-center py-2">
-            <div className="flex-1 flex flex-grow items-center">
+            {/*<div className="flex-1 flex flex-grow items-center">*/}
+            <div className="basis-1/3 flex flex-grow items-center">
                 <Label className="text-lg font-medium cursor-pointer" htmlFor={props.id}>{props.name}</Label>
                 <div className="flex-grow border-t ml-4"></div>
             </div>
-            <div className="flex-1 flex items-center">
+            {/*<div className="flex-1 flex items-center">*/}
+            <div className="basis-2/3 flex items-center">
                 <Switch
                     checked={props.isChecked}
                     onCheckedChange={props.onUpdate}

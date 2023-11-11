@@ -1,6 +1,7 @@
 import {Input} from '@/components/ui/input'
 import {Label} from "@components/ui/label.tsx";
 import React from "react";
+import {cn} from "@/lib/utils.ts";
 
 interface IProps {
     id: string;
@@ -8,13 +9,15 @@ interface IProps {
     placeholder?: string;
     value?: string;
     onUpdate: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    className?: string | undefined;
 }
 
 const FieldText = (props: IProps) => {
 
     return (
-        <div className="flex items-center py-2">
-            <div className="flex-1 flex flex-grow items-center">
+        <div className={cn("flex items-center py-2", props.className)}>
+            {/*<div className="flex-1 flex flex-grow items-center">*/}
+            <div className="basis-1/3 flex items-center">
                 <Label className="text-lg font-medium cursor-pointer"
                        htmlFor={props.id}
                 >
@@ -22,7 +25,8 @@ const FieldText = (props: IProps) => {
                 </Label>
                 <div className="flex-grow border-t ml-4"></div>
             </div>
-            <div className="flex-1 cursor-pointer">
+            {/*<div className="flex-1 cursor-pointer">*/}
+            <div className="basis-2/3 cursor-pointer">
                 <Input
                     id={props.id}
                     type="string"

@@ -4,7 +4,7 @@ import {useState} from "react";
 
 const Projects = () => {
 
-    const [searchStatus, setSearchStatus] = useState<"loading" | "success" | "failed">("loading");
+    const [searchStatus, setSearchStatus] = useState<"loading" | "success" | "failed">("success");
 
     return (
         <MainLayout>
@@ -17,8 +17,7 @@ const Projects = () => {
                 </div>
 
                 <div className="m-4 p-4">
-                    <p>Find Project</p>
-                    <FindProject/>
+                    <FindProject status={searchStatus} setStatus={setSearchStatus}/>
                 </div>
 
             </div>
