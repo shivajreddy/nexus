@@ -18,3 +18,9 @@ backend/nexus/app/files/archive
 **/.env.test
 **/.env.prod
 
+
+# Ignore the docker files that have actual environment variables
+docker-compose-dev.yml
+docker-compose-prod.yml
+
+
