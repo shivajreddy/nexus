@@ -1,11 +1,11 @@
 FROM python:3.10
 
 # set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # copy the requiremens.txt to working directory
-COPY ./backend/nexus/requirements.txt ./
-
+# COPY ./backend/nexus/requirements.txt ./
+COPY . /app
 
 # install all the dependencies
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
