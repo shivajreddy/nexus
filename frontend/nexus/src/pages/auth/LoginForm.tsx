@@ -57,8 +57,8 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
         },
     });
 
-    // $ handle login with apislice and authslice
-    const [sendLoginRequest, {isLoading, isError, error}] = useLoginMutation();
+    // + handle login with apislice and authslice
+    const [sendLoginRequest, {isLoading, isError}] = useLoginMutation();
     const dispatch = useAppDispatch();
 
     const location = useLocation();
@@ -77,9 +77,9 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
             });
 
             // Check if response is an error
-            console.log("🐢✅ response =", response);
-            console.log(isLoading)
-            console.log(isError, error)
+            // console.log("🐢✅ response =", response);
+            // console.log(isLoading)
+            // console.log(isError, error)
 
             if (response && 'error' in response) { // Ensure that response exists and has an 'error' property
                 console.error("response.error:", response.error);
@@ -105,7 +105,7 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
                     setErrorDetail({title: "Complete Detail", content: JSON.stringify(response.error)})
                 }
             } else { // Handle the successful response here
-                console.log("🐌 no error in response")
+                // console.log("🐌 no error in response")
                 const data = response.data;
                 const userData: IUser = {
                     username: data?.username as string,
