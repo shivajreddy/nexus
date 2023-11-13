@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
 # Determine the environment and set the appropriate .env.prod file
 env = os.getenv("APP_ENV", "development")
+print("env=", env)
 if env == "production":
     settings = Settings(_env_file="./.env.prod")
 elif env == "test":
