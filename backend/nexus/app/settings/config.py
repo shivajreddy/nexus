@@ -38,5 +38,5 @@ if env == "production":
     settings = Settings(_env_file="./.env.prod")
 elif env == "test":
     settings = Settings(_env_file="./.env.test")
-else:
+elif env == "dev":
     settings = Settings(_env_file="./.env.dev")
