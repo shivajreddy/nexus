@@ -1,15 +1,14 @@
 version: '3'
 
 services:
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "80:3000"
 
   backend:
-    build:
-      context: ./backend
+    build: ./backend/nexus
     ports:
       - "8000:8000"
+
+  frontend:
+    build: ./frontend/nexus
+    ports:
+      - "80:3000"
 

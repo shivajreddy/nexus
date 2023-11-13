@@ -1,17 +1,15 @@
-FROM python:3.10
+FROM python:3.11-slim
 
 # set the working directory
-WORKDIR /app
+WORKDIR /app/backend
 
-# copy the requiremens.txt to working directory
-# COPY ./backend/nexus/requirements.txt ./
-COPY . /app
+COPY . .
 
 # install all the dependencies
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-COPY . .
+EXPOSE 8000
 
 # start the uvicorn app
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 

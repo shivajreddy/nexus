@@ -1,18 +1,14 @@
-# # Production
-# FROM node:18-alpine
-# WORKDIR /application/frontend
-# COPY /package*.json ./
-# RUN npm install
-# COPY ./ ./
-# EXPOSE 3000
-# RUN npm run build
-# CMD ["npx", "vite", "preview", "--host", "0.0.0.0", "--port", "3000"]
-
-# # Dev
 FROM node:18-alpine
-WORKDIR /application/frontend
-COPY /package*.json ./
-RUN npm install
+
+WORKDIR /app/frontend
+
 COPY . .
+
+# install all the dependencies
+RUN npm install
+
 EXPOSE 3000
-CMD [ "npm", "run", "dev" ]
+
+# start vite react app
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
