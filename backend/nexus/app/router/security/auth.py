@@ -63,7 +63,9 @@ async def create_user(payload: NewUserSchema):
 async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     # async def login_user(payload: LoginUserSchema, response: Response):
     # user_doc = user_coll.find_one({"username": payload.email})
+    print("form_data=", form_data)
     user_doc = users_coll.find_one({"username": form_data.username})
+    print("user_doc=", user_doc)
 
     if not user_doc:
         raise HTTPException(
