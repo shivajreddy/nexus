@@ -4,6 +4,8 @@ services:
 
   backend:
     build: ./backend/nexus
+    environment:
+      - APP_ENV=demo
     ports:
       - "8000:8000"
 
