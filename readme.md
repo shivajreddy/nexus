@@ -59,7 +59,8 @@ origins = [
 
 ###### Frontend
 - The only environment file the react app relies on is the `.env` file which should be inside the react-app's root directory.
-- 
+- under frontend-root/src/services/api/index.ts, we set the server-url so that axios-private can use this url as the base url. And this server-url we grab from the environment variable
+- If you set the `VITE_API_URL_PROD` to `http://localhost:8000` it won't work, because the frontend app will make a request to the client machine's port 8000 since that is the localhost where the request occured. So you should set the vm-ip or the domain name itself as the value for `VITE_API_URL_PROD`
 
 
 #### Specific notes  
