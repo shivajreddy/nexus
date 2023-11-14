@@ -41,3 +41,5 @@ elif env == "test":
     settings = Settings(_env_file="./.env.test")
 elif env == "dev":
     settings = Settings(_env_file="./.env.dev")
+else:
+    settings = Settings(_env_file="./.env.dev")

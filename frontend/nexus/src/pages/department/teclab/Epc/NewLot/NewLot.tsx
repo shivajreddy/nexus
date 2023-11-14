@@ -322,7 +322,7 @@ function NewLot() {
                             <CardDescription>[TEC-Lab only]Notes about the lot</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Textarea placeholder="Notes aboue the lot"/>
+                            <Textarea placeholder="Notes about the lot"/>
                         </CardContent>
                     </Card>
 

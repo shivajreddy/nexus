@@ -52,14 +52,17 @@ app.mount("/ws", sio_app)
 #
 #     "http://localhost:8000",
 #     "http://34.139.78.157:8000/",
+
+# "http://localhost",
+# "http://34.148.73.253:8000/",
+# "http://nexus.tecofva.com:8000",
 # ]
 
+# Front-end origins that should be allowed
+
 origins = [
-    "http://localhost:8000",
-    "http://localhost",
-    "http://34.148.73.253:8000/",
+    "http://localhost:3000",
     "http://34.148.73.253",
-    "http://nexus.tecofva.com:8000",
     "http://nexus.tecofva.com",
 ]
 

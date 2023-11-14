@@ -3,13 +3,11 @@ import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
 import React, {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {Button} from "@/components/ui/button";
-import {Loader2} from "lucide-react";
-import {data} from "autoprefixer";
 
 
 interface Iprops {
-    status: "loading" | "success" | "failed";
-    setStatus: React.Dispatch<React.SetStateAction<"loading" | "success" | "failed">>;
+    status: "initial" | "loading" |"failed";
+    setStatus: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed">>;
 }
 
 
@@ -22,6 +20,7 @@ const FindProject = ({...props}: Iprops) => {
     const [section, setSection] = useState<string>("");
     const [lotNumber, setLotNumber] = useState<string>("");
 
+    const [results, setResults] = useState<string[]>([]);
 
     // + Fetch data from server
     useEffect(() => {
@@ -36,20 +35,26 @@ const FindProject = ({...props}: Iprops) => {
 
     const handleSubmit = async () => {
         props.setStatus('loading');
-        const response = await axios.post("/projects",
-            {
-                "community": community,
-                "section": section,
-                "lot_number": lotNumber
-            },
-            {headers: {"Content-Type": "application/json"}}
-        )
-        console.log("response for /projects: ", response);
+        try {
+            const response = await axios.post("/projects",
+                {
+                    "community": community,
+                    "section": section,
+                    "lot_number": lotNumber
+                },
+                {headers: {"Content-Type": "application/json"}}
+            )
+            console.log("response for /projects: ", response);
+            setResults(response.data);
+            props.setStatus('initial');
+        } catch (e) {
+            props.setStatus('failed');
+        }
     }
 
     return (
-        <div className="px-10 p-5 bg-default-bg2 rounded-lg">
-            <p className="px-4 font-semibold text-2xl">Find Project</p>
+        <div className="px-10 p-5 bg-default-bg2 rounded-lg my-4">
+            <p className="px-4 font-semibold text-2xl">Find Project's</p>
             <div className="flex border-2 rounded-lg">
                 <div className="m-2">
                     <FieldDropDown id="1_community"
@@ -82,23 +87,31 @@ const FindProject = ({...props}: Iprops) => {
                         </div>
                     </div>
                     <div className="my-4">
-                        <p>Status: {props.status}</p>
-                        {props.status === 'success' &&
+                        {props.status === 'initial' &&
                           <Button variant="primary" onClick={handleSubmit}>
-                            Submit
+                            Fetch
                           </Button>
                         }
                         {props.status === 'loading' &&
-                          <Button disabled>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                            Loading</Button>
+                          <button disabled
+                                  className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
+                            Please wait
+                          </button>
+                        }
+                        {props.status === 'failed' &&
+                          <Button variant="primary" onClick={handleSubmit}>
+                            Failed to fetch
+                          </Button>
                         }
                     </div>
                 </div>
-                <div className="m-2 p-4">
-                    <p>results</p>
-                </div>
             </div>
+            {results.length > 0 &&
+              <div className="m-2 p-4">
+                <p>Results. Total: {results.length}</p>
+                  {results.map((item, idx) => <p key={idx}>{JSON.stringify(item)}</p>)}
+              </div>
+            }
         </div>
     );
 };

@@ -15,6 +15,7 @@ class Project(BaseModel):
     # project-info
     project_uid: str
     created_at: datetime
+    project_id: str
 
     # eagle-wide-data
     contract_type: Optional[Literal["SPEC", "Permit & Hold", "Contract"]] = None
