@@ -12,9 +12,7 @@ Each of the document is the giant data structure that will hold every data point
 
 
 class Project(BaseModel):
-    # project-info
-    project_uid: str
-    project_id: str
+    project_info: 'ProjectInfo'
 
     meta_info: 'ProjectMetaInfo'
 
@@ -23,6 +21,11 @@ class Project(BaseModel):
     # department-specific-data
     teclab_data: 'TecLabProjectData'
     sales_data: 'SalesProjectData'
+
+
+class ProjectInfo(BaseModel):
+    project_uid: str
+    project_id: str
 
 
 class ProjectMetaInfo(BaseModel):

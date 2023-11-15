@@ -245,20 +245,20 @@ function Epc() {
                               onClick={() => navigate('lot/new')}
                             >
                               <p className="pr-2"><BsPlusCircleFill/></p>
-                              Add New Lot
+                              Add EPC Data
                             </button>
                           </div>
                         }
-                        <div className="flex justify-center items-center ml-8 bg-default-bg2">
-                            <button
-                                className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
-                                onClick={() => navigate('/epc/all-lots')}
-                            >
-                                <p className="pr-2"><CgMenuGridO/></p>
-                                All Lots
-                            </button>
-                        </div>
-                        <EpcMenu/>
+                        {/*<div className="flex justify-center items-center ml-8 bg-default-bg2">*/}
+                        {/*    <button*/}
+                        {/*        className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"*/}
+                        {/*        onClick={() => navigate('/epc/all-lots')}*/}
+                        {/*    >*/}
+                        {/*        <p className="pr-2"><CgMenuGridO/></p>*/}
+                        {/*        All Lots*/}
+                        {/*    </button>*/}
+                        {/*</div>*/}
+                        {/*<EpcMenu/>*/}
                     </div>
                 </div>
                 <div className="epc-body">

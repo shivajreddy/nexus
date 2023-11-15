@@ -16,7 +16,7 @@ import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
 import FindProject from "@pages/Project/FindProject.tsx";
 
 
-function NewLot() {
+function AddEPCData() {
     const navigate = useNavigate();
     const axios = useAxiosPrivate()
 
@@ -122,7 +122,7 @@ function NewLot() {
                                 <p className="pr-2"><TiArrowBack/></p>
                                 Back to EPC
                             </Button>
-                            <EpcMenu/>
+                            {/*<EpcMenu/>*/}
                         </div>
                     </div>
                 </div>
@@ -319,10 +319,10 @@ function NewLot() {
                     <Card className="new-lot-section" id="new-lot-form-notes">
                         <CardHeader>
                             <CardTitle>Notes</CardTitle>
-                            <CardDescription>[TEC-Lab only]Notes about the lot</CardDescription>
+                            <CardDescription>TEC-Lab notes for the lot</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Textarea placeholder="Notes about the lot"/>
+                            <Textarea placeholder="Your notes here..."/>
                         </CardContent>
                     </Card>
 
@@ -340,4 +340,5 @@ function NewLot() {
     );
 }
 
-export default NewLot;
+
+export default AddEPCData;

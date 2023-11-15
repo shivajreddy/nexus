@@ -26,7 +26,7 @@ import SalesHome from "./pages/department/sales/SalesHome";
 import TecLabHome from "./pages/department/teclab/TecLabHome";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
 import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
-import NewLot from "@pages/department/teclab/Epc/NewLot/NewLot.tsx";
+import AddEPCData from "@pages/department/teclab/Epc/NewLot/AddEPCData.tsx";
 import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
 import EditLot from "@pages/department/teclab/Epc/EditLot/EditLot.tsx";
 import CoreDashboard from "@pages/department/sales/CoreDashboard.tsx";
@@ -61,7 +61,7 @@ const router = createBrowserRouter(
                     <Route path="epc">
                         <Route index element={<Epc/>}/>
                         <Route path="all-lots" element={<EPCAll/>}/>
-                        <Route path="lot/new" element={<NewLot/>}/>
+                        <Route path="lot/new" element={<AddEPCData/>}/>
                         <Route path="edit/:project_uid" element={<EditLot/>}/>
                         <Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>
                     </Route>
