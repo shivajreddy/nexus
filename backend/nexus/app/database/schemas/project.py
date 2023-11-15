@@ -14,16 +14,26 @@ Each of the document is the giant data structure that will hold every data point
 class Project(BaseModel):
     # project-info
     project_uid: str
-    created_at: datetime
     project_id: str
 
-    # eagle-wide-data
-    contract_type: Optional[Literal["SPEC", "Permit & Hold", "Contract"]] = None
-    contract_date: Optional[datetime] = None
+    meta_info: 'ProjectMetaInfo'
+
+    contract_info: 'ContractInfo'
 
     # department-specific-data
     teclab_data: 'TecLabProjectData'
     sales_data: 'SalesProjectData'
+
+
+class ProjectMetaInfo(BaseModel):
+    created_at: datetime
+    created_by: str
+
+
+class ContractInfo(BaseModel):
+    # eagle-wide-data
+    contract_type: Optional[Literal["SPEC", "Permit & Hold", "Contract"]] = None
+    contract_date: Optional[datetime] = None
 
 
 class TecLabProjectData(BaseModel):
@@ -39,3 +49,9 @@ class TargetProject(BaseModel):
     community: Optional[str] = None
     section: Optional[str] = None
     lot_number: Optional[str] = None
+
+
+class NewProject(BaseModel):
+    community: str
+    section: str
+    lot_number: str

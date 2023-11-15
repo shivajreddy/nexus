@@ -4,13 +4,55 @@ Projects endpoint
 
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.database.schemas.project import TargetProject, Project
+from app.database.schemas.project import TargetProject, Project, NewProject
 from app.security.oauth2 import get_current_user_data
 from app.database.database import projects_coll, client, eagle_data_coll, db
 
 router = APIRouter(prefix="/projects")
+
+
+@router.post('/new', dependencies=[Depends(get_current_user_data)])
+def new_project(project_details: NewProject):
+    print("given project", project_details.model_dump())
+    # find duplicates
+    # create the project_id
+    s = project_details.section
+    l = project_details.lot_number
+
+    communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    community_codes = communities_doc["community_codes"]
+    c1 = project_details.community
+    c = next((item[1] for item in community_codes if item[0] == c1), "")
+
+    new_project_id = c + "-" + s + "-" + l
+
+    for doc in projects_coll.find():
+        # project: Project = {k: v for (k, v) in doc.items() if k != "_id"}
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+        if project["project_id"] == new_project_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"{new_project_id} already exist"
+            )
+
+    # add new project
+    # return success result
+    return {"result": "Success",
+            "new_project_id": new_project_id,
+            "community_code": c,
+            "section_number": s,
+            "lot_number": l
+            }
+
+
+# :: TODO :: reshape the project documents in db with the updated schema
+@router.get('/update-project-shape')
+def update_project_shape():
+    # move to creation info to meta_info and create created by
+    # move to contract data to contract info
+    return "DONE"
 
 
 @router.post('/', dependencies=[Depends(get_current_user_data)])
