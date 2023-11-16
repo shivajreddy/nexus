@@ -9,7 +9,7 @@
 }
 
 body {
-    overflow-y: scroll;
+    /*overflow-y: scroll;*/
     position: relative;
     margin: 0;
 
@@ -51,8 +51,6 @@ body {
         /* --header-height: 56px; */
 
         color: var(--text-1);
-
-
     }
 
     /*:: Light Theme ::*/
@@ -263,5 +261,3 @@ body {
     }
 }
 
-
-/*!* :: ===================== Scroll bars ======================= *!*/

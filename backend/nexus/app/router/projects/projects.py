@@ -59,27 +59,70 @@ def new_project(project_details: NewProject):
             }
 
 
-@router.post('/', dependencies=[Depends(get_current_user_data)])
+@router.post('/search', dependencies=[Depends(get_current_user_data)])
 def get_all_projects(target_project: TargetProject):
     print("given project", target_project.model_dump())
 
     # search for projects in mongodb
     result = []
 
-    # nothing is selected
+    # nothing is selected, get all projects
     if not target_project.community and not target_project.section and not target_project.lot_number:
-        # get all projects
         for doc in projects_coll.find():
-            # project: Project = {k: v for (k, v) in doc.items() if k != "_id"}
             project = {k: v for (k, v) in doc.items() if k != "_id"}
-            result.append(project["project_id"])
+            result.append(project["project_info"]["project_id"])
+        return result
 
-            # final_object = {"project_uid": doc["project_uid"]}
-            # if "teclab_data" in project and "epc_data" in project["teclab_data"]:
-            #     final_object.update(project["teclab_data"]["epc_data"])
-            #     result.append(final_object)
-            # else:
-            #     print("doc without epc_data", project)
+    # only community is selected
+    if target_project.community and not target_project.section and not target_project.lot_number:
+        for doc in projects_coll.find():
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            # filter for target community
+            if project["teclab_data"]["epc_data"]["community"] == target_project.community:
+                result.append(project["project_info"]["project_id"])
+        return result
+
+    # only section is selected
+    if not target_project.community and target_project.section and not target_project.lot_number:
+        for doc in projects_coll.find():
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            # filter for target section
+            if project["teclab_data"]["epc_data"]["section_number"] == target_project.section:
+                result.append(project["project_info"]["project_id"])
+        return result
+
+    # only lot_number is selected
+    if not target_project.community and not target_project.section and target_project.lot_number:
+        for doc in projects_coll.find():
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            # filter for target lot_number
+            if project["teclab_data"]["epc_data"]["lot_number"] == target_project.lot_number:
+                result.append(project["project_info"]["project_id"])
+        return result
+
+    # community and section is selected
+    if target_project.community and target_project.section and not target_project.lot_number:
+        for doc in projects_coll.find():
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            # filter for target community & section
+            if (
+                    project["teclab_data"]["epc_data"]["community"] == target_project.community and
+                    project["teclab_data"]["epc_data"]["section_number"] == target_project.section
+            ):
+                result.append(project["project_info"]["project_id"])
+        return result
+
+    # all are selected
+    if target_project.community and target_project.section and target_project.lot_number:
+        for doc in projects_coll.find():
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            # filter for target lot_number
+            if (
+                    project["teclab_data"]["epc_data"]["community"] == target_project.community and
+                    project["teclab_data"]["epc_data"]["section_number"] == target_project.section and
+                    project["teclab_data"]["epc_data"]["lot_number"] == target_project.lot_number
+            ):
+                result.append(project["project_info"]["project_id"])
         return result
 
     return result

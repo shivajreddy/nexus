@@ -105,6 +105,9 @@ function AddEPCData() {
         });
     }
 
+    const [getProjectsStatus, setGetPRojectsStatus] = useState<"initial" | "loading" | "failed">("initial");
+    const [chosenProject, setChosenProject] = useState<string | undefined>(undefined);
+
     return (
         <MainLayout>
             <div className="border rounded bg-default-bg1">
@@ -128,7 +131,7 @@ function AddEPCData() {
                 </div>
 
 
-                <FindProject/>
+                <FindProject status={getProjectsStatus}  setStatus={setGetPRojectsStatus}/>
 
                 <div id="new-lot-form-container" className="rounded-lg rounded-t-none bg-default-bg2">
 

@@ -3,10 +3,11 @@ import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
 import React, {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {Button} from "@/components/ui/button";
+import {ScrollArea, ScrollBar} from "@components/ui/scroll-area.tsx";
 
 
 interface Iprops {
-    status: "initial" | "loading" |"failed";
+    status: "initial" | "loading" | "failed";
     setStatus: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed">>;
 }
 
@@ -36,7 +37,7 @@ const FindProject = ({...props}: Iprops) => {
     const handleSubmit = async () => {
         props.setStatus('loading');
         try {
-            const response = await axios.post("/projects",
+            const response = await axios.post("/projects/search",
                 {
                     "community": community,
                     "section": section,
@@ -52,66 +53,89 @@ const FindProject = ({...props}: Iprops) => {
         }
     }
 
+    const handleChooseProject = async () => {
+        console.log("Handle Choose Project");
+    }
+
     return (
         <div className="px-10 p-5 bg-default-bg2 rounded-lg my-4">
             <p className="px-4 font-semibold text-2xl">Find Project's</p>
-            <div className="flex border-2 rounded-lg">
-                <div className="m-2">
-                    <FieldDropDown id="1_community"
+
+            <div className="border-2 rounded-lg">
+                <div className="flex">
+                    <div className="m-2">
+                        <FieldDropDown id="1_community"
+                                       className="mx-4"
+                                       name={"Community"}
+                                       dropdownData={existingCommunities}
+                                       value={community}
+                                       onUpdate={(newValue) => setCommunity(newValue)}
+                        />
+                        <FieldText id="1_section"
                                    className="mx-4"
-                                   name={"Community"}
-                                   dropdownData={existingCommunities}
-                                   value={community}
-                                   onUpdate={(newValue) => setCommunity(newValue)}
-                    />
-                    <FieldText id="1_section"
-                               className="mx-4"
-                               name={"Section"}
-                               value={section}
-                               onUpdate={(e) => setSection(e.target.value)}
-                    />
-                    <FieldText id="1_lot_number"
-                               className="mx-4"
-                               name={"Lot Number"}
-                               value={lotNumber}
-                               onUpdate={(e) => setLotNumber(e.target.value)}
-                    />
-                </div>
-                <div className="m-2 p-4">
-                    <div className="flex select-none">
-                        <p className="font-medium">Project Code:</p>
-                        <div className="flex px-2">
-                            <p className="h-max px-2 border rounded-lg">{community ? community : "ALL"}</p>
-                            <p className="h-max mx-2 px-2 border rounded-lg">{section ? section : "ALL"}</p>
-                            <p className="h-max px-2 border rounded-lg">{lotNumber ? lotNumber : "ALL"}</p>
+                                   name={"Section"}
+                                   value={section}
+                                   onUpdate={(e) => setSection(e.target.value)}
+                        />
+                        <FieldText id="1_lot_number"
+                                   className="mx-4"
+                                   name={"Lot Number"}
+                                   value={lotNumber}
+                                   onUpdate={(e) => setLotNumber(e.target.value)}
+                        />
+                    </div>
+                    <div className="m-2 p-4">
+                        <div className="flex select-none">
+                            <p className="font-medium">Project Code:</p>
+                            <div className="flex px-2">
+                                <p className="h-max px-2 border rounded-lg">{community ? community : "ALL"}</p>
+                                <p className="h-max mx-2 px-2 border rounded-lg">{section ? section : "ALL"}</p>
+                                <p className="h-max px-2 border rounded-lg">{lotNumber ? lotNumber : "ALL"}</p>
+                            </div>
+                        </div>
+                        <div className="my-4">
+                            {props.status === 'initial' &&
+                              <Button variant="primary" onClick={handleSubmit}>
+                                Fetch
+                              </Button>
+                            }
+                            {props.status === 'loading' &&
+                              <button disabled
+                                      className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
+                                Please wait
+                              </button>
+                            }
+                            {props.status === 'failed' &&
+                              <Button variant="primary" onClick={handleSubmit}>
+                                Failed to fetch
+                              </Button>
+                            }
                         </div>
                     </div>
-                    <div className="my-4">
-                        {props.status === 'initial' &&
-                          <Button variant="primary" onClick={handleSubmit}>
-                            Fetch
-                          </Button>
-                        }
-                        {props.status === 'loading' &&
-                          <button disabled
-                                  className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
-                            Please wait
-                          </button>
-                        }
-                        {props.status === 'failed' &&
-                          <Button variant="primary" onClick={handleSubmit}>
-                            Failed to fetch
-                          </Button>
-                        }
-                    </div>
+
                 </div>
+
+                {results.length > 0 &&
+                  <div className="rounded-md p-2">
+                    <p className="font-medium text-lg px-4">Results</p>
+                      {/*<ScrollArea className="rounded-md p-2 px-4 overflow-x-auto">*/}
+                    <div className="whitespace-nowrap flex w-full space-x-4 pb-4 px-4 overflow-x-scroll">
+                        {results.map((item, idx) =>
+                            <button key={idx}
+                                    className="px-2 rounded-md bg-default-bg0 font-medium"
+                                    onClick={handleChooseProject}
+                            >
+                                {item}
+                            </button>
+                        )}
+                    </div>
+                      {/*<ScrollBar orientation="horizontal"/>*/}
+                      {/*</ScrollArea>*/}
+                  </div>
+                }
+
             </div>
-            {results.length > 0 &&
-              <div className="m-2 p-4">
-                <p>Results. Total: {results.length}</p>
-                  {results.map((item, idx) => <p key={idx}>{JSON.stringify(item)}</p>)}
-              </div>
-            }
+
         </div>
     );
 };
