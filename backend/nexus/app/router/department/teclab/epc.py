@@ -151,7 +151,7 @@ def get_all_lots():
 
 
 @router.get('/get/{project_uid}', dependencies=[Depends(get_current_user_data)])
-def get_lot_with_project_uid(project_uid: str):
+def get_epc_data_with_project_uid(project_uid: str):
     target_project = None
     for doc in list(projects_coll.find()):
         project = {k: v for (k, v) in doc.items() if k != "_id"}

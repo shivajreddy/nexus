@@ -9,7 +9,6 @@ import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
 import FieldDropDown from "@pages/department/teclab/Epc/NewLot/FieldDropDown.tsx";
 import {Textarea} from "@components/ui/textarea.tsx";
 import React, {useEffect, useState} from "react";
-import "@assets/pages/Epc/NewLot.css"
 import {EPCData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";

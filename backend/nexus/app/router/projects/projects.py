@@ -70,7 +70,10 @@ def get_all_projects(target_project: TargetProject):
     if not target_project.community and not target_project.section and not target_project.lot_number:
         for doc in projects_coll.find():
             project = {k: v for (k, v) in doc.items() if k != "_id"}
-            result.append(project["project_info"]["project_id"])
+            result.append({
+                "project_id": project["project_info"]["project_id"],
+                "project_uid": project["project_info"]["project_uid"]
+            })
         return result
 
     # only community is selected
@@ -79,7 +82,10 @@ def get_all_projects(target_project: TargetProject):
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target community
             if project["teclab_data"]["epc_data"]["community"] == target_project.community:
-                result.append(project["project_info"]["project_id"])
+                result.append({
+                    "project_id": project["project_info"]["project_id"],
+                    "project_uid": project["project_info"]["project_uid"]
+                })
         return result
 
     # only section is selected
@@ -88,7 +94,10 @@ def get_all_projects(target_project: TargetProject):
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target section
             if project["teclab_data"]["epc_data"]["section_number"] == target_project.section:
-                result.append(project["project_info"]["project_id"])
+                result.append({
+                    "project_id": project["project_info"]["project_id"],
+                    "project_uid": project["project_info"]["project_uid"]
+                })
         return result
 
     # only lot_number is selected
@@ -97,7 +106,10 @@ def get_all_projects(target_project: TargetProject):
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target lot_number
             if project["teclab_data"]["epc_data"]["lot_number"] == target_project.lot_number:
-                result.append(project["project_info"]["project_id"])
+                result.append({
+                    "project_id": project["project_info"]["project_id"],
+                    "project_uid": project["project_info"]["project_uid"]
+                })
         return result
 
     # community and section is selected
@@ -109,7 +121,10 @@ def get_all_projects(target_project: TargetProject):
                     project["teclab_data"]["epc_data"]["community"] == target_project.community and
                     project["teclab_data"]["epc_data"]["section_number"] == target_project.section
             ):
-                result.append(project["project_info"]["project_id"])
+                result.append({
+                    "project_id": project["project_info"]["project_id"],
+                    "project_uid": project["project_info"]["project_uid"]
+                })
         return result
 
     # all are selected
@@ -122,7 +137,10 @@ def get_all_projects(target_project: TargetProject):
                     project["teclab_data"]["epc_data"]["section_number"] == target_project.section and
                     project["teclab_data"]["epc_data"]["lot_number"] == target_project.lot_number
             ):
-                result.append(project["project_info"]["project_id"])
+                result.append({
+                    "project_id": project["project_info"]["project_id"],
+                    "project_uid": project["project_info"]["project_uid"]
+                })
         return result
 
     return result
