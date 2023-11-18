@@ -9,12 +9,11 @@ import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
 import FieldDropDown from "@pages/department/teclab/Epc/NewLot/FieldDropDown.tsx";
 import {Textarea} from "@components/ui/textarea.tsx";
 import React, {useEffect, useState} from "react";
-import {EPCData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
+import {TECLabEPCData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import FindProject from "@pages/Project/FindProject.tsx";
 import {LoadingProgress} from "@components/common/LoadingProgress.tsx";
 import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
-import {Loader2} from "lucide-react";
 
 
 function AddEPCData() {
@@ -57,7 +56,7 @@ function AddEPCData() {
     }, [])
 
     // New Lot Form State
-    const [newLotState, setNewLotState] = useState<EPCData>({
+    const [selectedProjectsTECLabEPCData, setSelectedProjectsTECLabEPCData] = useState<TECLabEPCData>({
 
         // status
         // lot_status_finished: true,
@@ -71,8 +70,8 @@ function AddEPCData() {
     });
 
 
-    function handleStateChange(pieceOfStateName: keyof EPCData, newValue: any) {
-        setNewLotState((prevLotData) => {
+    function handleStateChange(pieceOfStateName: keyof TECLabEPCData, newValue: any) {
+        setSelectedProjectsTECLabEPCData((prevLotData) => {
             return {
                 ...prevLotData,
                 [pieceOfStateName]: newValue
@@ -85,12 +84,12 @@ function AddEPCData() {
     // + now a single form -> update EPC Data
     function updateEPCData(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
-        console.log("😄 NewLotData=", newLotState);
+        console.log("😄 NewLotData=", selectedProjectsTECLabEPCData);
         const makeServerRequest = async () => {
             try {
                 const response = await axios.post('/department/teclab/epc/new',
                     {
-                        "epc_data": newLotState
+                        "epc_data": selectedProjectsTECLabEPCData
                     },
                     {
                         headers: {
@@ -125,17 +124,56 @@ function AddEPCData() {
         console.log("Handle Choose Project", targetProject);
 
         // + fetch project's epc data
-        const fetchEPCData = async () => {
+        const fetchSelectedProjectTECLabEPCData = async () => {
             try {
                 const response = await axios.get(`/department/teclab/epc/get/${targetProject.project_uid}`)
-                console.log("response=", response)
+                console.log("Response for /get/{project_uid}: ", response);
+
+                const lotData = response.data;
+
+                // Data transformation
+                const transformedData: TECLabEPCData = {
+                    lot_status_finished: lotData.lot_status_finished,
+                    lot_status_released: lotData.lot_status_released,
+
+                    community: lotData.community,
+                    section_number: lotData.section_number,
+                    lot_number: lotData.lot_number,
+                    contract_date: lotData.contract_date ? new Date(lotData.contract_date) : undefined,
+                    contract_type: lotData.contract_type,
+                    product_name: lotData.product_name,
+                    elevation_name: lotData.elevation_name,
+
+                    drafting_drafter: lotData.drafting_drafter,
+                    drafting_assigned_on: lotData.drafting_assigned_on ? new Date(lotData.drafting_assigned_on) : undefined,
+                    drafting_finished: lotData.drafting_finished ? new Date(lotData.drafting_finished) : undefined,
+
+                    engineering_engineer: lotData.engineering_engineer,
+                    engineering_sent: lotData.engineering_sent ? new Date(lotData.engineering_sent) : undefined,
+                    engineering_received: lotData.engineering_received ? new Date(lotData.engineering_received) : undefined,
+
+                    plat_engineer: lotData.plat_engineer,
+                    plat_sent: lotData.plat_sent ? new Date(lotData.plat_sent) : undefined,
+                    plat_received: lotData.plat_received ? new Date(lotData.plat_received) : undefined,
+
+                    permitting_county_name: lotData.permitting_county_name,
+                    permitting_submitted: lotData.permitting_submitted ? new Date(lotData.permitting_submitted) : undefined,
+                    permitting_received: lotData.permitting_received ? new Date(lotData.permitting_received) : undefined,
+
+                    bbp_posted: lotData.bbp_posted ? new Date(lotData.bbp_posted) : undefined,
+
+                    notes: lotData.notes
+                };
+                console.log("transformedData=", transformedData);
+                // Set the data to the lot-state
+                setSelectedProjectsTECLabEPCData(transformedData);
                 setStatusEPCDataFetch("success");
-            } catch (e) {
-                console.error("error in getting project's epc data", e);
-                setStatusEPCDataFetch("failed");
+
+            } catch (e: any) {
+                console.error(e);
             }
-        }
-        fetchEPCData();
+        };
+        fetchSelectedProjectTECLabEPCData().then(()=>{})
     }
     useEffect(()=>{
         setSelectedProject(Array(searchResults.length).fill(false));
@@ -158,7 +196,7 @@ function AddEPCData() {
                                 <p className="pr-2"><TiArrowBack/></p>
                                 Back to EPC
                             </Button>
-                            {/*<EpcMenu/>*/}
+                            <EpcMenu/>
                         </div>
                     </div>
                 </div>
@@ -191,12 +229,11 @@ function AddEPCData() {
                   <div className="mx-4"><LoadingProgress/></div>
                 }
                 {statusEPCDataFetch === 'success' &&
-                  <div className="">
+                  <>
                     <div className="bg-default-bg2 mx-4 p-4 pb-0 rounded-lg rounded-b-none">
                       <p className="pb-3 font-semibold text-2xl">TEC-Lab info</p>
                       <div className="m-4 mb-0 rounded-lg bg-default-bg2 flex flex-wrap justify-center"
                       >
-
                           {/* 1: Lot Info */}
                         <Card className="min-w-[27%] m-4">
                           <CardHeader>
@@ -207,56 +244,56 @@ function AddEPCData() {
                             <FieldDropDown id="1_contract_type"
                                            name={"Contract Type"}
                                            dropdownData={["SPEC", "Permit & Hold", "Contract"]}
-                                           value={newLotState.contract_type}
+                                           value={selectedProjectsTECLabEPCData.contract_type}
                                            onUpdate={(newValue) => handleStateChange('contract_type', newValue)}
                             />
                             <FieldToggle id="1_finished"
                                          name="Finished"
-                                         isChecked={newLotState.lot_status_finished}
-                                         onUpdate={() => handleStateChange('lot_status_finished', !newLotState.lot_status_finished)}
+                                         isChecked={selectedProjectsTECLabEPCData.lot_status_finished}
+                                         onUpdate={() => handleStateChange('lot_status_finished', !selectedProjectsTECLabEPCData.lot_status_finished)}
                             />
                             <FieldToggle id="1_released"
                                          name="Released"
-                                         isChecked={newLotState.lot_status_released}
-                                         onUpdate={() => handleStateChange('lot_status_released', !newLotState.lot_status_released)}
+                                         isChecked={selectedProjectsTECLabEPCData.lot_status_released}
+                                         onUpdate={() => handleStateChange('lot_status_released', !selectedProjectsTECLabEPCData.lot_status_released)}
                             />
                             <FieldDate id="1_contract_date"
                                        name="Contract Date"
-                                       value={newLotState.contract_date}
+                                       value={selectedProjectsTECLabEPCData.contract_date}
                                        onUpdate={(newValue) => handleStateChange('contract_date', newValue)}
                             />
                             <FieldDropDown id="1_community"
                                            name={"Community"}
                                            dropdownData={formData.all_communities}
-                                           value={newLotState.community}
+                                           value={selectedProjectsTECLabEPCData.community}
                                            onUpdate={(newValue) => handleStateChange('community', newValue)}
                             />
                             <FieldText id="1_section"
                                        name={"Section"}
-                                       value={newLotState.section_number}
+                                       value={selectedProjectsTECLabEPCData.section_number}
                                        onUpdate={(e) => handleStateChange('section_number', e.target.value)}
                             />
                             <FieldText id="1_lot_number"
                                        name={"Lot Number"}
-                                       value={newLotState.lot_number}
+                                       value={selectedProjectsTECLabEPCData.lot_number}
                                        onUpdate={(e) => handleStateChange('lot_number', e.target.value)}
                             />
                             <FieldDropDown id="1_product"
                                            name={"Product"}
                                            dropdownData={formData.all_products}
-                                           value={newLotState.product_name}
+                                           value={selectedProjectsTECLabEPCData.product_name}
                                            onUpdate={(newValue) => handleStateChange('product_name', newValue)}
                             />
                             <FieldDropDown id="1_elevation"
                                            name={"Elevation"}
                                            dropdownData={formData.all_elevations}
-                                           value={newLotState.elevation_name}
+                                           value={selectedProjectsTECLabEPCData.elevation_name}
                                            onUpdate={(newValue) => handleStateChange('elevation_name', newValue)}
                             />
                           </CardContent>
                         </Card>
 
-                          {/* 2: Drafting */}
+                          {/* 2: Drafting, 3: Engineering */}
                         <div className="min-w-[27%] m-4">
                           <Card className="mb-5" id="new-lot-form-drafting">
                             <CardHeader>
@@ -267,23 +304,22 @@ function AddEPCData() {
                               <FieldDropDown id="2_drafter"
                                              name={"Drafter"}
                                              dropdownData={formData.all_drafters}
-                                             value={newLotState.drafting_drafter}
+                                             value={selectedProjectsTECLabEPCData.drafting_drafter}
                                              onUpdate={newValue => handleStateChange('drafting_drafter', newValue)}
                               />
                               <FieldDate id="2_assigned"
                                          name="Assigned On"
-                                         value={newLotState.drafting_assigned_on}
+                                         value={selectedProjectsTECLabEPCData.drafting_assigned_on}
                                          onUpdate={newDate => handleStateChange('drafting_assigned_on', newDate)}
                               />
                               <FieldDate id='2_finished'
                                          name='Finished On'
-                                         value={newLotState.drafting_finished}
+                                         value={selectedProjectsTECLabEPCData.drafting_finished}
                                          onUpdate={newDate => handleStateChange('drafting_finished', newDate)}
                               />
                             </CardContent>
                           </Card>
 
-                            {/* 3: Engineering */}
                           <Card className="mt-5" id="new-lot-form-engineering">
                             <CardHeader>
                               <CardTitle>Engineering</CardTitle>
@@ -293,26 +329,25 @@ function AddEPCData() {
                               <FieldDropDown id="3_engineer"
                                              name={"Engineer"}
                                              dropdownData={formData.all_engineers}
-                                             value={newLotState.engineering_engineer}
+                                             value={selectedProjectsTECLabEPCData.engineering_engineer}
                                              onUpdate={newValue => handleStateChange('engineering_engineer', newValue)}
                               />
                               <FieldDate id="3_sent"
                                          name="Sent On"
-                                         value={newLotState.engineering_sent}
+                                         value={selectedProjectsTECLabEPCData.engineering_sent}
                                          onUpdate={newDate => handleStateChange('engineering_sent', newDate)}
                               />
                               <FieldDate id="3_received"
                                          name="Received On"
-                                         value={newLotState.engineering_received}
+                                         value={selectedProjectsTECLabEPCData.engineering_received}
                                          onUpdate={newDate => handleStateChange('engineering_received', newDate)}
                               />
                             </CardContent>
                           </Card>
                         </div>
 
-
+                          {/* 4: Plat, 5: Permitting */}
                         <div className="min-w-[27%] m-4">
-                            {/* 4: Plat*/}
                           <Card className="mb-5" id="new-lot-form-plat">
                             <CardHeader>
                               <CardTitle>Plat Engineer</CardTitle>
@@ -322,23 +357,22 @@ function AddEPCData() {
                               <FieldDropDown id="4_plat_engineer"
                                              name={"Plat Engineer"}
                                              dropdownData={formData.all_plat_engineers}
-                                             value={newLotState.plat_engineer}
+                                             value={selectedProjectsTECLabEPCData.plat_engineer}
                                              onUpdate={newValue => handleStateChange('plat_engineer', newValue)}
                               />
                               <FieldDate id="4_sent"
                                          name="Sent on"
-                                         value={newLotState.plat_sent}
+                                         value={selectedProjectsTECLabEPCData.plat_sent}
                                          onUpdate={newDate => handleStateChange('plat_sent', newDate)}
                               />
                               <FieldDate id="4_received"
                                          name="Received on"
-                                         value={newLotState.plat_received}
+                                         value={selectedProjectsTECLabEPCData.plat_received}
                                          onUpdate={newDate => handleStateChange('plat_received', newDate)}
                               />
                             </CardContent>
                           </Card>
 
-                            {/* 5: Permitting */}
                           <Card className="mt-5" id="new-lot-form-permitting">
                             <CardHeader>
                               <CardTitle>Permitting</CardTitle>
@@ -348,24 +382,24 @@ function AddEPCData() {
                               <FieldDropDown id="5_county_name"
                                              name={"County Name"}
                                              dropdownData={formData.all_counties}
-                                             value={newLotState.permitting_county_name}
+                                             value={selectedProjectsTECLabEPCData.permitting_county_name}
                                              onUpdate={newValue => handleStateChange('permitting_county_name', newValue)}
                               />
                               <FieldDate id="5_sent"
                                          name="Sent on"
-                                         value={newLotState.permitting_submitted}
+                                         value={selectedProjectsTECLabEPCData.permitting_submitted}
                                          onUpdate={newDate => handleStateChange('permitting_submitted', newDate)}
                               />
                               <FieldDate id="5_received"
                                          name="Received on"
-                                         value={newLotState.permitting_received}
+                                         value={selectedProjectsTECLabEPCData.permitting_received}
                                          onUpdate={newDate => handleStateChange('permitting_received', newDate)}
                               />
                             </CardContent>
                           </Card>
                         </div>
 
-                          {/* 6: Build By Plans*/}
+                          {/* 6: Build By Plans */}
                         <Card className="min-w-[27%] m-4">
                           <CardHeader>
                             <CardTitle>Build By Plans</CardTitle>
@@ -374,13 +408,13 @@ function AddEPCData() {
                           <CardContent>
                             <FieldDate id="6_bbp"
                                        name="Posted on"
-                                       value={newLotState.bbp_posted}
+                                       value={selectedProjectsTECLabEPCData.bbp_posted}
                                        onUpdate={newDate => handleStateChange('bbp_posted', newDate)}
                             />
                           </CardContent>
                         </Card>
 
-                          {/*/!* 7: Notes *!/*/}
+                          {/* 7: Notes */}
                         <Card className="min-w-[27%] m-4">
                           <CardHeader>
                             <CardTitle>Notes</CardTitle>
@@ -403,7 +437,7 @@ function AddEPCData() {
                         SUBMIT
                       </Button>
                     </div>
-                  </div>
+                  </>
                 }
 
             </div>

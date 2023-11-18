@@ -150,7 +150,10 @@ def get_all_lots():
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
-@router.get('/get/{project_uid}', dependencies=[Depends(get_current_user_data)])
+@router.get(
+    path='/get/{project_uid}',
+    # response_model=
+    dependencies=[Depends(get_current_user_data)])
 def get_epc_data_with_project_uid(project_uid: str):
     target_project = None
     for doc in list(projects_coll.find()):

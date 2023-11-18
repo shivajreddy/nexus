@@ -1,5 +1,5 @@
 // + This should align with FastAPI modal schema
-type EPCData = {
+type TECLabEPCData = {
     // status
     lot_status_finished?: boolean;
     lot_status_released?: boolean;
@@ -83,5 +83,5 @@ type EPCData = {
 
 
 export {
-    type EPCData,
+    type TECLabEPCData,
 }
