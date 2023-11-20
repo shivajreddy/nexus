@@ -50,7 +50,7 @@ const FindProject = ({...props}: Iprops) => {
                 },
                 {headers: {"Content-Type": "application/json"}}
             )
-            console.log("response for /projects: ", response);
+            // console.log("response for /projects: ", response);
             props.setSearchResults(response.data);
             props.setStatus('initial');
         } catch (e) {

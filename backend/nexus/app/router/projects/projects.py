@@ -1,12 +1,16 @@
 """
 Projects endpoint
 """
-
-from typing import List
+import uuid
+from datetime import datetime
+from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.database.schemas.project import TargetProject, Project, NewProject
+from app.database.schemas.department_data import EPCData
+from app.database.schemas.project import TargetProject, Project, NewProject, ProjectInfo, ProjectMetaInfo, ContractInfo, \
+    TecLabProjectData, SalesProjectData
+from app.database.schemas.user import User
 from app.security.oauth2 import get_current_user_data
 from app.database.database import projects_coll, client, eagle_data_coll, db
 
@@ -22,13 +26,28 @@ def temp_func():
             print(project)
 
 
-@router.post('/new', dependencies=[Depends(get_current_user_data)])
-def new_project(project_details: NewProject):
+@router.post('/new')
+def create_new_project(project_details: NewProject, current_user_data: Annotated[User, Depends(get_current_user_data)]):
+    # + 1: make sure that there is no duplicates
+    duplicate_project = None
+    for doc in projects_coll.find():
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+        if (
+                project["project_info"]["community"] == project_details.community and
+                project["project_info"]["section"] == project_details.section and
+                project["project_info"]["lot_number"] == project_details.lot_number
+        ):
+            duplicate_project = project
+    print("duplicate_project=", duplicate_project)
+    if duplicate_project:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"{project_details.community}-{project_details.section}-{project_details.lot_number} already exists"
+        )
+
     print("given project", project_details.model_dump())
-    # find duplicates
-    # create the project_id
-    # eagle_data_coll = client["nexus"]["eagle-data"]
-    # projects_coll = client["nexus"]["projects"]
+
+    # + 2. create the project_id
     s = project_details.section
     l = project_details.lot_number
 
@@ -39,29 +58,34 @@ def new_project(project_details: NewProject):
 
     new_project_id = c + "-" + s + "-" + l
 
-    for doc in projects_coll.find():
-        # project: Project = {k: v for (k, v) in doc.items() if k != "_id"}
-        project = {k: v for (k, v) in doc.items() if k != "_id"}
-        if project["project_info"]["project_id"] == new_project_id:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"{new_project_id} already exist"
-            )
+    # + 3. add the project to database
+    new_project = Project(
+        project_info=ProjectInfo(
+            project_uid=str(uuid.uuid4()),
+            project_id=new_project_id,
+            community=project_details.community,
+            section=project_details.section,
+            lot_number=project_details.lot_number
+        ),
+        meta_info=ProjectMetaInfo(
+            created_at=datetime.now(),
+            created_by=current_user_data.username
+        ),
+        contract_info=ContractInfo(),
+        teclab_data=TecLabProjectData(epc_data=EPCData()),
+        sales_data=SalesProjectData()
+    )
+    # print("✅ This is the new project-object", new_project)
 
-    # TODO: add new project
+    projects_coll.insert_one(new_project.model_dump())
 
     # return success result
-    return {"result": "Success",
-            "new_project_id": new_project_id,
-            "community_code": c,
-            "section_number": s,
-            "lot_number": l
-            }
+    return {"result": "Success", "new_project": new_project.model_dump()}
 
 
 @router.post('/search', dependencies=[Depends(get_current_user_data)])
-def get_all_projects(target_project: TargetProject):
-    print("given project", target_project.model_dump())
+def query_projects(target_project: TargetProject):
+    print("given details to search for projects", target_project.model_dump())
 
     # search for projects in mongodb
     result = []
@@ -81,7 +105,7 @@ def get_all_projects(target_project: TargetProject):
         for doc in projects_coll.find():
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target community
-            if project["teclab_data"]["epc_data"]["community"] == target_project.community:
+            if project["project_info"]["community"] == target_project.community:
                 result.append({
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
@@ -93,7 +117,7 @@ def get_all_projects(target_project: TargetProject):
         for doc in projects_coll.find():
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target section
-            if project["teclab_data"]["epc_data"]["section_number"] == target_project.section:
+            if project["project_info"]["section_number"] == target_project.section:
                 result.append({
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
@@ -105,7 +129,7 @@ def get_all_projects(target_project: TargetProject):
         for doc in projects_coll.find():
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target lot_number
-            if project["teclab_data"]["epc_data"]["lot_number"] == target_project.lot_number:
+            if project["project_info"]["lot_number"] == target_project.community:
                 result.append({
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
@@ -118,8 +142,8 @@ def get_all_projects(target_project: TargetProject):
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target community & section
             if (
-                    project["teclab_data"]["epc_data"]["community"] == target_project.community and
-                    project["teclab_data"]["epc_data"]["section_number"] == target_project.section
+                    project["project_info"]["community"] == target_project.community and
+                    project["project_info"]["section"] == target_project.section
             ):
                 result.append({
                     "project_id": project["project_info"]["project_id"],
@@ -133,9 +157,9 @@ def get_all_projects(target_project: TargetProject):
             project = {k: v for (k, v) in doc.items() if k != "_id"}
             # filter for target lot_number
             if (
-                    project["teclab_data"]["epc_data"]["community"] == target_project.community and
-                    project["teclab_data"]["epc_data"]["section_number"] == target_project.section and
-                    project["teclab_data"]["epc_data"]["lot_number"] == target_project.lot_number
+                    project["project_info"]["community"] == target_project.community and
+                    project["project_info"]["section"] == target_project.section and
+                    project["project_info"]["lot_number"] == target_project.lot_number
             ):
                 result.append({
                     "project_id": project["project_info"]["project_id"],

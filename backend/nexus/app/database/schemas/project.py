@@ -26,6 +26,9 @@ class Project(BaseModel):
 class ProjectInfo(BaseModel):
     project_uid: str
     project_id: str
+    community: str
+    section: str
+    lot_number: str
 
 
 class ProjectMetaInfo(BaseModel):

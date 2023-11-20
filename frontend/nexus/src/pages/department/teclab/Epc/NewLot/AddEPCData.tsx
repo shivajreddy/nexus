@@ -84,7 +84,7 @@ function AddEPCData() {
     // + now a single form -> update EPC Data
     function updateEPCData(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
-        console.log("😄 NewLotData=", selectedProjectsTECLabEPCData);
+        // console.log("😄 NewLotData=", selectedProjectsTECLabEPCData);
         const makeServerRequest = async () => {
             try {
                 const response = await axios.post('/department/teclab/epc/new',
@@ -97,7 +97,7 @@ function AddEPCData() {
                         }
                     }
                 )
-                console.log("Response=", response);
+                // console.log("Response=", response);
             } catch (e) {
                 console.error("Error sending post request", e);
             }
@@ -121,50 +121,50 @@ function AddEPCData() {
         })
 
         setStatusEPCDataFetch("loading");
-        console.log("Handle Choose Project", targetProject);
+        // console.log("Handle Choose Project", targetProject);
 
         // + fetch project's epc data
         const fetchSelectedProjectTECLabEPCData = async () => {
             try {
                 const response = await axios.get(`/department/teclab/epc/get/${targetProject.project_uid}`)
-                console.log("Response for /get/{project_uid}: ", response);
+                // console.log("Response for /get/{project_uid}: ", response);
 
                 const lotData = response.data;
 
                 // Data transformation
                 const transformedData: TECLabEPCData = {
-                    lot_status_finished: lotData.lot_status_finished,
-                    lot_status_released: lotData.lot_status_released,
+                    lot_status_finished: lotData.epc_data.lot_status_finished,
+                    lot_status_released: lotData.epc_data.lot_status_released,
 
-                    community: lotData.community,
-                    section_number: lotData.section_number,
-                    lot_number: lotData.lot_number,
-                    contract_date: lotData.contract_date ? new Date(lotData.contract_date) : undefined,
-                    contract_type: lotData.contract_type,
-                    product_name: lotData.product_name,
-                    elevation_name: lotData.elevation_name,
+                    community: lotData.project_info.community,
+                    section_number: lotData.project_info.section,
+                    lot_number: lotData.project_info.lot_number,
+                    contract_date: lotData.epc_data.contract_date ? new Date(lotData.epc_data.contract_date) : undefined,
+                    contract_type: lotData.epc_data.contract_type,
+                    product_name: lotData.epc_data.product_name,
+                    elevation_name: lotData.epc_data.elevation_name,
 
-                    drafting_drafter: lotData.drafting_drafter,
-                    drafting_assigned_on: lotData.drafting_assigned_on ? new Date(lotData.drafting_assigned_on) : undefined,
-                    drafting_finished: lotData.drafting_finished ? new Date(lotData.drafting_finished) : undefined,
+                    drafting_drafter: lotData.epc_data.drafting_drafter,
+                    drafting_assigned_on: lotData.epc_data.drafting_assigned_on ? new Date(lotData.epc_data.drafting_assigned_on) : undefined,
+                    drafting_finished: lotData.epc_data.drafting_finished ? new Date(lotData.epc_data.drafting_finished) : undefined,
 
-                    engineering_engineer: lotData.engineering_engineer,
-                    engineering_sent: lotData.engineering_sent ? new Date(lotData.engineering_sent) : undefined,
-                    engineering_received: lotData.engineering_received ? new Date(lotData.engineering_received) : undefined,
+                    engineering_engineer: lotData.epc_data.engineering_engineer,
+                    engineering_sent: lotData.epc_data.engineering_sent ? new Date(lotData.epc_data.engineering_sent) : undefined,
+                    engineering_received: lotData.epc_data.engineering_received ? new Date(lotData.epc_data.engineering_received) : undefined,
 
-                    plat_engineer: lotData.plat_engineer,
-                    plat_sent: lotData.plat_sent ? new Date(lotData.plat_sent) : undefined,
-                    plat_received: lotData.plat_received ? new Date(lotData.plat_received) : undefined,
+                    plat_engineer: lotData.epc_data.plat_engineer,
+                    plat_sent: lotData.epc_data.plat_sent ? new Date(lotData.epc_data.plat_sent) : undefined,
+                    plat_received: lotData.epc_data.plat_received ? new Date(lotData.epc_data.plat_received) : undefined,
 
-                    permitting_county_name: lotData.permitting_county_name,
-                    permitting_submitted: lotData.permitting_submitted ? new Date(lotData.permitting_submitted) : undefined,
-                    permitting_received: lotData.permitting_received ? new Date(lotData.permitting_received) : undefined,
+                    permitting_county_name: lotData.epc_data.permitting_county_name,
+                    permitting_submitted: lotData.epc_data.permitting_submitted ? new Date(lotData.epc_data.permitting_submitted) : undefined,
+                    permitting_received: lotData.epc_data.permitting_received ? new Date(lotData.epc_data.permitting_received) : undefined,
 
-                    bbp_posted: lotData.bbp_posted ? new Date(lotData.bbp_posted) : undefined,
+                    bbp_posted: lotData.epc_data.bbp_posted ? new Date(lotData.epc_data.bbp_posted) : undefined,
 
-                    notes: lotData.notes
+                    notes: lotData.epc_data.notes
                 };
-                console.log("transformedData=", transformedData);
+                // console.log("transformedData=", transformedData);
                 // Set the data to the lot-state
                 setSelectedProjectsTECLabEPCData(transformedData);
                 setStatusEPCDataFetch("success");

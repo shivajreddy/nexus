@@ -44,9 +44,10 @@ class EPCData(BaseModel):
     lot_status_released: bool = False
 
     # lot-info
-    community: Optional[str] = None
-    section_number: Optional[str] = None
-    lot_number: Optional[str] = None
+    # these 3 are moved to project_info now
+    # community: Optional[str] = None
+    # section_number: Optional[str] = None
+    # lot_number: Optional[str] = None
     contract_date: Optional[datetime] = None
     contract_type: Optional[str] = None
     product_name: Optional[str] = None

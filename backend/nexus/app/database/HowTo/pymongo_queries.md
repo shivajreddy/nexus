@@ -55,3 +55,16 @@ for doc in projects_coll.find():
     # 2. set the project_id
     projects_coll.update_one({"_id": doc["_id"]}, {"$set": {"project_id": unique_id}})
 ```
+
+- How to copy a collection from one database to another
+```python
+@router.get('/import-projects')
+def import_projects():
+    production_db = client["nexus"]
+    production_projects_coll = production_db["projects"]
+    all_production_projects = production_projects_coll.find()
+    
+    projects_coll.insert_many(all_production_projects)
+    
+    return "ALL projects imported"
+```
