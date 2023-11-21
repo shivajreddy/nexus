@@ -183,32 +183,34 @@ function Epc() {
             async function get_current_user() {
                 const hasEditorRoles = hasRoles(userRoles, [101]);
                 if (hasEditorRoles) {
-                    const updatedColumnDefinitions = [
-                        ...columnDefinitions,
-                        {
-                            headerName: "✍🏻",
-                            field: "edit",
-                            sortable: false,
-                            filter: false,
-                            width: 50,
-                            pinned: "left",
-                            cellClass: ["editor-only"],
-                            headerTooltip: "Edit Lot",
-                            cellRenderer: (params: any) => {
-                                return (
-                                    <a
-                                        // href={`edit/${params.data.project_uid}`}
-                                        className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
-                                        data-id={params.data.id}
-                                        onClick={() => navigate(`edit/${params.data.project_uid}`)}
-                                    >
-                                        <PiPencilSimpleFill/>
-                                    </a>
-                                )
-                            },
-                        }
-                    ];
-                    setColumnDefinitions(updatedColumnDefinitions);
+
+
+                    // const updatedColumnDefinitions = [
+                    //     ...columnDefinitions,
+                    //     {
+                    //         headerName: "✍🏻",
+                    //         field: "edit",
+                    //         sortable: false,
+                    //         filter: false,
+                    //         width: 50,
+                    //         pinned: "left",
+                    //         cellClass: ["editor-only"],
+                    //         headerTooltip: "Edit Lot",
+                    //         cellRenderer: (params: any) => {
+                    //             return (
+                    //                 <a
+                    //                     // href={`edit/${params.data.project_uid}`}
+                    //                     className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
+                    //                     data-id={params.data.id}
+                    //                     onClick={() => navigate(`edit/${params.data.project_uid}`)}
+                    //                 >
+                    //                     <PiPencilSimpleFill/>
+                    //                 </a>
+                    //             )
+                    //         },
+                    //     }
+                    // ];
+                    // setColumnDefinitions(updatedColumnDefinitions);
                 }
             }
 
