@@ -17,6 +17,7 @@ interface IProps {
     value?: string;
     onUpdate: (newValue: string) => void;
     className?: string | undefined;
+    disabled?: boolean;
 }
 
 
@@ -29,7 +30,8 @@ const FieldDropDown = (props: IProps) => {
                 <div className="flex-grow border-t ml-4"></div>
             </div>
             {/*<div className="flex-1 w-[26rem] text-primary font-semibold">*/}
-            <div className="basis-2/3 text-primary font-semibold">
+            {/*<div className="basis-2/3 text-primary font-semibold">*/}
+                <div className={`basis-2/3 font-semibold  ${props.disabled ? "pointer-events-none text-default-fg1" : "text-primary"}`} >
                 <Select value={props.value} onValueChange={(newValue)=>props.onUpdate(newValue)}>
                     <SelectTrigger >
                         <SelectValue placeholder={""} />

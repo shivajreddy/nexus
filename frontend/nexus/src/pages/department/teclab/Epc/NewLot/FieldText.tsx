@@ -10,6 +10,7 @@ interface IProps {
     value?: string;
     onUpdate: (event: React.ChangeEvent<HTMLInputElement>) => void;
     className?: string | undefined;
+    disabled?: boolean;
 }
 
 const FieldText = (props: IProps) => {
@@ -30,7 +31,7 @@ const FieldText = (props: IProps) => {
                 <Input
                     id={props.id}
                     type="string"
-                    className="text-primary font-semibold"
+                    className={`font-semibold  ${props.disabled ? "pointer-events-none text-default-fg1" : "text-primary"}`}
                     placeholder={props.placeholder}
                     value={props.value}
                     onChange={(e) => props.onUpdate(e)}

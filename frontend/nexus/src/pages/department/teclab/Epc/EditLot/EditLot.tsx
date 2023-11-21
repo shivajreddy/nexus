@@ -35,6 +35,9 @@ function EditLot() {
     const [newLotState, setNewLotState] = useState<TECLabEPCData>({
         // Fields with strings, should be instantiated else
         // will get error: trying to change value of controlled components
+        project_id: "",
+        project_uid: "",
+
         section_number: "",
         lot_number: "",
         notes: ""

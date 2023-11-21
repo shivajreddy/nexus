@@ -16,7 +16,7 @@ import {LoadingProgress} from "@components/common/LoadingProgress.tsx";
 import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
 
 
-function AddEPCData() {
+function EditTECLabData() {
     const navigate = useNavigate();
     const axios = useAxiosPrivate()
 
@@ -29,6 +29,14 @@ function AddEPCData() {
         "all_plat_engineers": [],
         "all_counties": []
     })
+
+    const [getProjectsStatus, setGetProjectsStatus] = useState<"initial" | "loading" | "failed">("initial");
+    const [statusEPCDataFetch, setStatusEPCDataFetch] = useState<"initial" | "loading" | "failed" | "success">("initial");
+    const [searchResults, setSearchResults] = useState<ResultProject[]>([]);
+
+    const [selectedProject, setSelectedProject] = useState(Array(searchResults.length).fill(false));
+
+    const [updateTECLabDataStatus, setUpdateTECLabDataStatus] = useState<"initial" | "loading" | "failed" | "success">("initial");
 
     // + Fetch the formData
     useEffect(() => {
@@ -57,6 +65,8 @@ function AddEPCData() {
 
     // New Lot Form State
     const [selectedProjectsTECLabEPCData, setSelectedProjectsTECLabEPCData] = useState<TECLabEPCData>({
+        project_id: "",
+        project_uid: "",
 
         // status
         // lot_status_finished: true,
@@ -69,7 +79,6 @@ function AddEPCData() {
         notes: ""
     });
 
-
     function handleStateChange(pieceOfStateName: keyof TECLabEPCData, newValue: any) {
         setSelectedProjectsTECLabEPCData((prevLotData) => {
             return {
@@ -79,38 +88,33 @@ function AddEPCData() {
         })
     }
 
-
     // + new form submit
     // + now a single form -> update EPC Data
-    function updateEPCData(e: React.MouseEvent<HTMLButtonElement>) {
+    function updateTECLabDataForProject(e: React.MouseEvent<HTMLButtonElement>, project_uid: string) {
         e.preventDefault();
-        // console.log("😄 NewLotData=", selectedProjectsTECLabEPCData);
+        console.log("😄 updateTECLabDataForProject=", e);
+        console.log("😄 project_uid=", project_uid);
+        console.log("😄 =selectedProjectsTECLabEPCData", selectedProjectsTECLabEPCData);
         const makeServerRequest = async () => {
+            setUpdateTECLabDataStatus('loading');
             try {
-                const response = await axios.post('/department/teclab/epc/new',
+                await axios.post('/department/teclab/epc/edit',
                     {
+                        "project_uid": project_uid,
                         "epc_data": selectedProjectsTECLabEPCData
                     },
-                    {
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    }
+                    {headers: {"Content-Type": "application/json"}}
                 )
-                // console.log("Response=", response);
+                setUpdateTECLabDataStatus('success');
+
             } catch (e) {
                 console.error("Error sending post request", e);
+                setUpdateTECLabDataStatus('failed')
             }
         }
         makeServerRequest().then(() => {
         });
     }
-
-    const [getProjectsStatus, setGetProjectsStatus] = useState<"initial" | "loading" | "failed">("initial");
-
-    const [statusEPCDataFetch, setStatusEPCDataFetch] = useState<"initial" | "loading" | "failed" | "success">("initial");
-    const [searchResults, setSearchResults] = useState<ResultProject[]>([]);
-    const [selectedProject, setSelectedProject] = useState(Array(searchResults.length).fill(false));
 
     const handleChooseProject = async (idx: number, targetProject: ResultProject) => {
         // select the project
@@ -125,14 +129,18 @@ function AddEPCData() {
 
         // + fetch project's epc data
         const fetchSelectedProjectTECLabEPCData = async () => {
+            setUpdateTECLabDataStatus('initial')
             try {
                 const response = await axios.get(`/department/teclab/epc/get/${targetProject.project_uid}`)
-                // console.log("Response for /get/{project_uid}: ", response);
+                console.log("Response for /get/{project_uid}: ", response);
 
                 const lotData = response.data;
 
                 // Data transformation
                 const transformedData: TECLabEPCData = {
+                    project_id: lotData.project_info.project_id,
+                    project_uid: lotData.project_info.project_uid,
+
                     lot_status_finished: lotData.epc_data.lot_status_finished,
                     lot_status_released: lotData.epc_data.lot_status_released,
 
@@ -173,9 +181,10 @@ function AddEPCData() {
                 console.error(e);
             }
         };
-        fetchSelectedProjectTECLabEPCData().then(()=>{})
+        fetchSelectedProjectTECLabEPCData().then(() => {
+        })
     }
-    useEffect(()=>{
+    useEffect(() => {
         setSelectedProject(Array(searchResults.length).fill(false));
     }, [searchResults])
 
@@ -231,8 +240,9 @@ function AddEPCData() {
                 {statusEPCDataFetch === 'success' &&
                   <>
                     <div className="bg-default-bg2 mx-4 p-4 pb-0 rounded-lg rounded-b-none">
-                      <p className="pb-3 font-semibold text-2xl">TEC-Lab info</p>
-                      <div className="m-4 mb-0 rounded-lg bg-default-bg2 flex flex-wrap justify-center"
+                      <p className="font-semibold text-2xl px-4">TEC-Lab info</p>
+
+                      <div className="rounded-lg bg-default-bg2 flex flex-wrap justify-center w-max"
                       >
                           {/* 1: Lot Info */}
                         <Card className="min-w-[27%] m-4">
@@ -263,17 +273,20 @@ function AddEPCData() {
                                        onUpdate={(newValue) => handleStateChange('contract_date', newValue)}
                             />
                             <FieldDropDown id="1_community"
+                                           disabled
                                            name={"Community"}
                                            dropdownData={formData.all_communities}
                                            value={selectedProjectsTECLabEPCData.community}
                                            onUpdate={(newValue) => handleStateChange('community', newValue)}
                             />
                             <FieldText id="1_section"
+                                       disabled
                                        name={"Section"}
                                        value={selectedProjectsTECLabEPCData.section_number}
                                        onUpdate={(e) => handleStateChange('section_number', e.target.value)}
                             />
                             <FieldText id="1_lot_number"
+                                       disabled
                                        name={"Lot Number"}
                                        value={selectedProjectsTECLabEPCData.lot_number}
                                        onUpdate={(e) => handleStateChange('lot_number', e.target.value)}
@@ -430,12 +443,39 @@ function AddEPCData() {
 
                     <div
                       className="m-4 mt-0 pb-6 rounded-lg rounded-t-none flex justify-center items-center bg-default-bg2">
-                      <Button variant="primary"
-                              className="w-1/5"
-                              onClick={updateEPCData}
-                      >
-                        SUBMIT
-                      </Button>
+                        {updateTECLabDataStatus === 'initial' &&
+                            <Button variant="primary"
+                                    className="w-1/5"
+                                    onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                            >
+                                SUBMIT
+                            </Button>
+                        }
+                        {updateTECLabDataStatus === 'loading' &&
+                          <Button variant="outline"
+                                  className="w-1/5"
+                                  onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                          >
+                            loading
+                          </Button>
+                        }
+                        {updateTECLabDataStatus === 'success' &&
+                          <Button variant="secondary"
+                                  className="w-1/5"
+                                  onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                          >
+                            Successfully updated
+                          </Button>
+                        }
+                        {updateTECLabDataStatus === 'failed' &&
+                          <Button variant="destructive"
+                                  className="w-1/5"
+                                  onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                          >
+                            Failed
+                          </Button>
+                        }
+
                     </div>
                   </>
                 }
@@ -446,4 +486,4 @@ function AddEPCData() {
 }
 
 
-export default AddEPCData;
+export default EditTECLabData;

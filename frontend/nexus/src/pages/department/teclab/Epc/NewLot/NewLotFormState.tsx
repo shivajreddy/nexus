@@ -1,5 +1,10 @@
 // + This should align with FastAPI modal schema
 type TECLabEPCData = {
+    // project-info
+    project_uid: string;
+    project_id: string;
+
+
     // status
     lot_status_finished?: boolean;
     lot_status_released?: boolean;

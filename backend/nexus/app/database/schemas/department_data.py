@@ -86,7 +86,7 @@ class NewEPCLot(BaseModel):
     epc_data: EPCData
 
 
-class UpdateEPCLot(BaseModel):
+class UpdateTECLabData(BaseModel):
     project_uid: str
     epc_data: EPCData
 
