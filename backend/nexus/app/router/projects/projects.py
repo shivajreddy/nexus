@@ -151,6 +151,21 @@ def query_projects(target_project: TargetProject):
                 })
         return result
 
+    # community and lot_number is selected
+    if target_project.community and target_project.lot_number and not target_project.section:
+        for doc in projects_coll.find():
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            # filter for target community & section
+            if (
+                    project["project_info"]["community"] == target_project.community and
+                    project["project_info"]["lot_number"] == target_project.lot_number
+            ):
+                result.append({
+                    "project_id": project["project_info"]["project_id"],
+                    "project_uid": project["project_info"]["project_uid"]
+                })
+        return result
+
     # all are selected
     if target_project.community and target_project.section and target_project.lot_number:
         for doc in projects_coll.find():
