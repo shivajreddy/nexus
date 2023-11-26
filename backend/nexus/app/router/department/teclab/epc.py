@@ -1,17 +1,10 @@
-import csv
-import os
-import uuid
-from datetime import datetime
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from typing import List
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.database.database import projects_coll
-from app.database.schemas.department_data import NewEPCLot, UpdateTECLabData, EPCData
-from app.database.schemas.project import Project, TecLabProjectData, SalesProjectData
-from app.email.setup import send_email_with_given_message_and_attachment
+from app.database.database import projects_coll, users_coll, client
+from app.database.schemas.department_data import UpdateTECLabData
+from app.database.schemas.user import UserInfo
 from app.security.oauth2 import get_current_user_data
 
 """
@@ -20,34 +13,29 @@ TECLAB/EPC endpoint
 
 router = APIRouter(prefix="/department/teclab/epc")
 
-"""
-@router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
-def get_all_lots():
-    try:
-        result = []
-        for doc in projects_coll.find().sort("created_at", -1):
-            project = {k: v for (k, v) in doc.items() if k != "_id"}
-            if "project_uid" in project["project_info"]:
-                final_object = {
-                    "project_uid": doc["project_info"]["project_uid"],
-                    "community": doc["project_info"]["community"],
-                    "section_number": doc["project_info"]["section"],
-                    "lot_number": doc["project_info"]["lot_number"]
-                }
-                if "teclab_data" in project and "epc_data" in project["teclab_data"]:
-                    final_object.update(project["teclab_data"]["epc_data"])
-                    result.append(final_object)
-                else:
-                    print("doc without epc_data", project)
 
-            else:
-                print(doc["_id"])
-                print("doc without project_info or project_uid", project)
-        return result
-    except Exception as e:
-        print("error: ", e)
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-# """
+# + DELETE after db changes are done
+
+
+@router.get('/db-changes')
+def make_db_changes_for_users():
+    # add the 'info' object to all users
+    user_info = UserInfo(first_name="",
+                         last_name="",
+                         work_phone="",
+                         personal_phone="",
+                         department="",
+                         teams=[],
+                         job_title="")
+    users_coll.update_many({}, {'$set': {'user_info': user_info.model_dump()}})
+
+    # get the users collection
+    result = []
+    for doc in users_coll.find():
+        u = {k: v for (k, v) in doc.items() if k != "_id"}
+        # user = User()
+        result.append(u)
+    return result
 
 
 # """
@@ -67,7 +55,7 @@ def get_all_lots():
             result.append(final_object)
         return result
     except Exception as e:
-        print("error: ", e)
+        # print("error: ", e)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
@@ -101,7 +89,7 @@ def get_epc_data_with_project_uid(project_uid: str):
 
 @router.post('/edit', dependencies=[Depends(get_current_user_data)])
 def update_teclab_data_for_project(new_data: UpdateTECLabData):
-    print("given new_data", new_data)
+    # print("given new_data", new_data)
     # Check if the project exists
     existing_project = projects_coll.find_one({"project_info.project_uid": new_data.project_uid})
 
@@ -111,17 +99,12 @@ def update_teclab_data_for_project(new_data: UpdateTECLabData):
             detail=f"{new_data.project_uid} doesn't exist in Projects"
         )
 
-    print("HIII. existing_project=", existing_project)
-    # return "DONE"
+    # print("existing_project=", existing_project)
 
     # Update the project in the database
-    result = projects_coll.update_one(
+    projects_coll.update_one(
         {"project_info.project_uid": new_data.project_uid},
         {"$set": {"teclab_data.epc_data": new_data.epc_data.model_dump()}}
     )
-
-    print("result=", result)
-    print("Matched Count:", result.matched_count)
-    print("Modified Count:", result.modified_count)
 
     return {"message": f"Project {new_data.project_uid} updated successfully"}

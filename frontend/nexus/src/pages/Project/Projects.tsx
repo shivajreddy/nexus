@@ -15,10 +15,10 @@ const Projects = () => {
         <MainLayout>
             <div id="projects-container"
                  // className="h-[calc(100vh-100px)] bg-default-bg1 rounded-2xl border"
-                 className="bg-default-bg1 rounded-2xl border"
+                 className="bg-default-bg1 rounded-md border"
             >
-                <div className="bg-default-bg2 rounded-t-2xl">
-                    <p className="font-semibold text-2xl p-2 text-center"> Projects</p>
+                <div className="bg-default-bg1 rounded-t-md">
+                    <p className="font-semibold text-3xl p-2 text-center">PROJECTS</p>
                 </div>
 
                 <div className="m-4 my-8">

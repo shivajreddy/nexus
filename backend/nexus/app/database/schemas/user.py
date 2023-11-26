@@ -3,6 +3,12 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+class User(BaseModel):
+    username: str
+    security: 'UserSecurityDetails'
+    user_info: 'UserInfo'
+
+
 class UserSecurityDetails(BaseModel):
     roles: List[int] = []
     hashed_password: str
@@ -10,11 +16,14 @@ class UserSecurityDetails(BaseModel):
     created_at: Optional[str] = None
 
 
-class User(BaseModel):
-    username: str
-    security: 'UserSecurityDetails'
-    # department: str = ""
-    # teams: [str] = []
+class UserInfo(BaseModel):
+    first_name: str
+    last_name: str
+    work_phone: Optional[str]
+    personal_phone: Optional[str]
+    department: str
+    teams: List[str] = []
+    job_title: str
 
 
 class NewUserSchema(BaseModel):

@@ -1,5 +1,5 @@
 
-##### Moving one field into a new/other field in a document, and removing the old field
+- Moving one field into a new/other field in a document, and removing the old field
 ```python
 result = projects_coll.aggregate([
         # {'$match': filter_query},
@@ -67,4 +67,14 @@ def import_projects():
     projects_coll.insert_many(all_production_projects)
     
     return "ALL projects imported"
+
+@router.get('/import-users')
+def import_projects():
+    production_db = client["nexus"]
+    production_users_coll = production_db["users"]
+    all_users_projects = production_users_coll.find()
+
+    users_coll.insert_many(all_users_projects)
+
+    return "ALL users imported"
 ```

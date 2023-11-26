@@ -22,17 +22,40 @@ body {
     /*border: none;*/
 }
 
-/* File: font.css */
+/* File: fonts/berkeleymono/ */
 @font-face {
     font-family: 'Berkeley Mono';
-    src: url('./fonts/BerkeleyMono-Regular.woff') format('woff'),
-    url('./fonts/BerkeleyMono-Regular.woff2') format('woff2'),
-    url('./fonts/BerkeleyMono-Bold.woff') format('woff'),
-    url('./fonts/BerkeleyMono-Bold.woff2') format('woff2'),
-    url('./fonts/BerkeleyMono-Italic.woff') format('woff'),
-    url('./fonts/BerkeleyMono-Italic.woff2') format('woff2'),
-    url('./fonts/BerkeleyMono-BoldItalic.woff') format('woff'),
-    url('./fonts/BerkeleyMono-BoldItalic.woff2') format('woff2');
+    src: url('fonts/berkeleymono/BerkeleyMono-Regular.woff') format('woff'),
+    url('fonts/berkeleymono/BerkeleyMono-Regular.woff2') format('woff2'),
+    url('fonts/berkeleymono/BerkeleyMono-Bold.woff') format('woff'),
+    url('fonts/berkeleymono/BerkeleyMono-Bold.woff2') format('woff2'),
+    url('fonts/berkeleymono/BerkeleyMono-Italic.woff') format('woff'),
+    url('fonts/berkeleymono/BerkeleyMono-Italic.woff2') format('woff2'),
+    url('fonts/berkeleymono/BerkeleyMono-BoldItalic.woff') format('woff'),
+    url('fonts/berkeleymono/BerkeleyMono-BoldItalic.woff2') format('woff2');
+    font-weight: auto;
+    font-style: auto;
+}
+
+/* File: fonts/jetbrainsmono/ */
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('fonts/jetbrainsmono/JetBrainsMono-Bold.woff2') format('woff');
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-BoldItalic.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-ExtraBold.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-ExtraBoldItalic.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-ExtraLight.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-ExtraLightItalic.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-Italic.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-Light.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-LightItalic.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-Medium.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-MediumItalic.woff2') format('woff');*/
+    src: url('fonts/jetbrainsmono/JetBrainsMono-Regular.woff2') format('woff');
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-SemiBold.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-SemiBoldItalic.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-Thin.woff2') format('woff');*/
+    /*src: url('fonts/jetbrainsmono/JetBrainsMono-ThinItalic.woff2') format('woff');*/
     font-weight: auto;
     font-style: auto;
 }
@@ -96,28 +119,31 @@ body {
         --secondary: 240 4.8% 95.9%;
         --secondary-foreground: 240 5.9% 10%;
         --muted: 240 4.8% 95.9%;
-        /*--muted: #f4f4f5;*/
         --muted-foreground: 240 3.8% 46.1%;
         --accent: 240 4.8% 95.9%;
         --accent-foreground: 240 5.9% 10%;
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
-        --spinner-border: 240 5.9% 90%;
+        --border: 240 5.9% 90%;
         --input: 240 5.9% 90%;
         --ring: 240 5.9% 10%;
         --radius: 0.5rem;
 
+        /* + Nexus color palette */
+        --nexus-light-0: #E8E9ED;
+        --nexus-light-1: #F3F4F7;
+        --nexus-light-2: #ffffff;
+        --nexus-dark-0: #313244;
+        --nexus-dark-1: #11111b;
+        --nexus-dark-2: #000000;
+
         /*+ Background Colors +*/
-        /*--bg-0: #CDD0D9;*/
-        --bg-0: #E8E9ED;
-        /*--bg-1: #DDE0E7;*/
-        --bg-1: #F3F4F7;
-        /*--bg-1: #EFF1F5;*/
-        /*--bg-2: #EFF1F5;*/
-        --bg-2: #ffffff;
-        --btn-bg-0: #11111b;
-        --btn-bg-1: #313244;
-        --btn-bg-2: #000;
+        --bg-0: var(--nexus-light-0);
+        --bg-1: var(--nexus-light-1);
+        --bg-2: var(--nexus-light-2);
+        --btn-bg-0: var(--nexus-dark-0);
+        --btn-bg-1: var(--nexus-dark-1);
+        --btn-bg-2: var(--nexus-dark-2);
 
         /*+ Foreground Colors +*/
         --fg-0: var(--text);

@@ -30,17 +30,17 @@ const baseQuery = fetchBaseQuery({
 
 // * https://redux-toolkit.js.org/rtk-query/usage/customizing-queries
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
-    console.log("🏡going to use baseQueryWithReauth")
+    // console.log("🏡going to use baseQueryWithReauth")
     let result = await baseQuery(args, api, extraOptions);
 
     if (result?.error?.status === 403) {  // + if the baseQuery's response is 404 i.e., expired AccessToken
-        console.log("😂 result=", result, "😈 and status 403")
+        // console.log("😂 result=", result, "😈 and status 403")
 
         const refreshResult = await baseQuery(REFRESH_ENDPOINT, api, extraOptions);
 
         if (refreshResult.data) {
             const user = (api.getState() as RootState).auth.user;
-            console.log("🍎 user=", user, " refreshResult=", refreshResult)
+            // console.log("🍎 user=", user, " refreshResult=", refreshResult)
             // + store the new token
             // const new_authState: IAuthState = {accessToken: response.data}
             api.dispatch(setAuthState({...refreshResult.data, user}));
@@ -52,7 +52,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
             api.dispatch(removeAuthState());
         }
     }
-    console.log("😂 result=", result, "😶‍🌫️ and not status 403")
+    // console.log("😂 result=", result, "😶‍🌫️ and not status 403")
     return result;
 };
 

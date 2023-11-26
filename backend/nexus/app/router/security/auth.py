@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from app.database.database import users_coll
 from app.email.setup import send_email_with_verification_key
 from app.security.oauth2 import create_access_token, create_refresh_token, verify_refresh_token, get_current_user_data
-from app.database.schemas.user import User, NewUserSchema, UserSecurityDetails
+from app.database.schemas.user import User, NewUserSchema, UserSecurityDetails, UserInfo
 from app.security.utils import hash_password, verify_password
 
 router = APIRouter(prefix="/auth")
@@ -63,9 +63,9 @@ async def create_user(payload: NewUserSchema):
 async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     # async def login_user(payload: LoginUserSchema, response: Response):
     # user_doc = user_coll.find_one({"username": payload.email})
-    print("form_data=", form_data)
+    # print("form_data=", form_data)
     user_doc = users_coll.find_one({"username": form_data.username})
-    print("user_doc=", user_doc)
+    # print("user_doc=", user_doc)
 
     if not user_doc:
         raise HTTPException(
@@ -100,6 +100,7 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
             verified=True,
             created_at=security_data["created_at"]
         ),
+        user_info=user_doc["user_info"]
     )
 
     access_token = create_access_token(data=user)
@@ -143,7 +144,7 @@ def refresh(request: Request):
     user = User(**user_data)
     # print("☺️ user=", user)
     new_access_token = create_access_token(data=user)
-    print("✅ new_access_token", new_access_token)
+    # print("✅ new_access_token", new_access_token)
 
     # + check if the user has verified their account
     security_data = user_doc.get("security", {})
@@ -200,7 +201,7 @@ async def forgot_password():
 @router.get("/forgot-password/confirmation/{secret_key}")
 async def forgot_password_confirmation(secret_key: str):
     # get the
-    print("given secret_key", secret_key)
+    # print("given secret_key", secret_key)
 
     # get the secret_key from DB
     secret_key_from_db = None
@@ -219,8 +220,8 @@ async def forgot_password_confirmation(secret_key: str):
 
 @router.get("/confirm-registration/{username}/{email_verification_key}")
 async def confirm_registration(request: Request, username: str, email_verification_key: str):
-    print("given username:", username)
-    print("given key:", email_verification_key)
+    # print("given username:", username)
+    # print("given key:", email_verification_key)
 
     #  + validate username and email_verification_key
     user_doc = users_coll.find_one({"username": username})
@@ -249,10 +250,10 @@ async def update_password(
         new_plain_password: str,
         current_user_data: Annotated[User, Depends(get_current_user_data)],
 ):
-    print(current_user_data)
+    # print(current_user_data)
 
     # hash the new password
-    print("new_password given:", new_plain_password)
+    # print("new_password given:", new_plain_password)
 
     # save the hashed password to db
     new_hashed_password = hash_password(new_plain_password)

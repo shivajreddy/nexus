@@ -200,7 +200,7 @@ function EditTECLabData() {
                     <div className="flex mx-10 items-center">
                         {/* TODO: this should be role specific*/}
                         <div className="flex justify-center items-center">
-                            <Button variant="outline" className="flex justify-center items-center"
+                            <Button variant="default" className="flex justify-center items-center"
                                     onClick={() => navigate('/epc')}>
                                 <p className="pr-2"><TiArrowBack/></p>
                                 Back to EPC

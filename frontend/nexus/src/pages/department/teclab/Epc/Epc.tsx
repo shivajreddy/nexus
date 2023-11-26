@@ -22,7 +22,7 @@ import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
 import {Skeleton} from "@components/ui/skeleton.tsx";
-import {MdOutlineStorage} from "react-icons/md";
+import {MdModeEditOutline, MdOutlineStorage} from "react-icons/md";
 
 
 const defaultColumnSettings = {
@@ -242,13 +242,12 @@ function Epc() {
                     <div className="flex mx-10">
                         {hasRoles(userRoles, [101]) &&
                           <div className="flex justify-center items-center bg-default-bg2">
-                            <button
-                              className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
-                              onClick={() => navigate('lot/new')}
-                            >
-                              <p className="pr-2"><BsPlusCircleFill/></p>
-                              Add EPC Data
-                            </button>
+                            <Button onClick={() => navigate('lot/new')} className="min-w-[10em]">
+                              <p className="pr-2"><MdModeEditOutline/></p>
+                                {/*Manage EPC Data*/}
+                                {/*Edit TEC-Lab Data*/}
+                              Edit
+                            </Button>
                           </div>
                         }
                         {/*<div className="flex justify-center items-center ml-8 bg-default-bg2">*/}
