@@ -14,7 +14,7 @@ import {Input} from "@/components/ui/input";
 import {useAppDispatch} from "@/redux/hooks";
 import {useLocation, useNavigate} from "react-router-dom";
 import {setAuthState} from "@/features/auth/authSlice";
-import {IAuthState, IUser} from "@/types";
+import {IAuthState} from "@/types";
 import {useLoginMutation} from "@/features/auth/authApiSlice";
 import React, {useState} from "react";
 import {Alert, AlertDescription, AlertTitle} from "@components/ui/alert.tsx";
@@ -107,13 +107,7 @@ function LoginForm({isLoginPage, setIsLoginPage}: Iprops) {
             } else { // Handle the successful response here
                 // console.log("🐌 no error in response")
                 const data = response.data;
-                const userData: IUser = {
-                    username: data?.username as string,
-                    department: data?.department as string,
-                    roles: data?.roles as [number],
-                    team: data?.team as string
-                };
-                const newAuthState: IAuthState = {accessToken: data?.access_token, user: userData};
+                const newAuthState: IAuthState = {accessToken: data.access_token, user: data.user};
                 dispatch(setAuthState(newAuthState))
                 navigate(fromLocation, {replace: true})
             }

@@ -7,20 +7,18 @@ import UserPlaceholderDp from '@images/user/placeholder-dp.png'
 
 import "@assets/pages/User/userhome.css";
 import ThemeToggle from "@/features/themes/ThemeToggle.tsx";
-import {removeAuthState} from "@/features/auth/authSlice";
-import {useAppDispatch} from "@/redux/hooks";
+import {removeAuthState, selectCurrentUser} from "@/features/auth/authSlice";
+import {useAppDispatch, useAppSelector} from "@/redux/hooks";
 import {useLazyLogoutQuery} from "@/features/auth/authApiSlice.ts";
 import {useNavigate} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
 
 function UserHome() {
-    // Request for user details
-    const defaultName = "Eric Eagle";
-    const defaultJobTitle = "Eagle employee";
-    const defaultEmail = "jdoe@eagleofva.com";
-
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
+    const user = useAppSelector(selectCurrentUser)
+    console.log("user::=", user);
 
     const [lazyLogoutTrigger] = useLazyLogoutQuery(undefined);
 
@@ -39,8 +37,8 @@ function UserHome() {
                         <AvatarFallback>???</AvatarFallback>
                     </Avatar>
                     <div className="user-page-header flex flex-col ml-8">
-                        <p className="font-extrabold text-6xl"> {defaultName}</p>
-                        <p className="font-bold text-4xl "> {defaultJobTitle}</p>
+                        <p className="font-extrabold text-6xl"> {user?.user_info.first_name}</p>
+                        <p className="font-bold text-4xl "> {user?.user_info.job_title}</p>
                     </div>
                 </div>
 
@@ -52,20 +50,20 @@ function UserHome() {
                         <CardContent>
                             <div className="grid w-full items-center gap-4">
                                 <div className="flex flex-col space-y-1.5">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" type="text" defaultValue={defaultName}/>
+                                    <Label htmlFor="first_name">First Name</Label>
+                                    <Input id="first_name" type="text" defaultValue={user?.user_info.first_name}/>
+                                </div>
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="last_name">Last Name</Label>
+                                    <Input id="last_name" type="text" defaultValue={user?.user_info.last_name}/>
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="job-title">Title</Label>
                                     <Input
                                         id="job-title"
                                         type="text"
-                                        defaultValue={defaultJobTitle}
+                                        defaultValue={user?.user_info.job_title}
                                     />
-                                </div>
-                                <div className="flex flex-col space-y-1.5">
-                                    <Label htmlFor="email">Title</Label>
-                                    <Input id="email" type="email" defaultValue={defaultEmail}/>
                                 </div>
                             </div>
                         </CardContent>

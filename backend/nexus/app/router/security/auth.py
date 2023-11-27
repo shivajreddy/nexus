@@ -110,13 +110,20 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
     users_coll.update_one(user_doc, {"$set": {"security.refresh_token": refresh_token}})
 
     # + send user data and accessToken in response body
+    # response = JSONResponse(content={
+    #     "status": "success",
+    #     "access_token": access_token,
+    #     "roles": user.security.roles,
+    #     "username": user.username,
+    #     "department": "",
+    #     "team": "",
+    # })
+
+    # print("now would be user=", user.model_dump())
+    # print(type(user.model_dump()))
     response = JSONResponse(content={
-        "status": "success",
         "access_token": access_token,
-        "roles": user.security.roles,
-        "username": user.username,
-        "department": "",
-        "team": "",
+        "user": user.model_dump()
     })
     # + store refresh in HTTP only cookie
     response.set_cookie("refresh_token", refresh_token, httponly=True, max_age=86400)
@@ -142,9 +149,9 @@ def refresh(request: Request):
 
     user_data = {k: v for (k, v) in user_doc.items() if k != "_id"}
     user = User(**user_data)
-    # print("☺️ user=", user)
     new_access_token = create_access_token(data=user)
-    # print("✅ new_access_token", new_access_token)
+    # # print("☺️ user=", user)
+    # # print("✅ new_access_token", new_access_token)
 
     # + check if the user has verified their account
     security_data = user_doc.get("security", {})
@@ -157,16 +164,23 @@ def refresh(request: Request):
             roles=security_data["roles"],
             verified=True,
             created_at=security_data["created_at"],
+        ),
+        user_info=UserInfo(
+            **user_doc["user_info"]
         )
     )
 
+    # return {
+    #     "status": "success",
+    #     "username": user.username,
+    #     "new_access_token": new_access_token,
+    #     "roles": user.security.roles,
+    #     "department": "",
+    #     "team": ""
+    # }
     return {
-        "status": "success",
-        "username": user.username,
         "new_access_token": new_access_token,
-        "roles": user.security.roles,
-        "department": "",
-        "team": ""
+        "user": user.model_dump()
     }
 
 

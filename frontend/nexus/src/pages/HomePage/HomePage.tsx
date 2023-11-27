@@ -8,18 +8,28 @@ function HomePage() {
 
     const navigate = useNavigate();
     const user = useAppSelector(selectCurrentUser)
-    console.log("user=", user);
+    console.log("user::::=", user);
 
     // get the user details
 
     return (
         <MainLayout>
-            <div className="home-page rounded-md p-4 border-2 border-b0 min-h-[calc(100vh-105px)]">
-                <p className="text-2xl"> HomePage </p>
-                <Button onClick={() => navigate('/welcome')}>Go To Welcome Page</Button>
+            <div className="home-page rounded-md p-4 bg-default-bg1 border-2 border-b0 min-h-[calc(100vh-105px)]">
 
-                <p>Welcome {user?.username}</p>
-                <p>Your Roles</p>
+                <div className="px-4 flex flex-col border-2 border-red-600 min-h-[calc(100vh-120px)]">
+                    <div className="grow">
+                        <p className="text-4xl font-bold text-center py-4">👋 Hello {user?.user_info.first_name}</p>
+
+                        <p className="text-2xl font-semibold">Your ToDo:</p>
+                        <p>✅ Drafting | RB-5-33</p>
+                        <p>⬜ Drafting | RB-5-06</p>
+                    </div>
+
+                    <p> Check out Nexus's
+                        <Button className="p-0 px-1" variant="link"
+                                onClick={() => navigate('/welcome')}>timeline</Button>
+                    </p>
+                </div>
             </div>
             <br/>
         </MainLayout>

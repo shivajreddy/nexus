@@ -14,7 +14,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def create_access_token(data: User) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
+    # expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
+    expire = datetime.utcnow() + timedelta(seconds=settings.ACCESS_TOKEN_EXPIRES_IN)
 
     access_token_payload = AccessTokenData(
         username=data.username,
@@ -66,6 +67,7 @@ def verify_access_token(given_token):
             detail="Access-Token's payload is not of Type AccessTokenData",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
     except ExpiredSignatureError:
         raise HTTPException(

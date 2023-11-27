@@ -23,7 +23,7 @@ const authSlice = createSlice({
 
     reducers: {
 
-        // + add security state
+        // + add authState -> this has access-token and user object
         setAuthState: (state, action: PayloadAction<IAuthState>) => {
             const {user, accessToken} = action.payload;
             state.user = user;

@@ -14,27 +14,36 @@ export interface ThemeContextInterface {
 
 // + State :: Security 
 export interface IAuthState {
-    user?: IUser;
     accessToken?: string;
+    user?: IUser;
 }
 
 
 export interface IUser {
     username: string;
-    department: string;
-    team: string;
-    roles: [number];
+    security: {
+        roles: [number];
+        hashed_password: string;
+        verified: boolean;
+        created_at?: string;
+    },
+    user_info: {
+        first_name: string;
+        last_name: string;
+        work_phone?: string;
+        personal_phone?: string;
+        department: string;
+        teams: [string];
+        job_title: string;
+    }
 }
 
 
 // :: Types for API-Slice
+
 export interface ILoginResponse {
-    status: number;
     access_token: string;
-    roles: [number];
-    username: string;
-    department: string;
-    team: string;
+    user: IUser;
 }
 
 export interface ILogoutResponse {
@@ -46,12 +55,16 @@ export interface ICredentials {
     password: string;
 }
 
+// export interface IRefreshResponse {
+//     status: string;
+//     new_access_token: string;
+//     roles: [number];
+//     username: string;
+//     department: string;
+//     team: string;
+// }
 
 export interface IRefreshResponse {
-    status: string;
     new_access_token: string;
-    roles: [number];
-    username: string;
-    department: string;
-    team: string;
+    user: IUser;
 }

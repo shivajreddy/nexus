@@ -2,9 +2,8 @@ from typing import List
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.database.database import projects_coll, users_coll, client
+from app.database.database import projects_coll
 from app.database.schemas.department_data import UpdateTECLabData
-from app.database.schemas.user import UserInfo
 from app.security.oauth2 import get_current_user_data
 
 """
@@ -12,30 +11,6 @@ TECLAB/EPC endpoint
 """
 
 router = APIRouter(prefix="/department/teclab/epc")
-
-
-# + DELETE after db changes are done
-
-
-@router.get('/db-changes')
-def make_db_changes_for_users():
-    # add the 'info' object to all users
-    user_info = UserInfo(first_name="",
-                         last_name="",
-                         work_phone="",
-                         personal_phone="",
-                         department="",
-                         teams=[],
-                         job_title="")
-    users_coll.update_many({}, {'$set': {'user_info': user_info.model_dump()}})
-
-    # get the users collection
-    result = []
-    for doc in users_coll.find():
-        u = {k: v for (k, v) in doc.items() if k != "_id"}
-        # user = User()
-        result.append(u)
-    return result
 
 
 # """

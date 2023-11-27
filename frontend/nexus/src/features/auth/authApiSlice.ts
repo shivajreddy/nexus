@@ -1,5 +1,6 @@
 import serverAPI from "@/services/api/apiSlice";
 import {ICredentials, ILoginResponse, ILogoutResponse, IRefreshResponse} from "@/types";
+import {LOGIN_ENDPOINT} from "@/services/api";
 
 
 // + this extends the `service/api/apiSlice` 
@@ -10,7 +11,7 @@ export const authApiSlice = serverAPI.injectEndpoints({
         // + <TypeOfResponse, TypeOfBodySentInRequest>
         login: builder.mutation<ILoginResponse, ICredentials>({
             query: (credentials) => ({
-                url: "/auth/login",
+                url: LOGIN_ENDPOINT,
                 method: "POST",
                 body: `username=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`,
                 headers: {
