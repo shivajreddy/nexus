@@ -78,3 +78,26 @@ def import_projects():
 
     return "ALL users imported"
 ```
+
+- add user_info ppty to the user's doc in DB
+```python
+@router.get('/add-userinfo-field')
+def make_db_changes_for_users():
+# add the 'info' object to all users
+user_info = UserInfo(first_name="",
+last_name="",
+work_phone="",
+personal_phone="",
+department="",
+teams=[],
+job_title="")
+users_coll.update_many({}, {'$set': {'user_info': user_info.model_dump()}})
+
+    # get the users collection
+    result = []
+    for doc in users_coll.find():
+        u = {k: v for (k, v) in doc.items() if k != "_id"}
+        # user = User()
+        result.append(u)
+    return result
+```

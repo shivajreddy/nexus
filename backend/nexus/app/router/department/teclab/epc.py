@@ -2,8 +2,9 @@ from typing import List
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.database.database import projects_coll
+from app.database.database import projects_coll, users_coll
 from app.database.schemas.department_data import UpdateTECLabData
+from app.database.schemas.user import UserInfo
 from app.security.oauth2 import get_current_user_data
 
 """
@@ -11,6 +12,8 @@ TECLAB/EPC endpoint
 """
 
 router = APIRouter(prefix="/department/teclab/epc")
+
+
 
 
 # """
