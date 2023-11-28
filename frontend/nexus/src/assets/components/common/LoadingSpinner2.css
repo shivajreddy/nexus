@@ -10,7 +10,8 @@
     min-height: 100vh;
     display: grid;
     place-items: center;
-    background: hsl(var(--spinner-hue) 50% 8%);
+    /*background: hsl(var(--spinner-hue) 50% 8%);*/
+    background: var(--bg-2);
 
 }
 

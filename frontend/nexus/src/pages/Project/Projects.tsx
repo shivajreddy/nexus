@@ -23,8 +23,8 @@ const Projects = () => {
                     <FindProject
                         status={getProjectsStatus}
                         setStatus={setGetProjectsStatus}
-                        statusEPCDataFetch={statusEPCDataFetch}
-                        setStatusEPCDataFetch={setStatusEPCDataFetch}
+                        // statusEPCDataFetch={statusEPCDataFetch}
+                        // setStatusEPCDataFetch={setStatusEPCDataFetch}
                         searchResults={searchResults}
                         setSearchResults={setSearchResults}
                     />

@@ -2,7 +2,7 @@ import MainLayout from "@/templates/MainLayout";
 
 import {AgGridReact} from "ag-grid-react";
 
-import EpcMenu from "./EpcMenu";
+// import EpcMenu from "./EpcMenu";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -11,9 +11,9 @@ import "@/assets/pages/Epc/Epc.css"
 
 
 // import {rowData, columnDefinitions} from "./demoData.ts";
-import {BsPlusCircleFill} from "react-icons/bs";
+// import {BsPlusCircleFill} from "react-icons/bs";
 import {useNavigate} from "react-router-dom";
-import {CgMenuGridO} from "react-icons/cg";
+// import {CgMenuGridO} from "react-icons/cg";
 import {Button} from "@components/ui/button.tsx";
 import {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
@@ -21,8 +21,8 @@ import {format} from "date-fns";
 import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
-import {Skeleton} from "@components/ui/skeleton.tsx";
-import {MdModeEditOutline, MdOutlineStorage} from "react-icons/md";
+import {MdModeEditOutline} from "react-icons/md";
+import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 
 
 const defaultColumnSettings = {
@@ -134,7 +134,7 @@ function Epc() {
             try {
                 const response = await axios.get('/department/teclab/epc/live');
                 // console.log("response=", response);
-                // console.log("response.data=", response.data);
+                console.log("😆 response.data=", response.data);
                 // setLotData(response.data);
                 const backendData = response.data;
 
@@ -163,6 +163,7 @@ function Epc() {
                     county: item.permitting_county_name,
                     notes: item.notes,
                 }));
+                console.log("transformed 😇 data=", transformedData);
                 setAllEPCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
@@ -185,32 +186,32 @@ function Epc() {
                 if (hasEditorRoles) {
 
 
-                    // const updatedColumnDefinitions = [
-                    //     ...columnDefinitions,
-                    //     {
-                    //         headerName: "✍🏻",
-                    //         field: "edit",
-                    //         sortable: false,
-                    //         filter: false,
-                    //         width: 50,
-                    //         pinned: "left",
-                    //         cellClass: ["editor-only"],
-                    //         headerTooltip: "Edit Lot",
-                    //         cellRenderer: (params: any) => {
-                    //             return (
-                    //                 <a
-                    //                     // href={`edit/${params.data.project_uid}`}
-                    //                     className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
-                    //                     data-id={params.data.id}
-                    //                     onClick={() => navigate(`edit/${params.data.project_uid}`)}
-                    //                 >
-                    //                     <PiPencilSimpleFill/>
-                    //                 </a>
-                    //             )
-                    //         },
-                    //     }
-                    // ];
-                    // setColumnDefinitions(updatedColumnDefinitions);
+                    const updatedColumnDefinitions = [
+                        ...columnDefinitions,
+                        {
+                            headerName: "✍🏻",
+                            field: "edit",
+                            sortable: false,
+                            filter: false,
+                            width: 50,
+                            pinned: "left",
+                            cellClass: ["editor-only"],
+                            headerTooltip: "Edit Lot",
+                            cellRenderer: (params: any) => {
+                                return (
+                                    <a
+                                        // href={`edit/${params.data.project_uid}`}
+                                        className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
+                                        data-id={params.data.id}
+                                        onClick={() => navigate(`edit/${params.data.project_uid}`)}
+                                    >
+                                        <PiPencilSimpleFill/>
+                                    </a>
+                                )
+                            },
+                        }
+                    ];
+                    setColumnDefinitions(updatedColumnDefinitions);
                 }
             }
 
@@ -226,7 +227,7 @@ function Epc() {
 
     return (
         <MainLayout>
-            <div className="epc-container rounded-md m-4 bg-default-bg1">
+            <div className="epc-container rounded-md m-4 bg-default-bg2">
                 <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
                     <div className="border-r flex items-center">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
@@ -235,18 +236,16 @@ function Epc() {
                             : fetchLotDataStatus === 'failed' ?
                                 <p className="ml-4 font-semibold text-destructive text-xl">Failed</p>
                                 :
-                                <p className="ml-4 font-semibold text-primary text-xl">Live</p>
+                                <p className="ml-4 font-semibold text-primary text-xl">LIVE</p>
                         }
                     </div>
 
                     <div className="flex mx-10">
                         {hasRoles(userRoles, [101]) &&
                           <div className="flex justify-center items-center bg-default-bg1">
-                            <Button onClick={() => navigate('lot/new')} className="min-w-[10em]">
+                            <Button onClick={() => navigate('edit')} className="min-w-[10em]">
                               <p className="pr-2"><MdModeEditOutline/></p>
-                                {/*Manage EPC Data*/}
-                                {/*Edit TEC-Lab Data*/}
-                              Edit
+                              Search & Update
                             </Button>
                           </div>
                         }
@@ -264,15 +263,8 @@ function Epc() {
                 </div>
                 <div className="epc-body">
                     {fetchLotDataStatus === 'loading' ?
-                        <div
-                            id="nexus-epc-grid-container"
-                            className="flex flex-col justify-center items-center"
-                        >
-                            <div className="space-y-4 m-8">
-                                {[...Array(30)].map((_, index) => (
-                                    <Skeleton key={index} className="rounded-full h-4 w-[80vw]"/>
-                                ))}
-                            </div>
+                        <div className="flex flex-col justify-center items-center">
+                            <LoadingSpinner2/>
                         </div>
                         : fetchLotDataStatus === 'failed' ?
                             <div

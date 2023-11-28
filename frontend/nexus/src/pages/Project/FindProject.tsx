@@ -3,18 +3,18 @@ import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
 import React, {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {Button} from "@/components/ui/button";
+import {FaSearch} from "react-icons/fa";
 
 
 interface Iprops {
     status: "initial" | "loading" | "failed";
     setStatus: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed">>;
 
-    statusEPCDataFetch: "initial" | "loading" | "failed" | "success";
-    setStatusEPCDataFetch: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed" | "success">>;
+    // statusEPCDataFetch: "initial" | "loading" | "failed" | "success";
+    // setStatusEPCDataFetch: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed" | "success">>;
 
     searchResults: ResultProject[];
     setSearchResults: React.Dispatch<React.SetStateAction<ResultProject[]>>;
-
 }
 
 
@@ -58,13 +58,12 @@ const FindProject = ({...props}: Iprops) => {
         }
     }
 
-
     return (
-        <div className="m-4 mb-1 p-4 bg-default-bg2 rounded-lg">
+        <div className="m-8 mt-4 mb-0 mr-0 p-4 min-w-[30em] bg-default-bg2 rounded-md rounded-r-none">
             <p className="pb-3 font-semibold text-2xl">Project Finder</p>
 
             <div className="border-2 rounded-lg">
-                <div className="flex">
+                <div className="flex flex-col">
                     <div className="m-2">
                         <FieldDropDown id="1_community"
                                        className="mx-4"
@@ -86,26 +85,26 @@ const FindProject = ({...props}: Iprops) => {
                                    onUpdate={(e) => setLotNumber(e.target.value)}
                         />
                     </div>
-                    <div className="m-2 p-4">
-                        <div className="flex select-none">
-                            <p className="font-medium">Project Code:</p>
-                            <div className="flex px-2">
+                    <div className="mx-2 px-4">
+                        <div className="flex select-none justify-center">
+                            {/*<p className="font-medium">Project Code:</p>*/}
+                            <div className="flex">
                                 <p className="h-max px-2 border rounded-lg">{community ? community : "ALL"}</p>
                                 <p className="h-max mx-2 px-2 border rounded-lg">{section ? section : "ALL"}</p>
                                 <p className="h-max px-2 border rounded-lg">{lotNumber ? lotNumber : "ALL"}</p>
                             </div>
                         </div>
-                        <div className="my-4">
+                        <div className="my-4 flex justify-center">
                             {props.status === 'initial' &&
                               <Button variant="primary" onClick={handleSubmit}>
-                                Fetch
+                                <FaSearch />&nbsp;Search
                               </Button>
                             }
                             {props.status === 'loading' &&
-                              <button disabled
+                              <Button disabled
                                       className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
                                 Please wait
-                              </button>
+                              </Button>
                             }
                             {props.status === 'failed' &&
                               <Button variant="primary" onClick={handleSubmit}>

@@ -26,13 +26,14 @@ import SalesHome from "./pages/department/sales/SalesHome";
 import TecLabHome from "./pages/department/teclab/TecLabHome";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
 import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
-import EditTECLabData from "@pages/department/teclab/Epc/NewLot/EditTECLabData.tsx";
-import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
-import EditLot from "@pages/department/teclab/Epc/EditLot/EditLot.tsx";
+import SearchAndUpdateTECLabData from "@pages/department/teclab/Epc/NewLot/SearchAndUpdateTECLabData.tsx";
+// import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
+// import EditLot from "@pages/department/teclab/Epc/EditLot/EditLot.tsx";
 import CoreDashboard from "@pages/department/sales/CoreDashboard.tsx";
 import EPCAll from "@pages/department/teclab/Epc/EPCAll.tsx";
-import FindProject from "@pages/Project/FindProject.tsx";
+// import FindProject from "@pages/Project/FindProject.tsx";
 import Projects from "@pages/Project/Projects.tsx";
+import EditTECLabData from "@pages/department/teclab/Epc/NewLot/EditTECLabData.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -54,16 +55,18 @@ const router = createBrowserRouter(
 
                     <Route path="projects">
                         <Route index element={<Projects/>}/>
-                        <Route path="search" element={<FindProject/>}/>
+                        {/*<Route path="search" element={<FindProject/>}/>*/}
                         {/*<Route path="new" element={}/>*/}
                     </Route>
 
                     <Route path="epc">
                         <Route index element={<Epc/>}/>
                         <Route path="all-lots" element={<EPCAll/>}/>
-                        <Route path="lot/new" element={<EditTECLabData/>}/>
-                        <Route path="edit/:project_uid" element={<EditLot/>}/>
-                        <Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>
+                        {/*<Route path="lot/new" element={<EditTECLabData/>}/>*/}
+                        {/*<Route path="edit2" element={<EditTECLabData/>}/>*/}
+                        <Route path="edit" element={<SearchAndUpdateTECLabData/>}/>
+                        <Route path="edit/:project_uid" element={<EditTECLabData/>}/>
+                        {/*<Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>*/}
                     </Route>
 
                     <Route path="pipeline" element={<Pipeline/>}/>
