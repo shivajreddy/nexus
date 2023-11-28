@@ -15,8 +15,12 @@ function HomePage() {
                     <div className="grow">
                         <p className="text-4xl font-bold text-center py-4">👋 Hello {user?.user_info.first_name}</p>
                         <p className="text-2xl font-semibold">Your ToDo:</p>
-                        <p>✅ Drafting | RB-5-33</p>
-                        <p>⬜ Drafting | RB-5-06</p>
+                        {/*<p>✅ Drafting | RB-5-33</p>*/}
+                        {/*<p>⬜ Drafting | RB-5-06</p>*/}
+                        <p>✅ Drafting | xx-x-xx</p>
+                        <p>✅ Home Siting | xx-x-xx</p>
+                        <p>⬜ Design | xx-x-xx</p>
+                        <p>⬜ Drafting | xx-x-xx</p>
                     </div>
                 </div>
             </div>
