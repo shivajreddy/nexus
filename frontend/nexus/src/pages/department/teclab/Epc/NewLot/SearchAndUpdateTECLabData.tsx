@@ -29,7 +29,7 @@ function SearchAndUpdateTECLabData() {
         })
 
         setStatusEPCDataFetch("loading");
-        console.log("Handle Choose Project", targetProject);
+        // console.log("Handle Choose Project", targetProject);
 
         // + fetch project's epc data
         setResultProject(targetProject);

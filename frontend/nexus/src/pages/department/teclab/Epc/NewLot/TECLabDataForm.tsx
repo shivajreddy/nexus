@@ -115,7 +115,7 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
             setUpdateTECLabDataStatus('initial')
             try {
                 const response = await axios.get(`/department/teclab/epc/get/${project_uid}`)
-                console.log("Response for /get/{project_uid}: ", response);
+                // console.log("Response for /get/{project_uid}: ", response);
 
                 const lotData = response.data;
 

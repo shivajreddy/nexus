@@ -134,7 +134,7 @@ function Epc() {
             try {
                 const response = await axios.get('/department/teclab/epc/live');
                 // console.log("response=", response);
-                console.log("😆 response.data=", response.data);
+                // console.log("😆 response.data=", response.data);
                 // setLotData(response.data);
                 const backendData = response.data;
 
@@ -163,7 +163,7 @@ function Epc() {
                     county: item.permitting_county_name,
                     notes: item.notes,
                 }));
-                console.log("transformed 😇 data=", transformedData);
+                // console.log("transformed 😇 data=", transformedData);
                 setAllEPCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
