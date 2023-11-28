@@ -7,21 +7,23 @@ import Navbar from "@/templates/Navbar"
 // import SideBar from "@templates/SideBar"
 import {ReactNode} from "react";
 import BaseThemeContainer from "@templates/BaseThemeContainer.tsx";
+import {cn} from "@/lib/utils.ts";
 
 
 interface IProps {
     children: ReactNode;
+    className?: string | undefined;
 }
 
-function MainLayout({children}: IProps) {
+function MainLayout(props: IProps) {
 
     return (
-        <BaseThemeContainer>
-            <Navbar/>
-            <div className="m-4">
-            {children}
-            </div>
-        </BaseThemeContainer>
+        <div className={cn(props.className)}>
+            <BaseThemeContainer>
+                <Navbar/>
+                {props.children}
+            </BaseThemeContainer>
+        </div>
     )
 }
 

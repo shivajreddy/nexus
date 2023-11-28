@@ -14,14 +14,12 @@ const Projects = () => {
     return (
         <MainLayout>
             <div id="projects-container"
-                 // className="h-[calc(100vh-100px)] bg-default-bg1 rounded-2xl border"
+                // className="h-[calc(100vh-100px)] bg-default-bg1 rounded-2xl border"
                  className="bg-default-bg1 rounded-md border"
             >
-                <div className="bg-default-bg1 rounded-t-md">
-                    <p className="font-semibold text-3xl p-2 text-center">PROJECTS</p>
-                </div>
+                <p className="font-semibold text-3xl p-2 pt-6 text-center">PROJECTS</p>
 
-                <div className="m-4 my-8">
+                <div className="m-4">
                     <FindProject
                         status={getProjectsStatus}
                         setStatus={setGetProjectsStatus}
@@ -36,7 +34,7 @@ const Projects = () => {
                         <div className="whitespace-nowrap flex w-full pb-4 px-4 overflow-x-scroll">
                             {searchResults.map((item, idx) =>
                                 <p key={idx}
-                                        className="p-1 px-2 mx-2 rounded-md  font-medium bg-default-bg0"
+                                   className="p-1 px-2 mx-2 rounded-md  font-medium bg-default-bg0"
                                 >
                                     {item.project_id}
                                 </p>

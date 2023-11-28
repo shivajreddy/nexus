@@ -3,5 +3,5 @@ import {selectAuthState} from "@/features/auth/authSlice.ts";
 
 export function useUserRoles(){
     const authState = useAppSelector(selectAuthState);
-    return authState.user?.roles || [];
+    return authState.user?.security.roles || [];
 }

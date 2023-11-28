@@ -226,7 +226,7 @@ function Epc() {
 
     return (
         <MainLayout>
-            <div className="epc-container rounded-md">
+            <div className="epc-container rounded-md m-4 bg-default-bg1">
                 <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
                     <div className="border-r flex items-center">
                         <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
@@ -241,7 +241,7 @@ function Epc() {
 
                     <div className="flex mx-10">
                         {hasRoles(userRoles, [101]) &&
-                          <div className="flex justify-center items-center bg-default-bg2">
+                          <div className="flex justify-center items-center bg-default-bg1">
                             <Button onClick={() => navigate('lot/new')} className="min-w-[10em]">
                               <p className="pr-2"><MdModeEditOutline/></p>
                                 {/*Manage EPC Data*/}

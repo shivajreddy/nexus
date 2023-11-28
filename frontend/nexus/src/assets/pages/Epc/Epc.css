@@ -5,7 +5,7 @@
 
     --epc-header-height: 56px;
 
-    background-color: var(--bg-2);
+    /*background-color: var(--bg-2);*/
 
      /*border: 2px dashed red;*/
 }
@@ -20,13 +20,9 @@
 
     height: var(--epc-header-height);
 
-    /*justify-content: center;*/
-    align-items: center;
-
     display: grid;
     /*grid-template-columns: 70vw 20vw;*/
     grid-template-columns: 1fr 1fr;
-
 
     /* border: 2px dashed black; */
 }

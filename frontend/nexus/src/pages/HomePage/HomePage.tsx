@@ -1,5 +1,4 @@
 import MainLayout from "@/templates/MainLayout"
-import {Button} from "@components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import {selectCurrentUser} from "@/features/auth/authSlice.ts";
 import {useAppSelector} from "@redux/hooks.ts";
@@ -8,30 +7,29 @@ function HomePage() {
 
     const navigate = useNavigate();
     const user = useAppSelector(selectCurrentUser)
-    console.log("user::::=", user);
-
-    // get the user details
 
     return (
-        <MainLayout>
-            <div className="home-page rounded-md p-4 bg-default-bg1 border-2 border-b0 min-h-[calc(100vh-105px)]">
-
-                <div className="px-4 flex flex-col border-2 border-red-600 min-h-[calc(100vh-120px)]">
+        <MainLayout className="relative h-screen">
+            <div className="home-page rounded-md m-4 p-4 bg-default-bg1 border-2 border-b0">
+                <div className="px-4 flex flex-col min-h-[calc(40vh)]">
                     <div className="grow">
                         <p className="text-4xl font-bold text-center py-4">👋 Hello {user?.user_info.first_name}</p>
-
                         <p className="text-2xl font-semibold">Your ToDo:</p>
                         <p>✅ Drafting | RB-5-33</p>
                         <p>⬜ Drafting | RB-5-06</p>
                     </div>
-
-                    <p> Check out Nexus's
-                        <Button className="p-0 px-1" variant="link"
-                                onClick={() => navigate('/welcome')}>timeline</Button>
-                    </p>
                 </div>
             </div>
-            <br/>
+
+            <footer className="bg-default-bg1 p-2 pt-6 absolute bottom-0 w-full">
+                <span className="flex items-center justify-center pb-6">
+                    <a className="px-4 text-blue-500 hover:underline hover:cursor-pointer"
+                       onClick={() => navigate('/welcome')}> Timeline</a>
+                    <a className="px-4 text-blue-500 hover:underline hover:cursor-pointer"
+                       onClick={() => navigate('/updates')}> Design-Scheme</a>
+                </span>
+                <p className="text-center text-gray-400">©2023 Nexus. All Rights Reserved.</p>
+            </footer>
         </MainLayout>
     )
 }
