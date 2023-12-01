@@ -1,4 +1,4 @@
-import CORForm from "@pages/testing/CORForm.tsx";
+import CORForm from "@pages/department/sales/cord/CORForm.tsx";
 import MainLayout from "@templates/MainLayout.tsx";
 
 

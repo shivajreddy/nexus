@@ -1,7 +1,10 @@
-import {CheckboxReactHookFormMultiple} from "@pages/testing/CheckboxReactHookFormMultiple.tsx";
+import {CheckboxReactHookFormMultiple} from "@pages/department/sales/cord/CheckboxReactHookFormMultiple.tsx";
 import {Button} from "@components/ui/button.tsx";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@components/ui/card.tsx";
 import {ScrollArea} from "@components/ui/scroll-area.tsx";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@components/ui/tooltip.tsx";
+import {FaInfoCircle} from "react-icons/fa";
+import NexusToolTip from "@pages/department/sales/cord/NexusToolTip.tsx";
 
 const MyComponent = () => {
 
@@ -125,55 +128,75 @@ const MyComponent = () => {
 
     return (
         <div className="border border-b1 m-4 p-4 rounded-xl bg-default-bg1">
-            <p className="font-bold text-2xl text-center">C.O.R. Dashboard (CORD)</p>
-            {/*<p className="font-bold text-2xl text-center">TAKE A C.O.R - LEAVE A C.O.R</p>*/}
-
-            <div className="selection-section">
-                <p className="text-base">1. Choose the list of products</p>
-                <p className="text-sm text-zinc-500">Choosing none will search in all products</p>
-                {/*<ScrollArea className="h-72 w-48 rounded-md border border-b1 border-b-0">*/}
-                {/*    <CheckboxReactHookFormMultiple*/}
-                {/*        data={products}*/}
-                {/*        formLabel=""*/}
-                {/*        formDescription=""*/}
-                {/*    />*/}
-                {/*</ScrollArea>*/}
-                <div className="h-72 2-48 rounded-md border border-b1 border-b-0 rounded-bl-none rounded-br-none">
-                    <p>test selection</p>
-                </div>
-                <div className="flex items-center border border-red-600">
-                    <div className="p-2 h-11 bg-pink-300 border border-b2 rounded-bl-md">
-                        <p className="">chosen</p>
-                    </div>
-                    <div className="flex py-2 border border-b1 rounded-br-md items-center">
-                        <div className="border border-b2 mx-2 px-2">option1</div>
-                        <div className="border border-b2 mx-2 px-2">loooooooooong option1</div>
-                    </div>
-                </div>
+            <div className="flex items-center justify-center">
+                <p className="font-bold text-2xl text-center">C.O.R. Dashboard (CORD)</p>
+                <NexusToolTip>
+                    <p>This is a take a core, leave a core feature</p>
+                </NexusToolTip>
             </div>
 
             <div className="selection-section">
+                <div className="flex items-center">
+                    <p className="text-base">1. Choose the list of products</p>
+                    <NexusToolTip>
+                        <p className="text-sm text-zinc-500">Choosing none will search for all products</p>
+                    </NexusToolTip>
+                </div>
+                <ScrollArea className="h-72 w-48 rounded-md border border-b1">
+                    <CheckboxReactHookFormMultiple
+                        data={products}
+                        formLabel=""
+                        formDescription=""
+                    />
+                </ScrollArea>
+            </div>
+
+            <div className="selection-section">
+                <div className="flex items-center">
+                    <p className="text-base">2. Choose the list of elevations</p>
+                    <NexusToolTip>
+                        <p className="text-sm text-zinc-500">Choosing none will search for all products</p>
+                    </NexusToolTip>
+                </div>
+                <ScrollArea className="h-72 w-48 rounded-md border border-b1">
                 <CheckboxReactHookFormMultiple
                     data={elevations}
                     formLabel="2. Choose the list of Elevations"
                     formDescription="Choosing none will search in all products"
                 />
+                </ScrollArea>
             </div>
 
             <div className="selection-section">
-                <CheckboxReactHookFormMultiple
-                    data={locationCategories}
-                    formLabel="3. Choose the Location Categories"
-                    formDescription="Must choose atleast 1"
-                />
+                <div className="flex items-center">
+                    <p className="text-base">3. Choose the list of Location Categories</p>
+                    <NexusToolTip>
+                        <p className="text-sm text-zinc-500">Choosing none will search for all products</p>
+                    </NexusToolTip>
+                </div>
+                <ScrollArea className="h-72 w-48 rounded-md border border-b1">
+                    <CheckboxReactHookFormMultiple
+                        data={locationCategories}
+                        formLabel="3. Choose the Location Categories"
+                        formDescription="Must choose atleast 1"
+                    />
+                </ScrollArea>
             </div>
 
             <div className="selection-section">
-                <CheckboxReactHookFormMultiple
-                    data={typeCategories}
-                    formLabel="4. Type Categories"
-                    formDescription="Choosing none will search in all products"
-                />
+                <div className="flex items-center">
+                    <p className="text-base">4. Choose the list of Type Categories</p>
+                    <NexusToolTip>
+                        <p className="text-sm text-zinc-500">Choosing none will search for all products</p>
+                    </NexusToolTip>
+                </div>
+                <ScrollArea className="h-72 w-48 rounded-md border border-b1">
+                    <CheckboxReactHookFormMultiple
+                        data={typeCategories}
+                        formLabel="4. Type Categories"
+                        formDescription="Choosing none will search in all products"
+                    />
+                </ScrollArea>
             </div>
 
             <Button>Search the Database</Button>
