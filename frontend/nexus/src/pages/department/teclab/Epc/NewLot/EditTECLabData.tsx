@@ -3,7 +3,6 @@ import TECLabDataForm from "@pages/department/teclab/Epc/NewLot/TECLabDataForm.t
 import {useNavigate, useParams} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
 import {TiArrowBack} from "react-icons/ti";
-import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
 import {useState} from "react";
 
 
@@ -28,7 +27,6 @@ function EditTECLabData() {
                             <p className="pr-2"><TiArrowBack/></p>
                             Back to EPC
                         </Button>
-                        <EpcMenu/>
                     </div>
                 </div>
             </div>

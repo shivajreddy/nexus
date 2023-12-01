@@ -17,7 +17,7 @@ import {Input} from "@/components/ui/input"
 
 import {
     Select,
-    SelectContent,
+    SelectContent, SelectGroup,
     SelectItem,
     SelectTrigger,
     SelectValue,
@@ -124,9 +124,11 @@ const CreateProject = () => {
                                                 <SelectValue placeholder="Choose a community"/>
                                             </SelectTrigger>
                                         </FormControl>
-                                        <SelectContent >
-                                            {existingCommunities.map(community => <SelectItem key={community}
-                                                                                              value={community}>{community}</SelectItem>)}
+                                        <SelectContent>
+                                            <SelectGroup className="max-h-40 overflow-y-scroll">
+                                                {existingCommunities.map(community => <SelectItem key={community}
+                                                                                                  value={community}>{community}</SelectItem>)}
+                                            </SelectGroup>
                                         </SelectContent>
                                     </Select>
                                 </FormItem>

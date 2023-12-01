@@ -4,7 +4,6 @@ import {useNavigate} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
 import {useEffect, useState} from "react";
 import FindProject from "@pages/Project/FindProject.tsx";
-import EpcMenu from "@pages/department/teclab/Epc/EpcMenu.tsx";
 import TECLabDataForm from "@pages/department/teclab/Epc/NewLot/TECLabDataForm.tsx";
 import {ScrollArea} from "@components/ui/scroll-area.tsx";
 
@@ -56,7 +55,6 @@ function SearchAndUpdateTECLabData() {
                                 <p className="pr-2"><TiArrowBack/></p>
                                 Back to EPC
                             </Button>
-                            <EpcMenu/>
                         </div>
                     </div>
                 </div>
