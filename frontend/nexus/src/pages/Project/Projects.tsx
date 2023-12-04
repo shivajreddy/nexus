@@ -1,14 +1,12 @@
 import MainLayout from "@templates/MainLayout.tsx";
-import FindProject from "@pages/Project/FindProject.tsx";
+import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
 import {useState} from "react";
 import CreateProject from "@pages/Project/CreateProject.tsx";
-import {LoadingProgress} from "@components/common/LoadingProgress.tsx";
 
 const Projects = () => {
 
     const [getProjectsStatus, setGetProjectsStatus] = useState<"initial" | "loading" | "failed">("initial");
 
-    const [statusEPCDataFetch, setStatusEPCDataFetch] = useState<"initial" | "loading" | "failed" | "success">("initial");
     const [searchResults, setSearchResults] = useState<ResultProject[]>([]);
 
     return (
@@ -20,9 +18,9 @@ const Projects = () => {
                 <p className="font-semibold text-3xl p-2 pt-6 text-center">PROJECTS</p>
 
                 <div className="m-4">
-                    <FindProject
-                        status={getProjectsStatus}
-                        setStatus={setGetProjectsStatus}
+                    <ProjectFinder
+                        searchStatus={getProjectsStatus}
+                        setSearchStatus={setGetProjectsStatus}
                         // statusEPCDataFetch={statusEPCDataFetch}
                         // setStatusEPCDataFetch={setStatusEPCDataFetch}
                         searchResults={searchResults}
@@ -41,9 +39,6 @@ const Projects = () => {
                             )}
                         </div>
                       </div>
-                    }
-                    {statusEPCDataFetch === 'loading' &&
-                      <div className="mx-4"><LoadingProgress/></div>
                     }
                     <CreateProject/>
                 </div>

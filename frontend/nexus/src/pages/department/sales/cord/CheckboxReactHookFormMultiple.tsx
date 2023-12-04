@@ -5,7 +5,6 @@ import {Checkbox} from "@components/ui/checkbox.tsx"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -54,18 +53,6 @@ export function CheckboxReactHookFormMultiple(props: Iprops) {
                     name="items"
                     render={() => (
                         <FormItem>
-                            <div className="mb-4">
-                                {
-                                    // props.formLabel &&
-                                  // <FormLabel className="text-base">{props.formLabel}</FormLabel>
-                                }
-                                {
-                                  //   props.formDescription &&
-                                  // <FormDescription>
-                                  //     {props.formDescription}
-                                  // </FormDescription>
-                                }
-                            </div>
                             {props.data.map((item) => (
                                 <FormField
                                     key={item.id}

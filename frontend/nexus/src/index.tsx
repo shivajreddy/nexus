@@ -100,7 +100,7 @@ const router = createBrowserRouter(
 //     "████  ██   ██         ██ ██    ██   ██   ██      \n" +
 //     "██ ██ ██   ███████     ███     ██   ██   ████████\n" +
 //     "██  ████   ██         ██ ██    ██   ██         ██\n" +
-//     "██   ███   ███████   ██   ██   ███████   ████████" + "     " + "with ❤️ by Shiva Reddy"
+//     "██   ███   ███████   ██   ██   ███████   ████████" + "     " + "created with ❤️ by Shiva Reddy"
 // )
 // console.log(nexus_text_logo);
 

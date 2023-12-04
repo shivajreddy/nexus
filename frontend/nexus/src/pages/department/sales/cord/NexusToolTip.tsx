@@ -3,7 +3,8 @@ import {FaInfoCircle} from "react-icons/fa";
 import {ReactNode} from "react";
 
 interface IProps {
-    children: ReactNode;
+    text?: string;
+    children?: ReactNode;
 }
 
 const MyComponent = (props: IProps) => {
@@ -14,6 +15,7 @@ const MyComponent = (props: IProps) => {
                         <p className="px-2"><FaInfoCircle/></p>
                     </TooltipTrigger>
                     <TooltipContent>
+                        {props.text && <p>{props.text}</p>}
                         {props.children}
                     </TooltipContent>
                 </Tooltip>

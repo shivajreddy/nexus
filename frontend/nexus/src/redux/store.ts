@@ -1,5 +1,4 @@
 import {configureStore} from "@reduxjs/toolkit";
-import sidebarSlice from "@/features/sidebar/sidebarSlice";
 
 import serverAPI from "@/services/api/apiSlice";
 import authSlice from "@/features/auth/authSlice";
@@ -11,7 +10,6 @@ import eagleDataAPI from "@pages/auth/eagleApiSlice.ts";
 
 const store = configureStore({
     reducer: {
-        sidebarStatus: sidebarSlice,
         theme: themeReducer,
         auth: authSlice,
 
@@ -26,7 +24,7 @@ const store = configureStore({
             .concat(eagleDataAPI.middleware)
             .concat(testAPI.middleware),
 
-    devTools: true,
+    devTools: import.meta.env.VITE_APP_ENV === 'development'    // true if this env var is 'development'
 });
 
 

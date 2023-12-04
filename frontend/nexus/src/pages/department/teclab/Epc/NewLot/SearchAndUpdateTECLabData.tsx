@@ -3,7 +3,7 @@ import {TiArrowBack} from "react-icons/ti";
 import {useNavigate} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
 import {useEffect, useState} from "react";
-import FindProject from "@pages/Project/FindProject.tsx";
+import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
 import TECLabDataForm from "@pages/department/teclab/Epc/NewLot/TECLabDataForm.tsx";
 import {ScrollArea} from "@components/ui/scroll-area.tsx";
 
@@ -60,9 +60,9 @@ function SearchAndUpdateTECLabData() {
                 </div>
 
                 <div className="flex">
-                    <FindProject
-                        status={getProjectsStatus}
-                        setStatus={setGetProjectsStatus}
+                    <ProjectFinder
+                        searchStatus={getProjectsStatus}
+                        setSearchStatus={setGetProjectsStatus}
                         // statusEPCDataFetch={statusEPCDataFetch}
                         // setStatusEPCDataFetch={setStatusEPCDataFetch}
                         searchResults={searchResults}

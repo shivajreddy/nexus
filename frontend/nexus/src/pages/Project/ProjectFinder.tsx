@@ -7,8 +7,8 @@ import {FaSearch} from "react-icons/fa";
 
 
 interface Iprops {
-    status: "initial" | "loading" | "failed";
-    setStatus: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed">>;
+    searchStatus: "initial" | "loading" | "failed";
+    setSearchStatus: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed">>;
 
     // statusEPCDataFetch: "initial" | "loading" | "failed" | "success";
     // setStatusEPCDataFetch: React.Dispatch<React.SetStateAction<"initial" | "loading" | "failed" | "success">>;
@@ -18,7 +18,7 @@ interface Iprops {
 }
 
 
-const FindProject = ({...props}: Iprops) => {
+const ProjectFinder = ({...props}: Iprops) => {
 
     const axios = useAxiosPrivate();
     const [existingCommunities, setExistingCommunities] = useState<string[]>([]);
@@ -40,7 +40,7 @@ const FindProject = ({...props}: Iprops) => {
     }, [])
 
     const handleSubmit = async () => {
-        props.setStatus('loading');
+        props.setSearchStatus('loading');
         try {
             const response = await axios.post("/projects/search",
                 {
@@ -52,16 +52,16 @@ const FindProject = ({...props}: Iprops) => {
             )
             // console.log("response for /projects: ", response);
             props.setSearchResults(response.data);
-            props.setStatus('initial');
+            props.setSearchStatus('initial');
         } catch (e) {
-            props.setStatus('failed');
+            props.setSearchStatus('failed');
         }
     }
 
     return (
-        <div className="m-8 mt-4 mb-0 mr-0 p-4 min-w-[30em] bg-default-bg2 rounded-md rounded-r-none">
-            <p className="pb-3 font-semibold text-2xl">Project Finder</p>
-
+        // <div className="m-8 mt-4 mb-0 mr-0 p-4 min-w-[30em] bg-default-bg2 rounded-md rounded-r-none">
+        //     <p className="pb-3 font-semibold text-2xl">Project Finder</p>
+        <div className="min-w-[30em] bg-default-bg2 rounded-md rounded-r-none">
             <div className="border-2 rounded-lg">
                 <div className="flex flex-col">
                     <div className="m-2">
@@ -95,18 +95,18 @@ const FindProject = ({...props}: Iprops) => {
                             </div>
                         </div>
                         <div className="my-4 flex justify-center">
-                            {props.status === 'initial' &&
+                            {props.searchStatus === 'initial' &&
                               <Button variant="primary" onClick={handleSubmit}>
-                                <FaSearch />&nbsp;Search
+                                <FaSearch/>&nbsp;Search
                               </Button>
                             }
-                            {props.status === 'loading' &&
+                            {props.searchStatus === 'loading' &&
                               <Button disabled
                                       className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
                                 Please wait
                               </Button>
                             }
-                            {props.status === 'failed' &&
+                            {props.searchStatus === 'failed' &&
                               <Button variant="primary" onClick={handleSubmit}>
                                 Failed to fetch
                               </Button>
@@ -123,4 +123,4 @@ const FindProject = ({...props}: Iprops) => {
 };
 
 
-export default FindProject;
+export default ProjectFinder;

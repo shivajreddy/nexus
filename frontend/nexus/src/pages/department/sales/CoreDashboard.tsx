@@ -1,11 +1,13 @@
-import CORForm from "@pages/department/sales/cord/CORForm.tsx";
+import CORSearchForm from "@pages/department/sales/cord/CORSearchForm.tsx";
 import MainLayout from "@templates/MainLayout.tsx";
+import CORUpdateForm from "@pages/department/sales/cord/CORUpdateForm.tsx";
 
 
 const CoreDashboard = () => {
     return (
         <MainLayout>
-            <CORForm/>
+            <CORUpdateForm/>
+            <CORSearchForm/>
         </MainLayout>
     );
 };
