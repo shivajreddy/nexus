@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from app.database.database import projects_coll, users_coll
 from app.database.schemas.department_data import UpdateTECLabData
 from app.database.schemas.user import UserInfo
+from app.router.utils.find_project import find_project
 from app.security.oauth2 import get_current_user_data
 
 """
@@ -12,8 +13,6 @@ TECLAB/EPC endpoint
 """
 
 router = APIRouter(prefix="/department/teclab/epc")
-
-
 
 
 # """
@@ -45,17 +44,7 @@ def get_all_lots():
     # response_model=
     dependencies=[Depends(get_current_user_data)])
 def get_epc_data_with_project_uid(project_uid: str):
-    target_project = None
-    for doc in list(projects_coll.find()):
-        project = {k: v for (k, v) in doc.items() if k != "_id"}
-        if project["project_info"]["project_uid"] == project_uid:
-            target_project = project
-            continue
-
-    if not target_project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"{project_uid} not found"
-        )
+    target_project = find_project(project_uid)
 
     # return target_project["teclab_data"]["epc_data"]
     result_project = {

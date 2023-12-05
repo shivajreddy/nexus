@@ -53,7 +53,7 @@ const ProjectFinderWithResults = (props: Iprops) => {
                       <div className="w-full">
                           {props.searchResults.map((item, idx) =>
                               <button key={idx}
-                                      className={`p-1 px-2 m-2 rounded-md  font-medium border-none border-2  ${selectedProject[idx] ? "bg-primary-bg0 text-white" : "bg-default-bg0"}`}
+                                      className={`p-1 px-2 m-2 rounded-md font-medium border-none border-2 ${selectedProject[idx] ? "bg-primary-bg0 text-white" : "bg-default-bg0"}`}
                                       onClick={() => handleChosenProject(idx, item)}
                               >
                                   {item.project_id}

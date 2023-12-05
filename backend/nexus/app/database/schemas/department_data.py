@@ -91,6 +91,19 @@ class UpdateTECLabData(BaseModel):
     epc_data: EPCData
 
 
+class CORData(BaseModel):
+    product: str
+    elevation: str
+    locations: Optional[str] = []
+    type_categories: Optional[str] = []
+    custom_notes: str
+
+
+class UpdateCORData(BaseModel):
+    project_uid: str
+    epc_data: 'CORData'
+
+
 # :: SALES ::
 
 class B(BaseModel):
