@@ -114,4 +114,23 @@ const typeCategories = [
     {id: "fireplace", label: "Fireplace"}
 ]
 
-export {products, locationCategories, elevations, typeCategories}
+interface CORdata {
+    product: string;
+    elevation: string;
+    locations: string[];
+    categories: string[];
+}
+
+interface ProjectCORdata{
+    project_id: string;
+    project_uid: string;
+    cor_data: CORdata;
+}
+
+export {
+    products,
+    locationCategories,
+    elevations,
+    typeCategories,
+}
+export type {CORdata, ProjectCORdata};

@@ -1,6 +1,6 @@
-import CORSearchForm from "@pages/department/sales/cord/CORSearchForm.tsx";
+import CORSearchForm from "@pages/department/sales/cor/CORSearchForm.tsx";
 import MainLayout from "@templates/MainLayout.tsx";
-import CORUpdateForm from "@pages/department/sales/cord/CORUpdateForm.tsx";
+import CORUpdateForm from "@pages/department/sales/cor/CORUpdateForm.tsx";
 
 
 const CoreDashboard = () => {

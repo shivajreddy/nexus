@@ -22,8 +22,8 @@ const ProjectFinderWithResults = (props: Iprops) => {
     const [selectedProject, setSelectedProject] = useState(Array(props.searchResults.length).fill(false));
 
     function handleChosenProject(idx: number, targetProject: ResultProject) {
-        console.log("idx=", idx);
-        console.log("targetProject", targetProject);
+        // console.log("idx=", idx);
+        // console.log("targetProject", targetProject);
         // highlight the selected project
         setSelectedProject(() => {
             const newState = Array(props.searchResults.length).fill(false);
@@ -48,7 +48,7 @@ const ProjectFinderWithResults = (props: Iprops) => {
                 </div>
 
                 {props.searchResults.length > 0 &&
-                  <div className="grow rounded-md rounded-l-none bg-default-bg2 h-96">
+                  <div className="grow rounded-md rounded-l-none bg-default-bg2">
                     <ScrollArea className="rounded-md p-2 px-4 h-72 border">
                       <div className="w-full">
                           {props.searchResults.map((item, idx) =>

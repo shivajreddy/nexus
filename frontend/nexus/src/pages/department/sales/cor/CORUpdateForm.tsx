@@ -1,42 +1,104 @@
-import {Button} from "@components/ui/button.tsx";
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@components/ui/card.tsx";
-import {elevations, locationCategories, products, typeCategories} from "@pages/department/sales/cord/index.ts";
-
-import * as z from "zod";
+import React, {useEffect, useState} from "react";
+import ProjectFinderWithResults from "@pages/Project/ProjectFinderWithResults.tsx";
 import {Form, FormControl, FormField, FormItem, FormLabel} from "@components/ui/form.tsx";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Checkbox} from "@components/ui/checkbox.tsx";
-import {Command, CommandEmpty, CommandInput, CommandItem, CommandList} from "@components/ui/command.tsx";
+import {
+    elevations,
+    locationCategories,
+    products,
+    ProjectCORdata,
+    typeCategories
+} from "@pages/department/sales/cor/index.ts";
 import {IoMdDoneAll} from "react-icons/io";
 import {TfiLayoutSidebarNone} from "react-icons/tfi";
-
+import {Command, CommandEmpty, CommandInput, CommandItem, CommandList} from "@components/ui/command.tsx";
+import {Checkbox} from "@components/ui/checkbox.tsx";
+import {Button} from "@components/ui/button.tsx";
+import {useForm} from "react-hook-form";
+import * as z from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
+import {BASE_URL} from "@/services/api";
+import updates from "@pages/Updates/Updates.tsx";
 
 // 1. Form schema
 const FormSchema = z.object({
-    products: z.array(z.string()),
-    elevations: z.array(z.string()),
-    location_categories: z.array(z.string()),
-    type_categories: z.array(z.string())
+    // products: z.array(z.string()).nonempty(),
+    // elevations: z.array(z.string()).nonempty(),
+    products: z.string(),
+    elevations: z.string(),
+    locations: z.array(z.string()).nonempty(),
+    categories: z.array(z.string()).nonempty()
 })
 
 
-const CORSearchForm = () => {
+const CORUpdateForm = () => {
+
+    const [searchStatus, setSearchStatus] = useState<"initial" | "loading" | "failed">("initial");
+    const [searchResults, setSearchResults] = useState<ResultProject[]>([]);
+    const [chosenProject, setChosenProject] = useState<ResultProject | undefined>(undefined);
+
+    const axios = useAxiosPrivate();
 
     // 2. Define the form
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            products: [],
-            elevations: [],
-            location_categories: [],
-            type_categories: []
+            products: undefined,
+            elevations: undefined,
+            locations: [],
+            categories: []
         }
     })
 
+
+    // effect when a new project is chosen
+    useEffect(() => {
+        // fetch the cor_data from server
+        console.log("running useEffect to fetch cor_data for", chosenProject);
+
+        const fetchCORData = async () => {
+            const res = await axios.get(BASE_URL + `/department/teclab/cor/${chosenProject?.project_uid}`)
+            console.log("res=", res);
+
+            form.setValue('products', 'wtf')
+            form.setValue('elevations', 'wtf')
+            form.setValue('locations', ['wtf'])
+            form.setValue('categories', ['wtf'])
+        }
+        if (chosenProject) {
+            fetchCORData().then(() => {
+            });
+        }
+    }, [chosenProject])
+
     // 3. Define the form submission
     function handleFormSubmit(data: z.infer<typeof FormSchema>) {
-        console.log(data);
+        console.log("form-data = ", data);
+
+        function updateCORdata() {
+
+            // create the body of  post request
+            if (chosenProject) {
+                let p: ProjectCORdata = {
+                    project_id: chosenProject.project_id,
+                    project_uid: chosenProject.project_uid,
+                    cor_data: {
+                        product: "your_product",
+                        elevation: "your_elevation",
+                        locations: ["location1", "location2"],
+                        categories: ["category1", "category2"]
+                    }
+                };
+                console.log("p=", p);
+            }
+
+
+            // make a POST request
+            // axios.post(BASE_URL + '/department/teclab/cor/${chosenProject?.project_uid}')
+        }
+
+        updateCORdata();
+
     }
 
     return (
@@ -45,27 +107,28 @@ const CORSearchForm = () => {
                 <p className="font-medium text-2xl text-center">C.O.R. Dashboard (CORD)</p>
             </div>
 
+            <div className="m-8">
+                <ProjectFinderWithResults
+                    searchStatus={searchStatus}
+                    setSearchStatus={setSearchStatus}
+                    searchResults={searchResults}
+                    setSearchResults={setSearchResults}
+                    setChosenProject={setChosenProject}
+                />
+            </div>
+
+            <div className="flex justify-center">
+                <p className="font-semibold text-2xl text-center">C.O.R Data</p>
+                {chosenProject &&
+                  <p
+                    className="font-semibold text-2xl text-center text-primary">&nbsp;:&nbsp;{chosenProject.project_id}</p>
+                }
+            </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col items-center m-4">
                     <div className="flex items-start">
                         <div className="mx-4">
-                            <p className="text-lg text-center font-semibold">Select Products</p>
-                            <div className="flex justify-center m-2">
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('products', products.map(p => p.id))}
-                                >
-                                    <IoMdDoneAll/>
-                                    &nbsp;Select all
-                                </button>
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('products', [])}
-                                >
-                                    <TfiLayoutSidebarNone/>
-                                    &nbsp;Clear
-                                </button>
-                            </div>
+                            <p className="text-lg text-center font-semibold">Select Product</p>
                             <Command className="rounded-lg border bg-default-bg2">
                                 <CommandInput placeholder="search..."/>
                                 <CommandList>
@@ -83,7 +146,8 @@ const CORSearchForm = () => {
                                                                 className="bg-default-bg1 rounded w-5 h-5 border-b1"
                                                                 checked={field.value?.includes(item.id)}
                                                                 onCheckedChange={(checked) => {
-                                                                    return checked ? field.onChange([...field.value, item.id])
+                                                                    // return checked ? field.onChange([...field.value, item.id])
+                                                                    return checked ? field.onChange([item.id])
                                                                         : field.onChange(
                                                                             field.value?.filter((value) => value !== item.id)
                                                                         )
@@ -101,23 +165,7 @@ const CORSearchForm = () => {
                             </Command>
                         </div>
                         <div className="mx-4">
-                            <p className="text-lg text-center font-semibold">Select Elevations</p>
-                            <div className="flex justify-center m-2">
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('elevations', elevations.map(p => p.id))}
-                                >
-                                    <IoMdDoneAll/>
-                                    &nbsp;Select all
-                                </button>
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('elevations', [])}
-                                >
-                                    <TfiLayoutSidebarNone/>
-                                    &nbsp;Clear
-                                </button>
-                            </div>
+                            <p className="text-lg text-center font-semibold">Select Elevation</p>
                             <Command className="rounded-lg border bg-default-bg2">
                                 <CommandInput placeholder="search..."/>
                                 <CommandList>
@@ -135,7 +183,8 @@ const CORSearchForm = () => {
                                                                 className="bg-default-bg1 rounded w-5 h-5 border-b1"
                                                                 checked={field.value?.includes(item.id)}
                                                                 onCheckedChange={(checked) => {
-                                                                    return checked ? field.onChange([...field.value, item.id])
+                                                                    // return checked ? field.onChange([...field.value, item.id])
+                                                                    return checked ? field.onChange([item.id])
                                                                         : field.onChange(
                                                                             field.value?.filter((value) => value !== item.id)
                                                                         )
@@ -257,46 +306,12 @@ const CORSearchForm = () => {
                             </Command>
                         </div>
                     </div>
-                    <Button variant="primary" className="text-md m-4">Search</Button>
+                    <Button variant="primary" className="text-md m-4">Update</Button>
                 </form>
             </Form>
-
-            <div>
-                <p className="font-bold text-2xl text-center">Results (demo)</p>
-
-                <div className="results-container flex">
-                    <Card className="w-[350px]">
-                        <CardHeader>
-                            <CardTitle className="text-center">RB-05-31</CardTitle>
-                            <CardDescription>
-                                {"add niche to bedroom 2"}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                Product:
-                            </p>
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                Elevation:
-                            </p>
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                Location:
-                            </p>
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                Type:
-                            </p>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button variant="outline" className="w-[100px]">Files</Button>
-                            <Button variant="outline" className="w-[100px]">Images</Button>
-                        </CardFooter>
-                    </Card>
-                </div>
-            </div>
-
 
         </div>
     );
 };
 
-export default CORSearchForm;
+export default CORUpdateForm;
