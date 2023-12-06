@@ -35,36 +35,36 @@ const ProjectFinderWithResults = (props: Iprops) => {
     }
 
     return (
-        <div>
-            <p className="pb-3 font-semibold text-2xl text-center">Project Finder</p>
-            <div className="flex justify-center items-start">
-                <div>
-                    <ProjectFinder
-                        searchStatus={props.searchStatus}
-                        setSearchStatus={props.setSearchStatus}
-                        searchResults={props.searchResults}
-                        setSearchResults={props.setSearchResults}
-                    />
-                </div>
+        <div className="pt-4">
+            <div className="relative border rounded-md">
+                <p className="pb-3 font-semibold text-2xl text-center absolute -top-4 left-0 right-0 ml-auto mr-auto w-fit bg-default-bg2 px-4">Project
+                    Finder</p>
+                <div className="flex justify-center items-start my-8">
+                    <div>
+                        <ProjectFinder
+                            searchStatus={props.searchStatus}
+                            setSearchStatus={props.setSearchStatus}
+                            searchResults={props.searchResults}
+                            setSearchResults={props.setSearchResults}
+                        />
+                    </div>
 
-                {props.searchResults.length > 0 &&
-                  <div className="grow rounded-md rounded-l-none bg-default-bg2">
-                    <ScrollArea className="rounded-md p-2 px-4 h-72 border">
-                      <div className="w-full">
-                          {props.searchResults.map((item, idx) =>
-                              <button key={idx}
-                                      className={`p-1 px-2 m-2 rounded-md font-medium border-none border-2 ${selectedProject[idx] ? "bg-primary-bg0 text-white" : "bg-default-bg0"}`}
-                                      onClick={() => handleChosenProject(idx, item)}
-                              >
-                                  {item.project_id}
-                              </button>
-                          )}
+                    {props.searchResults.length > 0 &&
+                      <div className="grow">
+                        <div className="w-full max-h-72 overflow-y-scroll">
+                            {props.searchResults.map((item, idx) =>
+                                <button key={idx}
+                                        className={`p-1 px-2 m-2 rounded-md font-medium border-none border-2 ${selectedProject[idx] ? "bg-primary-bg0 text-white" : "bg-default-bg0"}`}
+                                        onClick={() => handleChosenProject(idx, item)}
+                                >
+                                    {item.project_id}
+                                </button>
+                            )}
+                        </div>
                       </div>
-                    </ScrollArea>
-                  </div>
-                }
+                    }
+                </div>
             </div>
-
         </div>
     );
 };

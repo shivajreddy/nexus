@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -94,9 +94,9 @@ class UpdateTECLabData(BaseModel):
 class CORData(BaseModel):
     product: str
     elevation: str
-    locations: Optional[str] = []
-    type_categories: Optional[str] = []
-    custom_notes: str
+    locations: Optional[List[str]] = []
+    categories: Optional[List[str]] = []
+    custom_notes: Optional[str]
 
 
 class UpdateCORData(BaseModel):

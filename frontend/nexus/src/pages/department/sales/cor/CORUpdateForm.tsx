@@ -19,6 +19,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {BASE_URL} from "@/services/api";
 import updates from "@pages/Updates/Updates.tsx";
+import {MdFileUpload} from "react-icons/md";
+import {Textarea} from "@components/ui/textarea.tsx";
 
 // 1. Form schema
 const FormSchema = z.object({
@@ -102,215 +104,230 @@ const CORUpdateForm = () => {
     }
 
     return (
-        <div className="border border-b0 m-4 rounded-xl bg-default-bg2">
-            <div className="flex items-center justify-center bg-default-bg2 p-2 rounded-t-md border-b">
-                <p className="font-medium text-2xl text-center">C.O.R. Dashboard (CORD)</p>
-            </div>
+        <>
+            <p className="font-medium text-2xl text-center m-4">C.O.R. Dashboard (CORD)</p>
+            <div className="border border-b0 m-4 rounded-md bg-default-bg2">
 
-            <div className="m-8">
-                <ProjectFinderWithResults
-                    searchStatus={searchStatus}
-                    setSearchStatus={setSearchStatus}
-                    searchResults={searchResults}
-                    setSearchResults={setSearchResults}
-                    setChosenProject={setChosenProject}
-                />
-            </div>
+                <div className="m-8">
+                    <ProjectFinderWithResults
+                        searchStatus={searchStatus}
+                        setSearchStatus={setSearchStatus}
+                        searchResults={searchResults}
+                        setSearchResults={setSearchResults}
+                        setChosenProject={setChosenProject}
+                    />
+                </div>
 
-            <div className="flex justify-center">
-                <p className="font-semibold text-2xl text-center">C.O.R Data</p>
                 {chosenProject &&
-                  <p
-                    className="font-semibold text-2xl text-center text-primary">&nbsp;:&nbsp;{chosenProject.project_id}</p>
-                }
-            </div>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col items-center m-4">
-                    <div className="flex items-start">
-                        <div className="mx-4">
+                  <div className="border rounded-md my-12 mx-8 relative">
+                    <div
+                      className="flex justify-center absolute -top-4 left-0 right-0 ml-auto mr-auto w-fit bg-default-bg2 px-4">
+                      <p className="font-semibold text-2xl text-center">C.O.R Data</p>
+                        {chosenProject &&
+                          <p
+                            className="font-semibold text-2xl text-center text-primary">&nbsp;:&nbsp;{chosenProject.project_id}</p>
+                        }
+                    </div>
+
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col items-center pt-8">
+                        <div className="flex items-start">
+                          <div className="mx-4">
                             <p className="text-lg text-center font-semibold">Select Product</p>
                             <Command className="rounded-lg border bg-default-bg2">
-                                <CommandInput placeholder="search..."/>
-                                <CommandList>
-                                    <CommandEmpty>No matches found</CommandEmpty>
-                                    {products.map((item) => (
-                                        <CommandItem key={item.id}>
-                                            <FormField
-                                                name="products"
-                                                control={form.control}
-                                                render={({field}) => (
-                                                    <FormItem
-                                                        className="flex flex-row items-center space-x-2 space-y-0">
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                className="bg-default-bg1 rounded w-5 h-5 border-b1"
-                                                                checked={field.value?.includes(item.id)}
-                                                                onCheckedChange={(checked) => {
-                                                                    // return checked ? field.onChange([...field.value, item.id])
-                                                                    return checked ? field.onChange([item.id])
-                                                                        : field.onChange(
-                                                                            field.value?.filter((value) => value !== item.id)
-                                                                        )
-                                                                }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormLabel
-                                                            className="cursor-pointer">{item.label}</FormLabel>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </CommandItem>
-                                    ))}
-                                </CommandList>
+                              <CommandInput placeholder="search..."/>
+                              <CommandList>
+                                <CommandEmpty>No matches found</CommandEmpty>
+                                  {products.map((item) => (
+                                      <CommandItem key={item.id}>
+                                          <FormField
+                                              name="products"
+                                              control={form.control}
+                                              render={({field}) => (
+                                                  <FormItem
+                                                      className="flex flex-row items-center space-x-2 space-y-0">
+                                                      <FormControl>
+                                                          <Checkbox
+                                                              className="bg-default-bg1 rounded w-5 h-5 border-b1"
+                                                              checked={field.value?.includes(item.id)}
+                                                              onCheckedChange={(checked) => {
+                                                                  // return checked ? field.onChange([...field.value, item.id])
+                                                                  return checked ? field.onChange([item.id])
+                                                                      : field.onChange(
+                                                                          field.value?.filter((value) => value !== item.id)
+                                                                      )
+                                                              }}
+                                                          />
+                                                      </FormControl>
+                                                      <FormLabel
+                                                          className="cursor-pointer">{item.label}</FormLabel>
+                                                  </FormItem>
+                                              )}
+                                          />
+                                      </CommandItem>
+                                  ))}
+                              </CommandList>
                             </Command>
-                        </div>
-                        <div className="mx-4">
+                          </div>
+                          <div className="mx-4">
                             <p className="text-lg text-center font-semibold">Select Elevation</p>
                             <Command className="rounded-lg border bg-default-bg2">
-                                <CommandInput placeholder="search..."/>
-                                <CommandList>
-                                    <CommandEmpty>No matches found</CommandEmpty>
-                                    {elevations.map((item) => (
-                                        <CommandItem key={item.id}>
-                                            <FormField
-                                                name="elevations"
-                                                control={form.control}
-                                                render={({field}) => (
-                                                    <FormItem
-                                                        className="flex flex-row items-center space-x-2 space-y-0">
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                className="bg-default-bg1 rounded w-5 h-5 border-b1"
-                                                                checked={field.value?.includes(item.id)}
-                                                                onCheckedChange={(checked) => {
-                                                                    // return checked ? field.onChange([...field.value, item.id])
-                                                                    return checked ? field.onChange([item.id])
-                                                                        : field.onChange(
-                                                                            field.value?.filter((value) => value !== item.id)
-                                                                        )
-                                                                }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormLabel
-                                                            className="cursor-pointer">{item.label}</FormLabel>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </CommandItem>
-                                    ))}
-                                </CommandList>
+                              <CommandInput placeholder="search..."/>
+                              <CommandList>
+                                <CommandEmpty>No matches found</CommandEmpty>
+                                  {elevations.map((item) => (
+                                      <CommandItem key={item.id}>
+                                          <FormField
+                                              name="elevations"
+                                              control={form.control}
+                                              render={({field}) => (
+                                                  <FormItem
+                                                      className="flex flex-row items-center space-x-2 space-y-0">
+                                                      <FormControl>
+                                                          <Checkbox
+                                                              className="bg-default-bg1 rounded w-5 h-5 border-b1"
+                                                              checked={field.value?.includes(item.id)}
+                                                              onCheckedChange={(checked) => {
+                                                                  // return checked ? field.onChange([...field.value, item.id])
+                                                                  return checked ? field.onChange([item.id])
+                                                                      : field.onChange(
+                                                                          field.value?.filter((value) => value !== item.id)
+                                                                      )
+                                                              }}
+                                                          />
+                                                      </FormControl>
+                                                      <FormLabel
+                                                          className="cursor-pointer">{item.label}</FormLabel>
+                                                  </FormItem>
+                                              )}
+                                          />
+                                      </CommandItem>
+                                  ))}
+                              </CommandList>
                             </Command>
-                        </div>
-                        <div className="mx-4">
+                          </div>
+                          <div className="mx-4">
                             <p className="text-lg text-center font-semibold">Select Locations</p>
                             <div className="flex justify-center m-2">
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('location_categories', locationCategories.map(p => p.id))}
-                                >
-                                    <IoMdDoneAll/>
-                                    &nbsp;Select all
-                                </button>
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('location_categories', [])}
-                                >
-                                    <TfiLayoutSidebarNone/>
-                                    &nbsp;Clear
-                                </button>
+                              <button type="button"
+                                      className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
+                                      onClick={() => form.setValue('location_categories', locationCategories.map(p => p.id))}
+                              >
+                                <IoMdDoneAll/>
+                                &nbsp;Select all
+                              </button>
+                              <button type="button"
+                                      className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
+                                      onClick={() => form.setValue('location_categories', [])}
+                              >
+                                <TfiLayoutSidebarNone/>
+                                &nbsp;Clear
+                              </button>
                             </div>
                             <Command className="rounded-lg border bg-default-bg2">
-                                <CommandInput placeholder="search..."/>
-                                <CommandList>
-                                    <CommandEmpty>No matches found</CommandEmpty>
-                                    {locationCategories.map((item) => (
-                                        <CommandItem key={item.id}>
-                                            <FormField
-                                                name="location_categories"
-                                                control={form.control}
-                                                render={({field}) => (
-                                                    <FormItem
-                                                        className="flex flex-row items-center space-x-2 space-y-0">
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                className="bg-default-bg1 rounded w-5 h-5 border-b1"
-                                                                checked={field.value?.includes(item.id)}
-                                                                onCheckedChange={(checked) => {
-                                                                    return checked ? field.onChange([...field.value, item.id])
-                                                                        : field.onChange(
-                                                                            field.value?.filter((value) => value !== item.id)
-                                                                        )
-                                                                }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormLabel
-                                                            className="cursor-pointer">{item.label}</FormLabel>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </CommandItem>
-                                    ))}
-                                </CommandList>
+                              <CommandInput placeholder="search..."/>
+                              <CommandList>
+                                <CommandEmpty>No matches found</CommandEmpty>
+                                  {locationCategories.map((item) => (
+                                      <CommandItem key={item.id}>
+                                          <FormField
+                                              name="location_categories"
+                                              control={form.control}
+                                              render={({field}) => (
+                                                  <FormItem
+                                                      className="flex flex-row items-center space-x-2 space-y-0">
+                                                      <FormControl>
+                                                          <Checkbox
+                                                              className="bg-default-bg1 rounded w-5 h-5 border-b1"
+                                                              checked={field.value?.includes(item.id)}
+                                                              onCheckedChange={(checked) => {
+                                                                  return checked ? field.onChange([...field.value, item.id])
+                                                                      : field.onChange(
+                                                                          field.value?.filter((value) => value !== item.id)
+                                                                      )
+                                                              }}
+                                                          />
+                                                      </FormControl>
+                                                      <FormLabel
+                                                          className="cursor-pointer">{item.label}</FormLabel>
+                                                  </FormItem>
+                                              )}
+                                          />
+                                      </CommandItem>
+                                  ))}
+                              </CommandList>
                             </Command>
-                        </div>
-                        <div className="mx-4">
+                          </div>
+                          <div className="mx-4">
                             <p className="text-lg text-center font-semibold">Select Categories</p>
                             <div className="flex justify-center m-2">
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('type_categories', typeCategories.map(p => p.id))}
-                                >
-                                    <IoMdDoneAll/>
-                                    &nbsp;Select all
-                                </button>
-                                <button type="button"
-                                        className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                        onClick={() => form.setValue('type_categories', [])}
-                                >
-                                    <TfiLayoutSidebarNone/>
-                                    &nbsp;Clear
-                                </button>
+                              <button type="button"
+                                      className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
+                                      onClick={() => form.setValue('categories', typeCategories.map(p => p.id))}
+                              >
+                                <IoMdDoneAll/>
+                                &nbsp;Select all
+                              </button>
+                              <button type="button"
+                                      className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
+                                      onClick={() => form.setValue('categories', [])}
+                              >
+                                <TfiLayoutSidebarNone/>
+                                &nbsp;Clear
+                              </button>
                             </div>
                             <Command className="rounded-lg border bg-default-bg2">
-                                <CommandInput placeholder="search..."/>
-                                <CommandList>
-                                    <CommandEmpty>No matches found</CommandEmpty>
-                                    {typeCategories.map((item) => (
-                                        <CommandItem key={item.id}>
-                                            <FormField
-                                                name="type_categories"
-                                                control={form.control}
-                                                render={({field}) => (
-                                                    <FormItem
-                                                        className="flex flex-row items-center space-x-2 space-y-0">
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                className="bg-default-bg1 rounded w-5 h-5 border-b1"
-                                                                checked={field.value?.includes(item.id)}
-                                                                onCheckedChange={(checked) => {
-                                                                    return checked ? field.onChange([...field.value, item.id])
-                                                                        : field.onChange(
-                                                                            field.value?.filter((value) => value !== item.id)
-                                                                        )
-                                                                }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormLabel
-                                                            className="cursor-pointer">{item.label}</FormLabel>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </CommandItem>
-                                    ))}
-                                </CommandList>
+                              <CommandInput placeholder="search..."/>
+                              <CommandList>
+                                <CommandEmpty>No matches found</CommandEmpty>
+                                  {typeCategories.map((item) => (
+                                      <CommandItem key={item.id}>
+                                          <FormField
+                                              name="type_categories"
+                                              control={form.control}
+                                              render={({field}) => (
+                                                  <FormItem
+                                                      className="flex flex-row items-center space-x-2 space-y-0">
+                                                      <FormControl>
+                                                          <Checkbox
+                                                              className="bg-default-bg1 rounded w-5 h-5 border-b1"
+                                                              checked={field.value?.includes(item.id)}
+                                                              onCheckedChange={(checked) => {
+                                                                  return checked ? field.onChange([...field.value, item.id])
+                                                                      : field.onChange(
+                                                                          field.value?.filter((value) => value !== item.id)
+                                                                      )
+                                                              }}
+                                                          />
+                                                      </FormControl>
+                                                      <FormLabel
+                                                          className="cursor-pointer">{item.label}</FormLabel>
+                                                  </FormItem>
+                                              )}
+                                          />
+                                      </CommandItem>
+                                  ))}
+                              </CommandList>
                             </Command>
+                          </div>
                         </div>
-                    </div>
-                    <Button variant="primary" className="text-md m-4">Update</Button>
-                </form>
-            </Form>
+                        <div className="w-2/3 px-6 mt-4">
+                          <p className="text-lg text-center font-semibold">Notes</p>
+                          <Textarea/>
+                        </div>
+                        <div className="flex space-x-4">
+                          <Button variant="primary" className="text-md m-4 w-40">
+                            <MdFileUpload/>
+                            <p className="pl-2">Update</p>
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </div>
+                }
 
-        </div>
+            </div>
+        </>
     );
 };
 

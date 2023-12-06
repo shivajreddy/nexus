@@ -10,6 +10,8 @@ import {Checkbox} from "@components/ui/checkbox.tsx";
 import {Command, CommandEmpty, CommandInput, CommandItem, CommandList} from "@components/ui/command.tsx";
 import {IoMdDoneAll} from "react-icons/io";
 import {TfiLayoutSidebarNone} from "react-icons/tfi";
+import {FaSearch} from "react-icons/fa";
+import React from "react";
 
 
 // 1. Form schema
@@ -257,7 +259,10 @@ const CORSearchForm = () => {
                             </Command>
                         </div>
                     </div>
-                    <Button variant="primary" className="text-md m-4">Search</Button>
+                    <Button variant="primary" className="w-40 m-4">
+                        <FaSearch/>
+                        <p className="pl-2">Search</p>
+                    </Button>
                 </form>
             </Form>
 

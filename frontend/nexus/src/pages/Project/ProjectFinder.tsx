@@ -61,63 +61,59 @@ const ProjectFinder = ({...props}: Iprops) => {
     return (
         // <div className="m-8 mt-4 mb-0 mr-0 p-4 min-w-[30em] bg-default-bg2 rounded-md rounded-r-none">
         //     <p className="pb-3 font-semibold text-2xl">Project Finder</p>
-        <div className="min-w-[30em] bg-default-bg2 rounded-md rounded-r-none">
-            <div className="border-2 rounded-lg">
-                <div className="flex flex-col">
-                    <div className="m-2">
-                        <FieldDropDown id="1_community"
-                                       className="mx-4"
-                                       name={"Community"}
-                                       dropdownData={existingCommunities}
-                                       value={community}
-                                       onUpdate={(newValue) => setCommunity(newValue)}
-                        />
-                        <FieldText id="1_section"
+        <div className="min-w-[30em]">
+            <div className="flex flex-col">
+                <div className="m-2">
+                    <FieldDropDown id="1_community"
                                    className="mx-4"
-                                   name={"Section"}
-                                   value={section}
-                                   onUpdate={(e) => setSection(e.target.value)}
-                        />
-                        <FieldText id="1_lot_number"
-                                   className="mx-4"
-                                   name={"Lot Number"}
-                                   value={lotNumber}
-                                   onUpdate={(e) => setLotNumber(e.target.value)}
-                        />
-                    </div>
-                    <div className="mx-2 px-4">
-                        <div className="flex select-none justify-center">
-                            {/*<p className="font-medium">Project Code:</p>*/}
-                            <div className="flex">
-                                <p className="h-max px-2 border rounded-lg">{community ? community : "ALL"}</p>
-                                <p className="h-max mx-2 px-2 border rounded-lg">{section ? section : "ALL"}</p>
-                                <p className="h-max px-2 border rounded-lg">{lotNumber ? lotNumber : "ALL"}</p>
-                            </div>
-                        </div>
-                        <div className="my-4 flex justify-center">
-                            {props.searchStatus === 'initial' &&
-                              <Button variant="primary" onClick={handleSubmit}>
-                                <FaSearch/>&nbsp;Search
-                              </Button>
-                            }
-                            {props.searchStatus === 'loading' &&
-                              <Button disabled
-                                      className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
-                                Please wait
-                              </Button>
-                            }
-                            {props.searchStatus === 'failed' &&
-                              <Button variant="primary" onClick={handleSubmit}>
-                                Failed to fetch
-                              </Button>
-                            }
-                        </div>
-                    </div>
-
+                                   name={"Community"}
+                                   dropdownData={existingCommunities}
+                                   value={community}
+                                   onUpdate={(newValue) => setCommunity(newValue)}
+                    />
+                    <FieldText id="1_section"
+                               className="mx-4"
+                               name={"Section"}
+                               value={section}
+                               onUpdate={(e) => setSection(e.target.value)}
+                    />
+                    <FieldText id="1_lot_number"
+                               className="mx-4"
+                               name={"Lot Number"}
+                               value={lotNumber}
+                               onUpdate={(e) => setLotNumber(e.target.value)}
+                    />
                 </div>
-
+                <div className="mx-2 px-4">
+                    <div className="flex select-none justify-center">
+                        {/*<p className="font-medium">Project Code:</p>*/}
+                        <div className="flex">
+                            <p className="h-max px-2 border rounded-lg">{community ? community : "ALL"}</p>
+                            <p className="h-max mx-2 px-2 border rounded-lg">{section ? section : "ALL"}</p>
+                            <p className="h-max px-2 border rounded-lg">{lotNumber ? lotNumber : "ALL"}</p>
+                        </div>
+                    </div>
+                    <div className="my-4 flex justify-center">
+                        {props.searchStatus === 'initial' &&
+                          <Button variant="primary" className="w-40" onClick={handleSubmit}>
+                            <FaSearch/>
+                            <p className="pl-2">Search</p>
+                          </Button>
+                        }
+                        {props.searchStatus === 'loading' &&
+                          <Button disabled
+                                  className="w-40 cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
+                            Please wait
+                          </Button>
+                        }
+                        {props.searchStatus === 'failed' &&
+                          <Button variant="primary" className="w-40" onClick={handleSubmit}>
+                            Failed to fetch
+                          </Button>
+                        }
+                    </div>
+                </div>
             </div>
-
         </div>
     );
 };
