@@ -7,7 +7,7 @@ const CoreDashboard = () => {
     return (
         <MainLayout>
             <CORUpdateForm/>
-            <CORSearchForm/>
+            {/*<CORSearchForm/>*/}
         </MainLayout>
     );
 };

@@ -10,4 +10,11 @@
 
 
 - [ ] New lot page - when width is reduced the # of cards should be 1 in a row
-- 
+
+
+# Roles
+2xx - TECLab Department  
+21x - EPC related  
+    - 211 - user
+    - 212 - lot-editor
+    - 213 - epc super user -> get emails, change form data

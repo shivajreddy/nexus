@@ -26,10 +26,11 @@ import {Textarea} from "@components/ui/textarea.tsx";
 const FormSchema = z.object({
     // products: z.array(z.string()).nonempty(),
     // elevations: z.array(z.string()).nonempty(),
-    products: z.string(),
-    elevations: z.string(),
+    product: z.string(),
+    elevation: z.string(),
     locations: z.array(z.string()).nonempty(),
-    categories: z.array(z.string()).nonempty()
+    categories: z.array(z.string()).nonempty(),
+    notes: z.string()
 })
 
 
@@ -45,8 +46,8 @@ const CORUpdateForm = () => {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            products: undefined,
-            elevations: undefined,
+            product: "",
+            elevation: undefined,
             locations: [],
             categories: []
         }
@@ -59,11 +60,13 @@ const CORUpdateForm = () => {
         console.log("running useEffect to fetch cor_data for", chosenProject);
 
         const fetchCORData = async () => {
-            const res = await axios.get(BASE_URL + `/department/teclab/cor/${chosenProject?.project_uid}`)
+            // const res = await axios.get(BASE_URL + `/department/teclab/cor/${chosenProject?.project_uid}`)
+            const res = await axios.get(BASE_URL + '/department/teclab/cor/826a5f29-ab9f-4d44-aa84-5659ffe9b948')
             console.log("res=", res);
 
-            form.setValue('products', 'wtf')
-            form.setValue('elevations', 'wtf')
+            // form.setValue('product', res.data.product)
+            form.setValue('product', 'acton')
+            form.setValue('elevation', 'wtf')
             form.setValue('locations', ['wtf'])
             form.setValue('categories', ['wtf'])
         }
@@ -141,7 +144,7 @@ const CORUpdateForm = () => {
                                   {products.map((item) => (
                                       <CommandItem key={item.id}>
                                           <FormField
-                                              name="products"
+                                              name="product"
                                               control={form.control}
                                               render={({field}) => (
                                                   <FormItem
@@ -152,9 +155,10 @@ const CORUpdateForm = () => {
                                                               checked={field.value?.includes(item.id)}
                                                               onCheckedChange={(checked) => {
                                                                   // return checked ? field.onChange([...field.value, item.id])
-                                                                  return checked ? field.onChange([item.id])
+                                                                  return checked ? field.onChange(item.id)
                                                                       : field.onChange(
-                                                                          field.value?.filter((value) => value !== item.id)
+                                                                          field.value
+                                                                          // field.value?.filter((value) => value !== item.id)
                                                                       )
                                                               }}
                                                           />
@@ -178,7 +182,7 @@ const CORUpdateForm = () => {
                                   {elevations.map((item) => (
                                       <CommandItem key={item.id}>
                                           <FormField
-                                              name="elevations"
+                                              name="elevation"
                                               control={form.control}
                                               render={({field}) => (
                                                   <FormItem
@@ -191,7 +195,8 @@ const CORUpdateForm = () => {
                                                                   // return checked ? field.onChange([...field.value, item.id])
                                                                   return checked ? field.onChange([item.id])
                                                                       : field.onChange(
-                                                                          field.value?.filter((value) => value !== item.id)
+                                                                          field.value
+                                                                          // field.value?.filter((value) => value !== item.id)
                                                                       )
                                                               }}
                                                           />
@@ -211,14 +216,14 @@ const CORUpdateForm = () => {
                             <div className="flex justify-center m-2">
                               <button type="button"
                                       className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                      onClick={() => form.setValue('location_categories', locationCategories.map(p => p.id))}
+                                      onClick={() => form.setValue('locations', locationCategories.map(p => p.id))}
                               >
                                 <IoMdDoneAll/>
                                 &nbsp;Select all
                               </button>
                               <button type="button"
                                       className="flex justify-center items-center border rounded-lg mx-1 px-2 text-sm font-semibold"
-                                      onClick={() => form.setValue('location_categories', [])}
+                                      onClick={() => form.setValue('locations', [])}
                               >
                                 <TfiLayoutSidebarNone/>
                                 &nbsp;Clear
@@ -231,7 +236,7 @@ const CORUpdateForm = () => {
                                   {locationCategories.map((item) => (
                                       <CommandItem key={item.id}>
                                           <FormField
-                                              name="location_categories"
+                                              name="locations"
                                               control={form.control}
                                               render={({field}) => (
                                                   <FormItem
@@ -283,7 +288,7 @@ const CORUpdateForm = () => {
                                   {typeCategories.map((item) => (
                                       <CommandItem key={item.id}>
                                           <FormField
-                                              name="type_categories"
+                                              name="categories"
                                               control={form.control}
                                               render={({field}) => (
                                                   <FormItem

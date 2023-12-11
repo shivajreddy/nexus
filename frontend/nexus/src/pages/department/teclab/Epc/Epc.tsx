@@ -23,6 +23,7 @@ import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
 import {MdModeEditOutline} from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
+import {BASE_URL} from "@/services/api";
 
 
 const defaultColumnSettings = {
@@ -225,6 +226,7 @@ function Epc() {
         }
     }, [loadEditorControls, columnDefinitions])
 
+
     return (
         <MainLayout>
             <div className="epc-container rounded-md m-4 bg-default-bg2">
@@ -246,6 +248,14 @@ function Epc() {
                             <Button onClick={() => navigate('edit')} className="min-w-[10em]">
                               <p className="pr-2"><MdModeEditOutline/></p>
                               Search & Update
+                            </Button>
+                          </div>
+                        }
+                        {hasRoles(userRoles, [213]) &&
+                          <div className="flex justify-center items-center bg-default-bg1 mx-4">
+                            <Button onClick={() => axios.get(BASE_URL+'/department/teclab/epc/epc-backlog-tracker')} className="min-w-[10em]">
+                              <p className="pr-2"><MdModeEditOutline/></p>
+                              Email Me Backlog
                             </Button>
                           </div>
                         }

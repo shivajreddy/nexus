@@ -13,12 +13,13 @@ router = APIRouter(prefix="/department/teclab/cor")
 @router.get('/{project_uid}')
 def get_the_cor_data(project_uid: str):
     project = find_project(project_uid)
-    print("Project :: ", project)
+    # print("Project :: ", project)
 
     cor_data = project["teclab_data"]["cor_data"]
     print("cor_data :: ", cor_data)
 
-    return "Found it"
+    return cor_data
+    # return "Found it"
 
 
 @router.patch('/db')
@@ -28,7 +29,7 @@ def temp_to_modify_the_db():
     p = find_project(target_project_uid)
     print(p)
     cor_data = CORData(
-        product="",
+        product="Acton",
         elevation="",
         # locations=[""],
         # categories=[""],
@@ -36,4 +37,5 @@ def temp_to_modify_the_db():
     )
     print("going to set this", cor_data.model_dump())
     projects_coll.update_one({"project_info.project_uid": target_project_uid}, {"$set": {"teclab_data.cor_data": cor_data.model_dump()}})
+    # projects_coll.update_many({}, )
     return "DB MODIFIED"
