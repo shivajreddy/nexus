@@ -100,8 +100,16 @@ class CORData(BaseModel):
 
 
 class UpdateCORData(BaseModel):
+    project_id: str
     project_uid: str
-    epc_data: 'CORData'
+    cor_data: 'CORData'
+
+
+class QueryCOR(BaseModel):
+    products: List[str] = []
+    elevations: List[str] = []
+    locations: List[str] = []
+    categories: List[str] = []
 
 
 # :: SALES ::

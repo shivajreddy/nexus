@@ -1,5 +1,4 @@
 import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
-import {ScrollArea} from "@components/ui/scroll-area.tsx";
 import React, {useState} from "react";
 
 

@@ -1,4 +1,4 @@
-const products = [
+const allProducts = [
     {id: "acton", label: "Acton"},
     {id: "belmont", label: "Belmont"},
     {id: "belmont_terrace", label: "Belmont Terrace"},
@@ -63,7 +63,7 @@ const products = [
     {id: "highland", label: "Highland"},
 ];
 
-const locationCategories = [
+const allLocations = [
     {id: "primarybath", label: "Primary Bath"},
     {id: "secondarybath", label: "Secondary Bath"},
     {id: "newbath", label: "New Bath"},
@@ -74,7 +74,7 @@ const locationCategories = [
     {id: "fireplace", label: "Fireplace"}
 ];
 
-const elevations = [
+const allElevations = [
     {id: "10traditional", label: "10 - Traditional"},
     {id: "15artsandcrafts", label: "15 - Arts & Crafts"},
     {id: "20artsandcrafts", label: "20 - Arts & Crafts"},
@@ -107,7 +107,7 @@ const elevations = [
     {id: "grd2r", label: "GR - D - 2 - R"}
 ];
 
-const typeCategories = [
+const allCategories = [
     {id: "windows", label: "Windows"},
     {id: "doors", label: "Doors"},
     {id: "vanity", label: "Vanity"},
@@ -119,6 +119,7 @@ interface CORdata {
     elevation: string;
     locations: string[];
     categories: string[];
+    custom_notes: string;
 }
 
 interface ProjectCORdata{
@@ -128,9 +129,9 @@ interface ProjectCORdata{
 }
 
 export {
-    products,
-    locationCategories,
-    elevations,
-    typeCategories,
+    allProducts,
+    allLocations,
+    allElevations,
+    allCategories,
 }
 export type {CORdata, ProjectCORdata};
