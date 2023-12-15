@@ -21,7 +21,7 @@ import {format} from "date-fns";
 import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
-import {MdModeEditOutline} from "react-icons/md";
+import {MdEmail, MdModeEditOutline} from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 import {BASE_URL} from "@/services/api";
 
@@ -254,7 +254,7 @@ function Epc() {
                         {hasRoles(userRoles, [213]) &&
                           <div className="flex justify-center items-center bg-default-bg1 mx-4">
                             <Button onClick={() => axios.get(BASE_URL+'/department/teclab/epc/epc-backlog-tracker')} className="min-w-[10em]">
-                              <p className="pr-2"><MdModeEditOutline/></p>
+                              <p className="pr-2"><MdEmail /></p>
                               Email Me Backlog
                             </Button>
                           </div>

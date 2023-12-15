@@ -171,11 +171,13 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
 
     return (
         <div className={cn(className)}>
-            <div className="bg-default-bg2 mx-4 p-4 pb-0">
-                <div className="flex justify-center">
+            <div className="bg-default-bg2 mx-4 p-4 pb-0 relative border rounded-md">
+                <div
+                    className="flex justify-center absolute -top-4 left-0 right-0 ml-auto mr-auto w-fit bg-default-bg2 px-4">
                     <p className="font-semibold text-2xl text-center">TEC-LAB Data</p>
                     {project_id &&
-                      <p className="font-semibold text-2xl text-center text-primary">&nbsp;:&nbsp;{project_id}</p>
+                      <p
+                        className="font-semibold text-2xl text-center text-primary">&nbsp;:&nbsp;{project_id}</p>
                     }
                 </div>
 
