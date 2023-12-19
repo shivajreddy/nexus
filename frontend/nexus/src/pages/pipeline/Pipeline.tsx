@@ -1,9 +1,10 @@
 import MainLayout from "@/templates/MainLayout"
+import PipelineView from "@pages/pipeline/PipelineView.tsx";
 
 function Pipeline() {
   return (
     <MainLayout>
-      Pipeline Page
+        <PipelineView/>
     </MainLayout>
   )
 }

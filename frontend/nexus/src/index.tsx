@@ -11,7 +11,7 @@ import "@assets/index.css";
 import HomePage from "@/pages/HomePage/HomePage";
 import Epc from "@/pages/department/teclab/Epc/Epc";
 import Updates from "@pages/Updates/Updates";
-import Pipeline from "@pages/Pipeline/Pipeline";
+import Pipeline from "@pages/pipeline/Pipeline";
 import UserHome from "@pages/User/UserHome";
 import PageNotFound from "@/pages/common/PageNotFound";
 import UiErrorPage from "@/pages/common/UiErrorPage";

@@ -5,6 +5,7 @@ import {ReactElement} from "react";
 import {FaRegCircle} from "react-icons/fa";
 
 import {BsCollection, BsHouses} from "react-icons/bs";
+import {PiGraphBold} from "react-icons/pi";
 // import {RiHome2Line} from "react-icons/ri";
 
 
@@ -24,6 +25,12 @@ function Navbar() {
             name: "Projects",
             link: "/projects",
             icon: <BsHouses size="1.5em"/>,
+            isBeta: true,
+        },
+        {
+            name: "PipeLine",
+            link: "/pipeline",
+            icon: <PiGraphBold size="1.5em"/>,
             isBeta: true,
         },
         {
