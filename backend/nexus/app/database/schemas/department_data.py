@@ -92,11 +92,11 @@ class UpdateTECLabData(BaseModel):
 
 
 class CORData(BaseModel):
-    product: str
-    elevation: str
+    product: str = ''
+    elevation: str = ''
     locations: Optional[List[str]] = []
     categories: Optional[List[str]] = []
-    custom_notes: Optional[str]
+    custom_notes: Optional[str] = ''
 
 
 class UpdateCORData(BaseModel):
