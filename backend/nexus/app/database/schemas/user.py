@@ -19,11 +19,11 @@ class UserSecurityDetails(BaseModel):
 class UserInfo(BaseModel):
     first_name: str
     last_name: str
-    work_phone: Optional[str]
-    personal_phone: Optional[str]
     department: str
-    teams: List[str] = []
     job_title: str
+    work_phone: Optional[str] = ""
+    personal_phone: Optional[str] = ""
+    teams: List[str] = []
 
 
 class NewUserSchema(BaseModel):
@@ -35,3 +35,8 @@ class NewUserSchema(BaseModel):
     name: str = ""
     email: str = ""
     verified: bool = False
+
+    first_name: str = ""
+    last_name: str = ""
+    department: str = ""
+    job_title: str = ""

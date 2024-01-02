@@ -28,7 +28,13 @@ async def create_user(payload: NewUserSchema):
     # create new User object
     new_user = User(
         username=payload.username,
-        security=UserSecurityDetails(hashed_password=hash_password(payload.plain_password))
+        security=UserSecurityDetails(hashed_password=hash_password(payload.plain_password)),
+        user_info=UserInfo(
+            first_name=payload.first_name,
+            last_name=payload.last_name,
+            department=payload.department,
+            job_title=payload.job_title
+        )
     )
 
     # set security details
