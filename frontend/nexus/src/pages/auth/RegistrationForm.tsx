@@ -92,7 +92,8 @@ function RegistrationForm({
     // :: Define a submit handler
     async function handleOnSubmit(values: z.infer<typeof formSchema>) {
         setRegistrationStatus('loading');
-        const postData = {"username": values.useremail, "plain_password": values.password}
+        // const postData = {"username": values.useremail, "plain_password": values.password}
+        const postData = {"username": values.useremail, "plain_password": values.password, "department": values.department}
         try {
             await axios.post(BASE_URL + REGISTRATION_ENDPOINT, postData);
             setRegistrationStatus('success');

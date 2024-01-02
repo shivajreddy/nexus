@@ -18,7 +18,7 @@ const initialNodes = [
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
         style: {
-            backgroundColor: 'orange'
+            backgroundColor: 'lightGreen'
         },
         type: "output"
     },
@@ -39,17 +39,17 @@ const initialNodes = [
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
         style: {
-            backgroundColor: 'lightGreen'
+            backgroundColor: '#3b9bc4'
         }
     },
     {
         id: '5',
         position: { x: 300, y: 150 },
-        data: { label: 'Custom node', count: 10 },
+        data: { label: 'Addendum 4', count: 10 },
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
         style: {
-            backgroundColor: 'lightGreen'
+            backgroundColor: '#db4848'
         }
     }
 ];
@@ -58,6 +58,7 @@ const initialEdges = [
     { id: 'e1-2', source: '1', target: '2', type: ConnectionLineType.Step },
     { id: 'e1-3', source: '1', target: '3', type: ConnectionLineType.Step },
     { id: 'e1-4', source: '1', target: '4', type: ConnectionLineType.Step },
+    { id: 'e1-5', source: '1', target: '5', type: ConnectionLineType.Step },
 ];
 
 type CounterData = {
