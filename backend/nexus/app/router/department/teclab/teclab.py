@@ -177,3 +177,14 @@ def get_all_drafters_names():
         if team["team_name"] == "Drafting":
             drafting_team = team
     return drafting_team["team_members"]
+
+
+# :: Home-Siting drafters ::
+@router.get('/homesiting-drafters', dependencies=[Depends(get_current_user_data)])
+def get_all_homesiting_drafters_names():
+    teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    all_teams = teclab_doc["data"]["teams"]
+    for team in all_teams:
+        print(team["team_name"])
+        if team["team_name"] == "HomeSite Drafting":
+            return team["team_members"]

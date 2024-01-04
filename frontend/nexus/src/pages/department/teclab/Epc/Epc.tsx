@@ -36,7 +36,7 @@ const defaultColumnSettings = {
     // wrapText: false
     wrapHeaderText: true,
     autoHeaderHeight: true,
-    // floatingFilter: true,
+    floatingFilter: true,
 }
 
 
@@ -134,6 +134,7 @@ function Epc() {
         const get_lots_data_from_server = async () => {
             try {
                 const response = await axios.get('/department/teclab/epc/live');
+                // const response = await axios.get('/department/teclab/epc/all');
                 // console.log("response=", response);
                 // console.log("😆 response.data=", response.data);
                 // setLotData(response.data);
@@ -141,11 +142,19 @@ function Epc() {
 
                 // Data transformation
                 const transformedData = backendData.map((item: any) => ({
+
+                    lot_status_finished: item.lot_status_finished,
+                    lot_status_released: item.lot_status_released,
+
+                    homesiting_completed_by: item.homesiting_completed_by,
+                    homesiting_completed_on: item.homesiting_completed_on,
+
                     project_uid: item.project_uid,
                     community_name: item.community,
                     section_number: item.section_number,
                     lot_number: item.lot_number,
-                    contract_date: item.contract_date ? format(new Date(item.contract_date), 'MM/dd/yyyy') : null,
+                    // contract_date: item.contract_date ? format(new Date(item.contract_date), 'MM/dd/yyyy') : null,
+                    contract_date: item.contract_date ? format(new Date(item.contract_date), 'yyyy/MM/dd') : null,
                     product: item.product_name,
                     elevation: item.elevation_name,
                     // Format date and handle null values as needed for another date fields
@@ -164,7 +173,7 @@ function Epc() {
                     county: item.permitting_county_name,
                     notes: item.notes,
                 }));
-                // console.log("transformed 😇 data=", transformedData);
+                console.log("transformed 😇 data=", transformedData);
                 setAllEPCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
@@ -183,9 +192,8 @@ function Epc() {
         try {
             // TODO: why is this even in async ? remove if not needed
             async function get_current_user() {
-                const hasEditorRoles = hasRoles(userRoles, [101]);
+                const hasEditorRoles = hasRoles(userRoles, [102]);
                 if (hasEditorRoles) {
-
 
                     const updatedColumnDefinitions = [
                         ...columnDefinitions,

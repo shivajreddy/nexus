@@ -7,7 +7,7 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.database.database import projects_coll, users_coll
+from app.database.database import projects_coll, users_coll, client
 from app.database.schemas.department_data import UpdateTECLabData, EPCData
 from app.database.schemas.user import UserInfo, User
 from app.email.utils import send_email_with_given_message_and_attachment
@@ -22,7 +22,67 @@ router = APIRouter(prefix="/department/teclab/epc")
 
 
 # """
+# Filter out all finished and released lots
 @router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
+def get_all_lots():
+    try:
+        result = []
+        for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
+            project = {k: v for (k, v) in doc.items() if k != "_id"}
+            if not doc["teclab_data"]["epc_data"]["lot_status_finished"] and\
+                    not doc["teclab_data"]["epc_data"]["lot_status_released"]:
+                final_object = {
+                    "project_uid": doc["project_info"]["project_uid"],
+                    "community": doc["project_info"]["community"],
+                    "section_number": doc["project_info"]["section"],
+                    "lot_number": doc["project_info"]["lot_number"]
+                }
+                final_object.update(project["teclab_data"]["epc_data"])
+                result.append(final_object)
+        return result
+    except Exception as e:
+        # print("error: ", e)
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
+
+# """
+
+@router.get('/update-db')
+def update_db():
+    # db = client["nexus"]
+    # projects_coll = db["projects"]
+
+    # projects_coll.update_many({'project_info.project_uid': '826a5f29-ab9f-4d44-aa84-5659ffe9b948'},
+    # ! update all projects with new fields
+    projects_coll.update_many({},
+                              {'$set': {'teclab_data.epc_data.homesiting_completed_by': None,
+                                        'teclab_data.epc_data.homesiting_completed_on': None}
+                               })
+
+    # ! update all projects that are 2018,19,20,21,22 as finished
+    start_date = datetime(2018, 1, 1)
+    end_date = datetime(2022, 12, 31, 23, 59, 59)
+    date_query = {'$gte': start_date, '$lt': end_date}
+    query = {'contract_info.contract_date': date_query}
+
+    update_query = {
+        '$set': {'teclab_data.epc_data.lot_status_finished': True}
+    }
+    projects_coll.update_many(query, update_query)
+
+    # res = projects_coll.find(query)
+    res = projects_coll.find()
+    result = []
+    for doc in res:
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+        result.append(project)
+
+    return result
+    # return "updated db"
+
+
+# """
+@router.get('/all', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
 def get_all_lots():
     try:
         result = []
@@ -138,7 +198,8 @@ def query_tracker_data():
             if not p['teclab_data']['epc_data']['drafting_finished']:
                 # pm_waiting_drafting.append(p)
                 result_data[p_community][3] += 1
-            elif not p['teclab_data']['epc_data']['engineering_received'] or not p['teclab_data']['epc_data']['plat_received']:
+            elif not p['teclab_data']['epc_data']['engineering_received'] or not p['teclab_data']['epc_data'][
+                'plat_received']:
                 # pm_waiting_eng_or_plat.append(p)
                 result_data[p_community][4] += 1
             elif not p['teclab_data']['epc_data']['permitting_submitted']:

@@ -57,6 +57,21 @@ for doc in projects_coll.find():
 ```
 
 - How to copy a collection from one database to another
+- (backup)
+```python
+@router.get('/backup-projects')
+def backupdb():
+  production_db = client["nexus"]
+  production_projects_coll = production_db["projects"]
+  all_production_projects = production_projects_coll.find()
+
+  backup_db = client["nexus-backup"]
+  backup_projects_coll = backup_db["projects"]
+  backup_projects_coll.drop()
+  backup_projects_coll.insert_many(all_production_projects)
+
+  return "ALL projects imported"
+```
 ```python
 @router.get('/import-projects')
 def import_projects():

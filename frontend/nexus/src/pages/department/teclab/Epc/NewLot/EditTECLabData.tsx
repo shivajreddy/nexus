@@ -31,6 +31,7 @@ function EditTECLabData() {
                 </div>
             </div>
             <TECLabDataForm
+                className="mx-4 p-10 bg-white"
                 statusEPCDataFetch={statusEPCDataFetch}
                 setStatusEPCDataFetch={setStatusEPCDataFetch}
                 project_uid={project_uid ? project_uid : ""}

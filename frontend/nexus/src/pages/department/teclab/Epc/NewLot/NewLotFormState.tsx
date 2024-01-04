@@ -4,7 +4,6 @@ type TECLabEPCData = {
     project_uid: string;
     project_id: string;
 
-
     // status
     lot_status_finished?: boolean;
     lot_status_released?: boolean;
@@ -37,6 +36,10 @@ type TECLabEPCData = {
     permitting_county_name?: string;
     permitting_submitted?: Date;
     permitting_received?: Date;
+
+    // Homesiting
+    homesiting_completed_by?: string;
+    homesiting_completed_on?: Date;
 
     // BBP
     bbp_posted?: Date;

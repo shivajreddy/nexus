@@ -69,7 +69,7 @@
     font-family: "JetBrains Mono", monospace;
 
     --ag-foreground-color: var(--fg-base-2);
-    --ag-background-color: var(--bg-base-0);
+    /*--ag-background-color: var(--bg-base-0);*/
     --ag-header-foreground-color: var(--fg-base-2);
     --ag-header-background-color: var(--bg-base-2);
     --ag-odd-row-background-color: var(--bg-base-1);
@@ -78,7 +78,6 @@
     --ag-column-hover-color: var(--bg-base-1) !important;
 
     --ag-header-column-resize-handle-color: rgb(126, 46, 132);
-
 }
 
 .ag-theme-alpine .ag-side-buttons, .ag-theme-alpine-dark .ag-side-buttons {

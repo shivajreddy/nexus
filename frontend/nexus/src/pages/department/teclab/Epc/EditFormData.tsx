@@ -87,7 +87,7 @@ const EditFormData = () => {
                 <CommandInput placeholder="Search..."/>
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
-                    {allFormData.map((eachItem) => {
+                    {allFormData.map((eachItem: any) => {
                             return (
                                 <Item name={eachItem} key={eachItem}/>
                             )

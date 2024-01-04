@@ -51,7 +51,8 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
         "all_drafters": [],
         "all_engineers": [],
         "all_plat_engineers": [],
-        "all_counties": []
+        "all_counties": [],
+        "all_homesiting_drafters": []
     })
 
     const [updateTECLabDataStatus, setUpdateTECLabDataStatus] = useState<"initial" | "loading" | "failed" | "success">("initial");
@@ -61,8 +62,8 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
     function updateTECLabDataForProject(e: React.MouseEvent<HTMLButtonElement>, project_uid: string) {
         e.preventDefault();
         // console.log("😄 updateTECLabDataForProject=", e);
-        // console.log("😄 project_uid=", project_uid);
-        // console.log("😄 =selectedProjectsTECLabEPCData", selectedProjectsTECLabEPCData);
+        console.log("😄 project_uid=", project_uid);
+        console.log("😄 =selectedProjectsTECLabEPCData", selectedProjectsTECLabEPCData);
         const makeServerRequest = async () => {
             setUpdateTECLabDataStatus('loading');
             try {
@@ -94,6 +95,7 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
             const engineersResponse = await axios.get('/eagle/engineers');
             const platEngineersResponse = await axios.get('/eagle/plat-engineers');
             const countiesResponse = await axios.get('/eagle/counties');
+            const homesitingDraftersResponse = await axios.get('/department/teclab/homesiting-drafters')
             setFormData({
                 all_communities: communitiesResponse.data,
                 all_products: productsResponse.data,
@@ -101,7 +103,8 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
                 all_drafters: draftersResponse.data,
                 all_engineers: engineersResponse.data,
                 all_plat_engineers: platEngineersResponse.data,
-                all_counties: countiesResponse.data
+                all_counties: countiesResponse.data,
+                all_homesiting_drafters:homesitingDraftersResponse.data
             })
         }
 
@@ -118,14 +121,18 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
                 // console.log("Response for /get/{project_uid}: ", response);
 
                 const lotData = response.data;
+                console.log(":::lotData = ", lotData)
 
                 // Data transformation
                 const transformedData: TECLabEPCData = {
-                    project_id: lotData.project_info.project_id,
-                    project_uid: lotData.project_info.project_uid,
-
                     lot_status_finished: lotData.epc_data.lot_status_finished,
                     lot_status_released: lotData.epc_data.lot_status_released,
+
+                    homesiting_completed_by: lotData.epc_data.homesiting_completed_by,
+                    homesiting_completed_on: lotData.epc_data.homesiting_completed_on ? new Date(lotData.epc_data.homesiting_completed_on) : undefined,
+
+                    project_id: lotData.project_info.project_id,
+                    project_uid: lotData.project_info.project_uid,
 
                     community: lotData.project_info.community,
                     section_number: lotData.project_info.section,
@@ -362,7 +369,29 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
                       </Card>
                     </div>
 
-                      {/* 6: Build By Plans */}
+                      {/* 6: Home Siting */}
+                    <Card className="min-w-[27%] m-4">
+                      <CardHeader>
+                        <CardTitle>Home Siting</CardTitle>
+                        <CardDescription>Home Siting details</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <FieldDate id="6_bbp"
+                                   name="Completed On"
+                                   value={selectedProjectsTECLabEPCData.homesiting_completed_on}
+                                   onUpdate={newDate => handleStateChange('homesiting_completed_on', newDate)}
+                        />
+                        <FieldDropDown id="6_drafter"
+                                       name={"Completed By"}
+                                       dropdownData={formData.all_homesiting_drafters}
+                                       value={selectedProjectsTECLabEPCData.homesiting_completed_by}
+                                       onUpdate={newValue => handleStateChange('homesiting_completed_by', newValue)}
+                        />
+
+                      </CardContent>
+                    </Card>
+
+                      {/* 7: Build By Plans */}
                     <Card className="min-w-[27%] m-4">
                       <CardHeader>
                         <CardTitle>Build By Plans</CardTitle>
@@ -377,57 +406,62 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
                       </CardContent>
                     </Card>
 
-                      {/* 7: Notes */}
+                      {/* 8: Notes */}
                     <Card className="min-w-[27%] m-4">
                       <CardHeader>
                         <CardTitle>Notes</CardTitle>
                         <CardDescription>TEC-Lab notes for the lot</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <Textarea placeholder="Your notes here..."/>
+                          {/* ! TODO: provide the onChange handler for the Textarea content cuz i am giving the value to begin with*/}
+                        <Textarea placeholder="Your notes here..."
+                                  value={selectedProjectsTECLabEPCData.notes}
+                                  onChange={newNotes => handleStateChange('notes', newNotes.target.value)}
+                        />
                       </CardContent>
                     </Card>
 
                   </div>
                 }
+
+                {/* Button that updates based on fetch status */}
+                <div
+                    className="m-4 mt-0 rounded-lg rounded-t-none flex justify-center items-center bg-default-bg2">
+                    {updateTECLabDataStatus === 'initial' &&
+                      <Button variant="primary"
+                              className="w-1/5"
+                              onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                      >
+                        SUBMIT
+                      </Button>
+                    }
+                    {updateTECLabDataStatus === 'loading' &&
+                      <Button variant="outline"
+                              className="w-1/5"
+                              onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                      >
+                        loading
+                      </Button>
+                    }
+                    {updateTECLabDataStatus === 'success' &&
+                      <Button variant="secondary"
+                              className="w-1/5"
+                              onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                      >
+                        Successfully updated
+                      </Button>
+                    }
+                    {updateTECLabDataStatus === 'failed' &&
+                      <Button variant="destructive"
+                              className="w-1/5"
+                              onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
+                      >
+                        Failed
+                      </Button>
+                    }
+                </div>
             </div>
 
-            {/* Button that updates based on fetch status */}
-            <div
-                className="m-4 mt-0 pb-6 rounded-lg rounded-t-none flex justify-center items-center bg-default-bg2">
-                {updateTECLabDataStatus === 'initial' &&
-                  <Button variant="primary"
-                          className="w-1/5"
-                          onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
-                  >
-                    SUBMIT
-                  </Button>
-                }
-                {updateTECLabDataStatus === 'loading' &&
-                  <Button variant="outline"
-                          className="w-1/5"
-                          onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
-                  >
-                    loading
-                  </Button>
-                }
-                {updateTECLabDataStatus === 'success' &&
-                  <Button variant="secondary"
-                          className="w-1/5"
-                          onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
-                  >
-                    Successfully updated
-                  </Button>
-                }
-                {updateTECLabDataStatus === 'failed' &&
-                  <Button variant="destructive"
-                          className="w-1/5"
-                          onClick={(e) => updateTECLabDataForProject(e, selectedProjectsTECLabEPCData.project_uid)}
-                  >
-                    Failed
-                  </Button>
-                }
-            </div>
 
         </div>
     );

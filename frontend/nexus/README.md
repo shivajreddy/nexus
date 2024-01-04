@@ -15,6 +15,8 @@
 # Roles
 2xx - TECLab Department  
 21x - EPC related  
+    - 101 - viewer
+    - 102 - lot-editor
     - 211 - user
     - 212 - lot-editor
     - 213 - epc super user -> get emails, change form data

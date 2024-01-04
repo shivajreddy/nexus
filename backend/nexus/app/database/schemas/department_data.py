@@ -73,6 +73,10 @@ class EPCData(BaseModel):
     permitting_submitted: Optional[datetime] = None
     permitting_received: Optional[datetime] = None
 
+    # HomeSiting
+    homesiting_completed_by: Optional[str] = None
+    homesiting_completed_on: Optional[str] = None
+
     # Build By Plans
     bbp_posted: Optional[datetime] = None
 
