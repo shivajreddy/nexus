@@ -1,16 +1,16 @@
 import MainLayout from "@templates/MainLayout.tsx";
 
+import EpcMenu from "./EpcMenu";
+
 import {AgGridReact} from "ag-grid-react";
-
-// import EpcMenu from "./EpcMenu";
-
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
 import "@assets/pages/Epc/Epc.css"
 
 
-// import {rowData, columnDefinitions} from "./demoData.ts";
+import {demoColumnDefinitions, demoRowData} from '../archive/demoData.ts'
+import epcColumnDefinitionsData from "@pages/department/teclab/Epc/View/epcColumnDefinitions.ts";
 // import {BsPlusCircleFill} from "react-icons/bs";
 import {useNavigate} from "react-router-dom";
 // import {CgMenuGridO} from "react-icons/cg";
@@ -40,65 +40,9 @@ const defaultColumnSettings = {
 }
 
 
-const columnDefinitionsData = [
-    {
-        headerName: 'Lot Info',
-        children: [
-            {headerName: 'Community', field: 'community_name', width: 200},
-            {headerName: 'Section', field: 'section_number'},
-            {headerName: 'Lot-#', field: 'lot_number'},
-            {headerName: 'Contract Date', field: 'contract_date'},
-            {headerName: 'Product', field: 'product'},
-            {headerName: 'Elevation', field: 'elevation', width: 120},
-        ],
-    },
-    {
-        headerName: 'Drafting',
-        children: [
-            {headerName: 'Drafter', field: 'drafter_name'},
-            {headerName: 'Assigned', field: 'drafting_assigned_on_date'},
-            {headerName: 'Finished', field: 'drafting_finished_date'},
-        ],
-    },
-    {
-        headerName: 'Engineering',
-        children: [
-            {headerName: 'Engineer', field: 'engineer_name'},
-            {headerName: 'Sent', field: 'engineering_sent'},
-            {headerName: 'Received', field: 'engineering_received'},
-        ],
-    },
-    {
-        headerName: 'Plat',
-        children: [
-            {headerName: 'Plat Eng.', field: 'plat_name'},
-            {headerName: 'Sent', field: 'plat_sent'},
-            {headerName: 'Received', field: 'plat_received'},
-        ],
-    },
-    {
-        headerName: 'Permitting',
-        children: [
-            {headerName: 'County', field: 'county'},
-            {headerName: 'Submitted', field: 'permit_submitted'},
-            {headerName: 'Received', field: 'permit_received'},
-        ],
-    },
-    {
-        headerName: 'Build By Plans',
-        children: [
-            {headerName: 'Posted', field: 'bbp_posted'},
-        ],
-    },
-    {
-        headerName: 'Notes', field: 'notes'
-    },
-];
-
-
 const gridOptions = {
     defaultColDef: defaultColumnSettings,
-    columnDefs: columnDefinitionsData,
+    columnDefs: epcColumnDefinitionsData,
     // Group columns
     groupHeaderHeight: 40,
     // Label columns
@@ -127,7 +71,7 @@ function Epc() {
     const [fetchErrorDetails, setFetchErrorDetails] = useState('');
     const [allEPCLots, setAllEPCLots] = useState([]);
 
-    const [columnDefinitions, setColumnDefinitions] = useState(columnDefinitionsData)
+    const [columnDefinitions, setColumnDefinitions] = useState(epcColumnDefinitionsData);
 
     // + Fetch all EPC lots
     useEffect(() => {
@@ -251,7 +195,7 @@ function Epc() {
                     </div>
 
                     <div className="flex mx-10">
-                        {hasRoles(userRoles, [101]) &&
+                        {hasRoles(userRoles, [102]) &&
                           <div className="flex justify-center items-center bg-default-bg1">
                             <Button onClick={() => navigate('edit')} className="min-w-[10em]">
                               <p className="pr-2"><MdModeEditOutline/></p>
@@ -261,22 +205,15 @@ function Epc() {
                         }
                         {hasRoles(userRoles, [213]) &&
                           <div className="flex justify-center items-center bg-default-bg1 mx-4">
-                            <Button onClick={() => axios.get(BASE_URL+'/department/teclab/epc/epc-backlog-tracker')} className="min-w-[10em]">
-                              <p className="pr-2"><MdEmail /></p>
+                            <Button onClick={() => axios.get(BASE_URL + '/department/teclab/epc/epc-backlog-tracker')}
+                                    className="min-w-[10em]">
+                              <p className="pr-2"><MdEmail/></p>
                               Email Me Backlog
                             </Button>
                           </div>
                         }
-                        {/*<div className="flex justify-center items-center ml-8 bg-default-bg2">*/}
-                        {/*    <button*/}
-                        {/*        className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"*/}
-                        {/*        onClick={() => navigate('/epc/all-lots')}*/}
-                        {/*    >*/}
-                        {/*        <p className="pr-2"><CgMenuGridO/></p>*/}
-                        {/*        All Lots*/}
-                        {/*    </button>*/}
-                        {/*</div>*/}
-                        {/*<EpcMenu/>*/}
+                        {/* :: For now only dev can see this, make it visible once menu is finished */}
+                        {hasRoles(userRoles, [999]) && <EpcMenu/>}
                     </div>
                 </div>
                 <div className="epc-body">
@@ -303,8 +240,12 @@ function Epc() {
                             >
                                 <AgGridReact
                                     rowData={allEPCLots}
-                                    gridOptions={gridOptions}
                                     columnDefs={columnDefinitions}
+                                    gridOptions={gridOptions}
+                                />
+                                <AgGridReact
+                                    rowData={demoRowData}
+                                    columnDefs={demoColumnDefinitions}
                                 />
                             </div>
                     }

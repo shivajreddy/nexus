@@ -14,7 +14,7 @@ import {
 import {FaInfoCircle} from "react-icons/fa";
 import {MdOutlineStorage} from "react-icons/md";
 import {useNavigate} from "react-router-dom";
-
+import {CgMenuGridO} from "react-icons/cg";
 
 function EpcMenu() {
     const navigate = useNavigate();
@@ -32,6 +32,16 @@ function EpcMenu() {
                 <SheetContent className="flex flex-col justify-center items-center">
                     <SheetHeader>Menu</SheetHeader>
                     <Separator/>
+
+                    <div className="flex justify-center items-center ml-8 bg-default-bg2">
+                        <button
+                            className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
+                            onClick={() => navigate('/epc/all-lots')}
+                        >
+                            <p className="pr-2"><CgMenuGridO/></p>
+                            All Lots
+                        </button>
+                    </div>
 
                     <div>
                         <Button onClick={()=>navigate('/epc/edit-newlot-form-data')}>Edit Form Data</Button>
