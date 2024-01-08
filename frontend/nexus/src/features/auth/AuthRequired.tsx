@@ -15,10 +15,8 @@ const AuthRequired = () => {
     return (
         // + if authState is incomplete, send to login, remember current page
         // TODO: check also authState.user
-        authState.accessToken ?
-            <Outlet/>
-            : <Navigate to="/login" state={{from: location}} replace/>
-    )
+        (authState.accessToken ? <Outlet/> : <Navigate to="/login" state={{from: location}} replace/>)
+    );
 
 };
 

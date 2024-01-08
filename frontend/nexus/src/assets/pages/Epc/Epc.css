@@ -45,6 +45,9 @@
 
 /* ! ag-grid customization------------------------------------ */
 /* # ==========================  ag-grid  ========================== */
+.ag-theme-quartz {
+    font-family: "JetBrains Mono", monospace;
+}
 .ag-theme-alpine {
     /*--ag-background-color: #b833e1;*/
     --ag-cell-horizontal-padding: 10px;

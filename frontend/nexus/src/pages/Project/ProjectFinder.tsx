@@ -61,7 +61,7 @@ const ProjectFinder = ({...props}: Iprops) => {
     return (
         // <div className="m-8 mt-4 mb-0 mr-0 p-4 min-w-[30em] bg-default-bg2 rounded-md rounded-r-none">
         //     <p className="pb-3 font-semibold text-2xl">Project Finder</p>
-        <div className="min-w-[30em]">
+        (<div className="min-w-[30em]">
             <div className="flex flex-col">
                 <div className="m-2">
                     <FieldDropDown id="1_community"
@@ -114,7 +114,7 @@ const ProjectFinder = ({...props}: Iprops) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>)
     );
 };
 

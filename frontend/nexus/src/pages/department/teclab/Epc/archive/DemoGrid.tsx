@@ -147,18 +147,13 @@ const DemoGrid = () => {
 
     // Container: Defines the grid's theme & dimensions.
     return (
-        <div
-            className={
-                "ag-theme-quartz-dark"
-            }
-            style={{ width: '100%', height: '100%' }}
-        >
+        <div className="ag-theme-quartz-dark w-[100vw] h-[100vh]">
             <AgGridReact
                 rowData={rowData}
                 columnDefs={colDefs}
-                defaultColDef={defaultColDef}
-                pagination={true}
-                rowSelection="multiple"
+                // defaultColDef={defaultColDef}
+                // pagination={true}
+                // rowSelection="multiple"
                 // onSelectionChanged={(event) => console.log('Row Selected!')}
                 // onCellValueChanged={(event) =>
                 //     console.log(`New Cell Value: ${event.value}`)

@@ -5,15 +5,12 @@ import EpcMenu from "./EpcMenu";
 import {AgGridReact} from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import "@assets/pages/Epc/Epc.css"
 
-
-import {demoColumnDefinitions, demoRowData} from '../archive/demoData.ts'
-import epcColumnDefinitionsData from "@pages/department/teclab/Epc/View/epcColumnDefinitions.ts";
-// import {BsPlusCircleFill} from "react-icons/bs";
+import epcColumnDefinitions from "@pages/department/teclab/Epc/View/epcColumnDefinitions.ts";
 import {useNavigate} from "react-router-dom";
-// import {CgMenuGridO} from "react-icons/cg";
 import {Button} from "@components/ui/button.tsx";
 import {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
@@ -24,39 +21,7 @@ import {useUserRoles} from "@hooks/useUserRoles.ts";
 import {MdEmail, MdModeEditOutline} from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 import {BASE_URL} from "@/services/api";
-
-
-const defaultColumnSettings = {
-    sortable: true,
-    filter: true,
-    resizable: false,
-    width: 120,
-    // searchable: true,
-    // wrapText: true,
-    // wrapText: false
-    wrapHeaderText: true,
-    autoHeaderHeight: true,
-    floatingFilter: true,
-}
-
-
-const gridOptions = {
-    defaultColDef: defaultColumnSettings,
-    columnDefs: epcColumnDefinitionsData,
-    // Group columns
-    groupHeaderHeight: 40,
-    // Label columns
-    headerHeight: 30,
-    // headerWidth: 30,
-    // Floating filter
-    floatingFiltersHeight: 50,
-    // Pivoting, requires turning on pivot mode. Label columns
-    pivotHeaderHeight: 100,
-    // Pivoting, requires turning on pivot mode. Group columns
-    pivotGroupHeaderHeight: 50,
-    // sideBar: true,
-    // suppressMenuHide: true
-}
+import {ColDef, ColGroupDef, GridOptions} from "ag-grid-community";
 
 
 function Epc() {
@@ -70,8 +35,6 @@ function Epc() {
     const [fetchLotDataStatus, setFetchLotDataStatus] = useState<'loading' | 'failed' | 'success'>('loading');
     const [fetchErrorDetails, setFetchErrorDetails] = useState('');
     const [allEPCLots, setAllEPCLots] = useState([]);
-
-    const [columnDefinitions, setColumnDefinitions] = useState(epcColumnDefinitionsData);
 
     // + Fetch all EPC lots
     useEffect(() => {
@@ -130,26 +93,24 @@ function Epc() {
         });
     }, [])
 
-    const [loadEditorControls, setLoadEditorControls] = useState<'loading' | 'failed' | 'success'>('loading');
-    // + Get the user roles
-    useEffect(() => {
-        try {
-            // TODO: why is this even in async ? remove if not needed
-            async function get_current_user() {
-                const hasEditorRoles = hasRoles(userRoles, [102]);
-                if (hasEditorRoles) {
-
-                    const updatedColumnDefinitions = [
-                        ...columnDefinitions,
+    // + Set column defs based on user roles
+    const [finalEpcColDefs] = useState(() => {
+            const viewerColDef = epcColumnDefinitions;
+            const editorColDef: ColGroupDef[] = [
+                {
+                    headerName: "✍🏻",
+                    children: [
                         {
-                            headerName: "✍🏻",
-                            field: "edit",
+                            field: 'edit',
+                            headerName: '',
                             sortable: false,
                             filter: false,
                             width: 50,
                             pinned: "left",
                             cellClass: ["editor-only"],
                             headerTooltip: "Edit Lot",
+                            resizable: false,
+                            suppressMovable: true,
                             cellRenderer: (params: any) => {
                                 return (
                                     <a
@@ -161,23 +122,42 @@ function Epc() {
                                         <PiPencilSimpleFill/>
                                     </a>
                                 )
-                            },
+
+                            }
                         }
-                    ];
-                    setColumnDefinitions(updatedColumnDefinitions);
+                    ]
                 }
+            ];
+            if (hasRoles(userRoles, [102])) {
+                return [...viewerColDef, ...editorColDef];
             }
-
-            if (loadEditorControls === 'loading') {
-                get_current_user().then(() => {
-                });
-                setLoadEditorControls('success')
-            }
-        } catch (e) {
-            setLoadEditorControls('failed');
+            return viewerColDef
         }
-    }, [loadEditorControls, columnDefinitions])
+    );
 
+    const defaultColumnSettings: ColDef = {
+        sortable: true,
+        filter: true,
+        resizable: true,
+        width: 120,
+        wrapHeaderText: true,
+        autoHeaderHeight: true,
+        floatingFilter: true,
+        suppressMenu: true,
+    }
+
+    const epcGridOptions: GridOptions = {
+        defaultColDef: defaultColumnSettings,
+        columnDefs: finalEpcColDefs,
+        groupHeaderHeight: 30,
+        headerHeight: 30,
+        floatingFiltersHeight: 40,
+        pivotHeaderHeight: 100,
+        pivotGroupHeaderHeight: 50,
+        // columnHoverHighlight: true,
+        suppressMovableColumns: true,
+        pagination: true
+    }
 
     return (
         <MainLayout>
@@ -234,18 +214,14 @@ function Epc() {
                             :
                             <div
                                 // id="nexus-epc-grid-container"
-                                className="ag-theme-alpine ag-theme-nexus"
+                                // className="ag-theme-alpine ag-theme-nexus"
+                                className="ag-theme-quartz ag-theme-nexus"
                                 // className="ag-theme-alpine"
                                 style={{height: '100%'}}
                             >
                                 <AgGridReact
                                     rowData={allEPCLots}
-                                    columnDefs={columnDefinitions}
-                                    gridOptions={gridOptions}
-                                />
-                                <AgGridReact
-                                    rowData={demoRowData}
-                                    columnDefs={demoColumnDefinitions}
+                                    gridOptions={epcGridOptions}
                                 />
                             </div>
                     }

@@ -35,6 +35,7 @@ import EPCAll from "@pages/department/teclab/Epc/View/EPCAll.tsx";
 import Projects from "@pages/Project/Projects.tsx";
 import EditTECLabData from "@pages/department/teclab/Epc/View/EditTECLabData.tsx";
 import DemoGrid from "@pages/department/teclab/Epc/archive/DemoGrid.tsx";
+import Epc2 from "@pages/department/teclab/Epc/archive/Epc2.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -62,6 +63,7 @@ const router = createBrowserRouter(
 
                     <Route path="epc">
                         <Route index element={<Epc/>}/>
+                        <Route path="epc2" element={<Epc2/>}/>
                         <Route path="test" element={<DemoGrid/>}/>
                         <Route path="all-lots" element={<EPCAll/>}/>
                         {/*<Route path="lot/new" element={<EditTECLabData/>}/>*/}
