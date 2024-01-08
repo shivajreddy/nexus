@@ -1,4 +1,4 @@
-import MainLayout from "@/templates/MainLayout";
+import MainLayout from "@templates/MainLayout.tsx";
 
 import {AgGridReact} from "ag-grid-react";
 
@@ -7,7 +7,7 @@ import {AgGridReact} from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import "@/assets/pages/Epc/Epc.css"
+import "@assets/pages/Epc/Epc.css"
 
 
 // import {rowData, columnDefinitions} from "./demoData.ts";

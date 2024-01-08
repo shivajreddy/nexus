@@ -1,11 +1,11 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@components/ui/card.tsx";
-import FieldDropDown from "@pages/department/teclab/Epc/NewLot/FieldDropDown.tsx";
-import FieldToggle from "@pages/department/teclab/Epc/NewLot/FieldToggle.tsx";
-import FieldDate from "@pages/department/teclab/Epc/NewLot/FieldDate.tsx";
-import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
+import FieldDate from "@pages/department/teclab/Epc/helpers/FieldDate.tsx";
+import FieldDropDown from "@pages/department/teclab/Epc/helpers/FieldDropDown.tsx";
+import FieldText from "@pages/department/teclab/Epc/helpers/FieldText.tsx";
+import FieldToggle from "@pages/department/teclab/Epc/helpers/FieldToggle.tsx";
 import {Textarea} from "@components/ui/textarea.tsx";
 import {Button} from "@components/ui/button.tsx";
-import {TECLabEPCData} from "@pages/department/teclab/Epc/NewLot/NewLotFormState.tsx";
+import {TECLabEPCData} from "@pages/department/teclab/Epc/types/NewLotFormState.ts";
 import React, {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";

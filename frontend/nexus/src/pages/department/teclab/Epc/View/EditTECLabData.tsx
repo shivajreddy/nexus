@@ -1,5 +1,5 @@
 import MainLayout from "@templates/MainLayout.tsx";
-import TECLabDataForm from "@pages/department/teclab/Epc/NewLot/TECLabDataForm.tsx";
+import TECLabDataForm from "@pages/department/teclab/Epc/View/TECLabDataForm.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
 import {TiArrowBack} from "react-icons/ti";

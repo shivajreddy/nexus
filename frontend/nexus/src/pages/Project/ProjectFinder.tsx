@@ -1,5 +1,5 @@
-import FieldDropDown from "@pages/department/teclab/Epc/NewLot/FieldDropDown.tsx";
-import FieldText from "@pages/department/teclab/Epc/NewLot/FieldText.tsx";
+import FieldDropDown from "@pages/department/teclab/Epc/helpers/FieldDropDown.tsx";
+import FieldText from "@/pages/department/teclab/Epc/helpers/FieldText";
 import React, {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {Button} from "@/components/ui/button";

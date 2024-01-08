@@ -1,16 +1,16 @@
-import {Button} from "@components/ui/button";
+import {Button} from "@components/ui/button.tsx";
 import {
     Sheet,
     SheetContent,
     SheetHeader,
     SheetTrigger,
-} from "@/components/ui/sheet";
-import {Separator} from "@components/ui/separator";
+} from "@components/ui/sheet.tsx";
+import {Separator} from "@components/ui/separator.tsx";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@components/ui/popover.tsx";
 import {FaInfoCircle} from "react-icons/fa";
 import {MdOutlineStorage} from "react-icons/md";
 import {useNavigate} from "react-router-dom";

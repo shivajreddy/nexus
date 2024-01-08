@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
 import {useState} from "react";
 // import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
-import TECLabDataForm from "@pages/department/teclab/Epc/NewLot/TECLabDataForm.tsx";
+import TECLabDataForm from "@pages/department/teclab/Epc/View/TECLabDataForm.tsx";
 // import {ScrollArea} from "@components/ui/scroll-area.tsx";
 import ProjectFinderWithResults from "@pages/Project/ProjectFinderWithResults.tsx";
 

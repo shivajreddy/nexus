@@ -1,19 +1,17 @@
-import MainLayout from "@/templates/MainLayout";
+import MainLayout from "@templates/MainLayout.tsx";
 
 import {AgGridReact} from "ag-grid-react";
 
-import EpcMenu from "./EpcMenu";
+import EpcMenu from "./EpcMenu.tsx";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import "@/assets/pages/Epc/Epc.css"
+import "@assets/pages/Epc/Epc.css"
 
 
 // import {rowData, columnDefinitions} from "./demoData.ts";
-import {BsPlusCircleFill} from "react-icons/bs";
 import {useNavigate} from "react-router-dom";
-import {CgMenuGridO} from "react-icons/cg";
 import {Button} from "@components/ui/button.tsx";
 import {useEffect, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
@@ -22,7 +20,6 @@ import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
 import {Skeleton} from "@components/ui/skeleton.tsx";
-import {MdOutlineStorage} from "react-icons/md";
 import {TiArrowBack} from "react-icons/ti";
 
 

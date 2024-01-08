@@ -9,7 +9,7 @@ import {Provider} from "react-redux";
 import store from "@/redux/store";
 import "@assets/index.css";
 import HomePage from "@/pages/HomePage/HomePage";
-import Epc from "@/pages/department/teclab/Epc/Epc";
+import Epc from "@pages/department/teclab/Epc/View/Epc.tsx";
 import Updates from "@pages/Updates/Updates";
 import Pipeline from "@pages/pipeline/Pipeline";
 import UserHome from "@pages/User/UserHome";
@@ -26,14 +26,14 @@ import SalesHome from "./pages/department/sales/SalesHome";
 import TecLabHome from "./pages/department/teclab/TecLabHome";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
 import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
-import SearchAndUpdateTECLabData from "@pages/department/teclab/Epc/NewLot/SearchAndUpdateTECLabData.tsx";
+import SearchAndUpdateTECLabData from "@pages/department/teclab/Epc/View/SearchAndUpdateTECLabData.tsx";
 // import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
 // import EditLot from "@pages/department/teclab/Epc/EditLot/EditLot.tsx";
 import CoreDashboard from "@pages/department/sales/CoreDashboard.tsx";
-import EPCAll from "@pages/department/teclab/Epc/EPCAll.tsx";
+import EPCAll from "@pages/department/teclab/Epc/View/EPCAll.tsx";
 // import FindProject from "@pages/Project/FindProject.tsx";
 import Projects from "@pages/Project/Projects.tsx";
-import EditTECLabData from "@pages/department/teclab/Epc/NewLot/EditTECLabData.tsx";
+import EditTECLabData from "@pages/department/teclab/Epc/View/EditTECLabData.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(

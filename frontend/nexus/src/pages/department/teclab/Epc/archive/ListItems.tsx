@@ -1,6 +1,6 @@
 import {useState} from "react";
 import ListItem from "./ListItem.tsx";
-import NewListItem from "./NewListItem.tsx";
+import NewListItem from "../View/NewListItem.tsx";
 import {v4 as uuid} from 'uuid';
 import {Command, CommandEmpty, CommandInput, CommandList} from "@components/ui/command.tsx";
 
