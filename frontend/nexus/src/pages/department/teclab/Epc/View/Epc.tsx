@@ -12,7 +12,7 @@ import "@assets/pages/Epc/Epc.css"
 import epcColumnDefinitions from "@pages/department/teclab/Epc/View/epcColumnDefinitions.ts";
 import {useNavigate} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {format} from "date-fns";
 import {PiPencilSimpleFill} from "react-icons/pi";
@@ -80,7 +80,7 @@ function Epc() {
                     county: item.permitting_county_name,
                     notes: item.notes,
                 }));
-                console.log("transformed 😇 data=", transformedData);
+                // console.log("transformed 😇 data=", transformedData);
                 setAllEPCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
@@ -146,6 +146,9 @@ function Epc() {
         suppressMenu: true,
     }
 
+    const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
+        return [50, 100, 200];
+    }, []);
     const epcGridOptions: GridOptions = {
         defaultColDef: defaultColumnSettings,
         columnDefs: finalEpcColDefs,
@@ -156,7 +159,10 @@ function Epc() {
         pivotGroupHeaderHeight: 50,
         // columnHoverHighlight: true,
         suppressMovableColumns: true,
-        pagination: true
+        pagination: true,
+        rowSelection: 'multiple',
+        paginationPageSize: 100,
+        paginationPageSizeSelector: paginationPageSizeSelector
     }
 
     return (

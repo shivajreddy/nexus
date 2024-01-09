@@ -1,5 +1,6 @@
 import {ColGroupDef} from "ag-grid-community";
 import colorCode from "@pages/department/teclab/Epc/helpers/colorCode.ts";
+// import {colorCode, colorCode2} from "@pages/department/teclab/Epc/helpers/colorCode.ts";
 
 const epcColumnDefinitions: ColGroupDef[] = [
     {
@@ -30,8 +31,8 @@ const epcColumnDefinitions: ColGroupDef[] = [
         children: [
             {headerName: 'Engineer', field: 'engineer_name'},
             {headerName: 'Sent', field: 'engineering_sent'},
-            {headerName: 'Received', field: 'engineering_received'},
-            // {headerName: 'Received', field: 'engineering_received', cellStyle: colorCode},
+            // {headerName: 'Received', field: 'engineering_received'},
+            {headerName: 'Received', field: 'engineering_received', cellStyle: colorCode},
             // {headerName: 'Received', field: 'engineering_received', cellStyle: (params)=>colorCode(params, 20)},
         ],
         marryChildren: true
@@ -41,7 +42,8 @@ const epcColumnDefinitions: ColGroupDef[] = [
         children: [
             {headerName: 'Plat Eng.', field: 'plat_name'},
             {headerName: 'Sent', field: 'plat_sent'},
-            {headerName: 'Received', field: 'plat_received'},
+            // {headerName: 'Received', field: 'plat_received'},
+            {headerName: 'Received', field: 'plat_received', cellStyle: colorCode},
         ],
         marryChildren: true
     },
@@ -50,14 +52,16 @@ const epcColumnDefinitions: ColGroupDef[] = [
         children: [
             {headerName: 'County', field: 'county', width: 140},
             {headerName: 'Submitted', field: 'permit_submitted'},
-            {headerName: 'Received', field: 'permit_received'},
+            // {headerName: 'Received', field: 'permit_received'},
+            {headerName: 'Received', field: 'permit_received', cellStyle: colorCode},
         ],
         marryChildren: true
     },
     {
         headerName: 'Build By Plans',
         children: [
-            {headerName: 'Posted', field: 'bbp_posted', width: 150},
+            // {headerName: 'Posted', field: 'bbp_posted', width: 150},
+            {headerName: 'Posted', field: 'bbp_posted', width: 150, cellStyle: colorCode},
         ],
         marryChildren: true
     },
