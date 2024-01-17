@@ -7,7 +7,7 @@
 
     /*background-color: var(--bg-2);*/
 
-     /*border: 2px dashed red;*/
+    /*border: 2px dashed red;*/
 }
 
 
@@ -47,7 +47,9 @@
 /* # ==========================  ag-grid  ========================== */
 .ag-theme-quartz {
     font-family: "JetBrains Mono", monospace;
+    --ag-selected-row-background-color: rgb(137, 180, 250, 0.4);
 }
+
 .ag-theme-alpine {
     /*--ag-background-color: #b833e1;*/
     --ag-cell-horizontal-padding: 10px;

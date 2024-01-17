@@ -1,12 +1,12 @@
 import {CellClassParams} from "ag-grid-community";
 
 // styles to mark the cells whose task is not finished yet
-const style_1 = {color: "black", backgroundColor: "#a6e3a1"};
-const style_2 = {color: "black", backgroundColor: "#89dceb"};
-const style_3 = {color: "black", backgroundColor: "#f9e2af"};
-const style_4 = {color: "white", backgroundColor: "#fab387"};
-const style_5 = {color: "black", backgroundColor: "#e78284"};
-const style_6 = {color: "black", backgroundColor: "#e64553"};
+const style_1 = {color: "black", backgroundColor: "#2d711e"};
+const style_2 = {color: "black", backgroundColor: "#40a02b"};
+const style_3 = {color: "black", backgroundColor: "#1e66f5"};
+const style_4 = {color: "white", backgroundColor: "#df8e1d"};
+const style_5 = {color: "black", backgroundColor: "#df5301"};
+const style_6 = {color: "black", boxShadow: 'inset 0px 0px 20px 1px #d20f39'};
 
 // Complimentary styles to mark the cells that have already finished the task
 const style_1_comp = {color: "#2d711e", fontWeight: 600};
@@ -14,7 +14,6 @@ const style_2_comp = {color: "#40a02b", fontWeight: 600};
 const style_3_comp = {color: "#1e66f5", fontWeight: 600};
 const style_4_comp = {color: "#df8e1d", fontWeight: 600};
 const style_5_comp = {color: "#df5301", fontWeight: 600};
-// const style_5_comp = {color: "#fe640b"}
 const style_6_comp = {color: "#d20f39", fontWeight: 600}
 
 
@@ -78,24 +77,22 @@ function getStyle(startDate: string, finishDate: string | null, taskDuration: nu
         const days_taken_to_finish = getWorkingDaysDiff(startDate, finishDate);
         const days_taken_percent = (days_taken_to_finish * 100) / taskDuration;
 
-        if (days_taken_percent <= 0) {
+        if (days_taken_percent <= 20) {
             return style_1_comp;
         }
-        if (days_taken_percent <= 20) {
+        if (days_taken_percent <= 40) {
             return style_2_comp;
         }
-        if (days_taken_percent <= 40) {
+        if (days_taken_percent <= 60) {
             return style_3_comp;
         }
-        if (days_taken_percent <= 60) {
+        if (days_taken_percent <= 80) {
             return style_4_comp;
         }
-        if (days_taken_percent <= 80) {
+        if (days_taken_percent <= 100) {
             return style_5_comp;
         }
-        if (days_taken_percent >= 100) {
-            return style_6_comp;
-        }
+        return style_6_comp;
     }
 
     // there is NO finish-date, calculate the anticipated date
