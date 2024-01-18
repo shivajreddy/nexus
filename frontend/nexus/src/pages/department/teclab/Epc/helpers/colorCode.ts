@@ -1,11 +1,11 @@
 import {CellClassParams} from "ag-grid-community";
 
 // styles to mark the cells whose task is not finished yet
-const style_1 = {color: "black", backgroundColor: "#2d711e"};
-const style_2 = {color: "black", backgroundColor: "#40a02b"};
-const style_3 = {color: "black", backgroundColor: "#1e66f5"};
-const style_4 = {color: "white", backgroundColor: "#df8e1d"};
-const style_5 = {color: "black", backgroundColor: "#df5301"};
+const style_1 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #2d711e'};
+const style_2 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #40a02b'};
+const style_3 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #1e66f5'};
+const style_4 = {color: "white",boxShadow: 'inset 0px 0px 20px 1px #df8e1d'};
+const style_5 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #df5301'};
 const style_6 = {color: "black", boxShadow: 'inset 0px 0px 20px 1px #d20f39'};
 
 // Complimentary styles to mark the cells that have already finished the task
