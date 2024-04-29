@@ -68,3 +68,9 @@ origins = [
 > **To allow ssh from alacritty into GCP VM shell add the following in .bashrc**
 export TERM=xterm-256color
 
+### PRODUCTION
+- 1. once you make the changes, pull those changes.
+        Note: app is in /home/shiva, not in root which is /home/tec
+- 2. `sudo docker-compose -f docker-compose-prod.yml down`      down will tear down.
+- 3. `sudo docker-compose -f docker-compose-prod.yml up --build -d`   d is to run in detached mode.
+- 4. when you keep building up, the storage keeps increasing due to past images/containers/volumes. so delete them using ?
