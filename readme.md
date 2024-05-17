@@ -73,7 +73,8 @@ export TERM=xterm-256color
         Note: app is in /home/shiva, not in root which is /home/tec
 - 2. `sudo docker-compose -f docker-compose-prod.yml down`      down will tear down.
 - 3. `sudo docker-compose -f docker-compose-prod.yml up --build -d`   d is to run in detached mode.
-- 4. when you keep building up, the storage keeps increasing due to past images/containers/volumes. so delete them using ?
+- 4. when you keep building up, the storage keeps increasing due to past images/containers/volumes. so delete them using:
+    `sudo docker system prune -a`
 
 ### Running it locally
 - 1. clone this repo
