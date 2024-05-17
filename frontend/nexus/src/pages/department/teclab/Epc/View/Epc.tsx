@@ -54,7 +54,7 @@ function Epc() {
                     lot_status_released: item.lot_status_released,
 
                     homesiting_completed_by: item.homesiting_completed_by,
-                    homesiting_completed_on: item.homesiting_completed_on,
+                    homesiting_completed_on: item.homesiting_completed_on ? format(new Date(item.homesiting_completed_on), 'MM/dd/yyyy') : null,
 
                     project_uid: item.project_uid,
                     community_name: item.community,

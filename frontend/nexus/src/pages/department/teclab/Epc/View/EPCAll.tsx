@@ -58,6 +58,12 @@ const columnDefinitionsData = [
         ],
     },
     {
+      headerName: 'Home Siting',
+      children: [
+            {headerName: 'Completed On', field: 'home_siting_completed_on', width: 200},
+      ],
+    },
+    {
         headerName: 'Engineering',
         children: [
             {headerName: 'Engineer', field: 'engineer_name'},

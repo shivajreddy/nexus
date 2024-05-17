@@ -16,6 +16,12 @@ const epcColumnDefinitions: ColGroupDef[] = [
         marryChildren: true
     },
     {
+      headerName: 'Home Site',
+      children: [
+            {headerName: 'Completed On', field: 'homesiting_completed_on', width: 170},
+      ],
+    },
+    {
         headerName: 'Drafting',
         children: [
             {headerName: 'Drafter', field: 'drafter_name'},
