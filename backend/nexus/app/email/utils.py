@@ -1,5 +1,6 @@
 from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from fastapi import HTTPException
 from app.settings.config import settings
@@ -48,22 +49,41 @@ def send_email_with_given_message_and_attachment(recipient_email, message):
 def send_email_with_verification_key(recipient_email: str, verification_key: str):
     admin_email_addrs = "sreddy@tecofva.com"
 
-    # confirmation_link = settings.SERVER_ADDRESS + f"/auth/confirm-registration/{recipient_email}/{verification_key}"
-    confirmation_link = settings.CLIENT_ORIGIN + f"/auth/confirm-registration/{recipient_email}/{verification_key}"
+    confirmation_link = "http://" + settings.CLIENT_ORIGIN + f"/auth/confirm-registration/{recipient_email}/{verification_key}"
 
-    message = f"Please use this link to verify your account: {confirmation_link}"
+    html_message = f"""
+    <pre>
+        <p>Please use the below link to verify your account:</p>
+        <a href="{confirmation_link}">Confirmation Registration</a>
+    </pre>
+    """
+    # this text_message will act as fallback if html_message fails
+    text_message = f"Please copy paste the following link in your broswer to finish registration \n {confirmation_link}"
 
-    customer_email = EmailMessage()
+    html_mime_message = MIMEText(html_message, 'html')
+    text_mime_message = MIMEText(text_message, 'plain')
+
+    # customer_email = EmailMessage()
+    customer_email = MIMEMultipart('alternative')
     customer_email["From"] = settings.SENDER_EMAIL
     customer_email["To"] = recipient_email
     customer_email["Subject"] = "Nexus account Registration"
-    customer_email.set_content(message)
+    # customer_email.set_content(message)
+    # customer_email.set_content(message, subtype="html")     # sending email in html formatl, to get clickable url.
+    # customer_email.set_content(mime_message, subtype="html")     # sending email in html formatl, to get clickable url.
+    customer_email.attach(html_mime_message)
+    customer_email.attach(text_mime_message)
 
-    admin_email = EmailMessage()
+    # admin_email = EmailMessage()
+    admin_email = MIMEMultipart('alternative')
     admin_email["From"] = settings.SENDER_EMAIL
     admin_email["To"] = admin_email_addrs
     admin_email["Subject"] = "Copy Of Customer's registration email confirmation"
-    admin_email.set_content(message)
+    # admin_email.set_content(message)
+    # admin_email.set_content(message, subtype="html")     # sending email in html formatl, to get clickable url.
+    # admin_email.set_content(mime_message, subtype="html")     # sending email in html formatl, to get clickable url.
+    admin_email.attach(html_mime_message)
+    admin_email.attach(text_mime_message)
 
     smtp = smtplib.SMTP(
         host=settings.SMTP_SERVER_ADDRESS,
