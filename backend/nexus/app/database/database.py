@@ -20,6 +20,6 @@ projects_coll = db["projects"]
 def connect_mongodb():
     try:
         client.admin.command("ping")
-        print("Database Connection: ✅")
+        print(f"Connection to Database:{database_name} ✅")
     except Exception as e:
-        print("Database Connection: ❌", e)
+        print("Connection to Database:{database_name} ❌", e)

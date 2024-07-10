@@ -3,7 +3,11 @@ from typing import List
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError, ExpiredSignatureError
+
+# from jose import jwt, JWTError, ExpiredSignatureError
+import jwt
+from jwt import PyJWTError, ExpiredSignatureError
+
 from pydantic import ValidationError
 
 from app.settings.config import settings
@@ -76,7 +80,8 @@ def verify_access_token(given_token):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except JWTError:
+    # except JWTError:
+    except PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="JWTError - token is not able to decode",
@@ -109,7 +114,8 @@ def verify_refresh_token(given_token) -> RefreshTokenData:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except JWTError:
+    # except JWTError:
+    except PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="JWTError - token is not able to decode",

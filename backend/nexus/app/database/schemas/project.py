@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel
 
+from app.database.schemas.common.schema import Note
 from app.database.schemas.department_data import EPCData, CORData
+from app.database.schemas.teclab.schema import BuildByPlans, Drafting, Engineering, HomeSiting, LotInfo, Permitting, Plat
 
 """
 Schema for `project`
@@ -42,9 +44,20 @@ class ContractInfo(BaseModel):
     contract_date: Optional[datetime] = None
 
 
+'''
+All data of a project that is created/used/modified
+by TEC-LAB department
+'''
 class TecLabProjectData(BaseModel):
-    epc_data: 'EPCData'
-    cor_data: 'CORData'
+    lot_info: LotInfo
+    home_siting: HomeSiting
+    drafting: Drafting
+    engineering: Engineering
+    plat_engineering: Plat
+    permitting: Permitting
+    build_by_plants: BuildByPlans
+    # Department specific notes
+    project_notes: List[Note] = []
 
 
 class SalesProjectData(BaseModel):

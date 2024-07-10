@@ -33,13 +33,14 @@ class Settings(BaseSettings):
 
 
 # Determine the environment and set the appropriate .env.prod file
+# set the default environment as 'development'
 env = os.getenv("APP_ENV", "development")
 print("Environment is :APP_ENV=", env)
 if env == "production":
     settings = Settings(_env_file="./.env.prod")
-elif env == "test":
-    settings = Settings(_env_file="./.env.test")
-elif env == "dev":
-    settings = Settings(_env_file="./.env.dev")
+elif env == "testing":
+    settings = Settings(_env_file="./.env.testing")
+elif env == "development":
+    settings = Settings(_env_file="./.env.development")
 else:
     settings = Settings(_env_file="./.env.dev")
