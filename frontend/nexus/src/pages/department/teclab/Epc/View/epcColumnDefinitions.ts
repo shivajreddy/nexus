@@ -9,6 +9,7 @@ const epcColumnDefinitions: ColGroupDef[] = [
             {headerName: 'Community', field: 'community_name', width: 200},
             {headerName: 'Section', field: 'section_number'},
             {headerName: 'Lot-#', field: 'lot_number'},
+            {headerName: 'Contract Type', field: 'contract_type', width: 170},
             {headerName: 'Contract Date', field: 'contract_date', width: 170},
             {headerName: 'Product', field: 'product'},
             {headerName: 'Elevation', field: 'elevation', width: 120},

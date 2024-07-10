@@ -60,6 +60,7 @@ function Epc() {
                     community_name: item.community,
                     section_number: item.section_number,
                     lot_number: item.lot_number,
+                    contract_type: item.contract_type,
                     // contract_date: item.contract_date ? format(new Date(item.contract_date), 'MM/dd/yyyy') : null,
                     contract_date: item.contract_date ? format(new Date(item.contract_date), 'yyyy/MM/dd') : null,
                     product: item.product_name,
@@ -144,6 +145,7 @@ function Epc() {
         autoHeaderHeight: true,
         floatingFilter: true,
         suppressMenu: true,
+        lockVisible: true,
     }
 
     const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
@@ -158,7 +160,7 @@ function Epc() {
         pivotHeaderHeight: 100,
         pivotGroupHeaderHeight: 50,
         // columnHoverHighlight: true,
-        suppressMovableColumns: true,
+        // suppressMovableColumns: true,
         pagination: true,
         rowSelection: 'multiple',
         paginationPageSize: 100,
