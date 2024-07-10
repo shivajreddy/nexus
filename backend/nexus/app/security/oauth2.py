@@ -3,7 +3,12 @@ from typing import List
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError, ExpiredSignatureError
+
+# from jose import jwt, JWTError, ExpiredSignatureError
+import jwt
+from jwt import PyJWTError, ExpiredSignatureError
+
+
 from pydantic import ValidationError
 
 from app.settings.config import settings
