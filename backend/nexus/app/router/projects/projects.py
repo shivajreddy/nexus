@@ -7,7 +7,7 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.database.schemas.department_data import EPCData, CORData
+from app.database.schemas.department_data import EPCData, CORData, FOSCData
 from app.database.schemas.project import TargetProject, Project, NewProject, ProjectInfo, ProjectMetaInfo, ContractInfo, \
     TecLabProjectData, SalesProjectData
 from app.database.schemas.user import User
@@ -74,7 +74,8 @@ def create_new_project(project_details: NewProject, current_user_data: Annotated
         contract_info=ContractInfo(),
         teclab_data=TecLabProjectData(
             epc_data=EPCData(),
-            cor_data=CORData()
+            cor_data=CORData(),
+            fosc_data=FOSCData()
         ),
         sales_data=SalesProjectData()
     )

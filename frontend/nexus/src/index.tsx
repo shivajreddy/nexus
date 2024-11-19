@@ -26,7 +26,11 @@ import SalesHome from "./pages/department/sales/SalesHome";
 import TecLabHome from "./pages/department/teclab/TecLabHome";
 import PersistentLogin from "@/features/auth/PersistentLogin.tsx";
 import SuccessfulRegistration from "@pages/auth/SuccessfulRegistration.tsx";
-import SearchAndUpdateTECLabData from "@pages/department/teclab/Epc/View/SearchAndUpdateTECLabData.tsx";
+import SearchAndUpdateEPCTECLabData from "@pages/department/teclab/Epc/View/SearchAndUpdateTECLabData.tsx";
+import SearchAndUpdateFOSCData from "@pages/department/teclab/Fosc/Views/SearchAndUpdateFOSCData.tsx";
+
+
+import Fosc from "@pages/department/teclab/Fosc/Views/Fosc.tsx";
 // import EditNewLotData from "@pages/department/teclab/Epc/EditNewLotData.tsx";
 // import EditLot from "@pages/department/teclab/Epc/EditLot/EditLot.tsx";
 import CoreDashboard from "@pages/department/sales/CoreDashboard.tsx";
@@ -36,6 +40,10 @@ import Projects from "@pages/Project/Projects.tsx";
 import EditTECLabData from "@pages/department/teclab/Epc/View/EditTECLabData.tsx";
 import DemoGrid from "@pages/department/teclab/Epc/archive/DemoGrid.tsx";
 import Epc2 from "@pages/department/teclab/Epc/archive/Epc2.tsx";
+import EditFOSCData from "@pages/department/teclab/Fosc/Views/EditFOSCData.tsx";
+import FOSCSummary from "@pages/department/teclab/Fosc/Views/FOSCSummary.tsx";
+import FOSCCurrent from "@pages/department/teclab/Fosc/Views/FOSCCurrent.tsx";
+import FOSCAll from "@pages/department/teclab/Fosc/Views/FOSCAll.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -68,9 +76,22 @@ const router = createBrowserRouter(
                         <Route path="all-lots" element={<EPCAll/>}/>
                         {/*<Route path="lot/new" element={<EditTECLabData/>}/>*/}
                         {/*<Route path="edit2" element={<EditTECLabData/>}/>*/}
-                        <Route path="edit" element={<SearchAndUpdateTECLabData/>}/>
+                        <Route path="edit" element={<SearchAndUpdateEPCTECLabData/>}/>
                         <Route path="edit/:project_uid" element={<EditTECLabData/>}/>
                         {/*<Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>*/}
+                    </Route>
+
+                    <Route path="fosc">
+                        <Route index element={<Fosc/>}/>
+                        {/*<Route path="fosc2" element={<Epc2/>}/>*/}
+                        <Route path="all-lots" element={<FOSCAll/>}/>
+                        <Route path="summary" element={<FOSCSummary/>}/>
+                        <Route path="current" element={<FOSCCurrent/>}/>
+
+
+
+                        <Route path="edit" element={<SearchAndUpdateFOSCData/>}/>
+                        <Route path="edit/:project_uid" element={<EditFOSCData/>}/>
                     </Route>
 
                     <Route path="pipeline" element={<Pipeline/>}/>

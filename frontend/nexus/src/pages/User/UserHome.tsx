@@ -52,15 +52,29 @@ function UserHome() {
                             <div className="grid w-full items-center gap-4">
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="first_name">First Name</Label>
-                                    <Input id="first_name" disabled type="text" defaultValue={user?.user_info.first_name}/>
+                                    <Input id="first_name" disabled type="text"
+                                           defaultValue={user?.user_info.first_name}/>
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="last_name">Last Name</Label>
-                                    <Input id="last_name" disabled type="text" defaultValue={user?.user_info.last_name}/>
+                                    <Input id="last_name" disabled type="text"
+                                           defaultValue={user?.user_info.last_name}/>
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="job-title">Title</Label>
-                                    <Input id="job-title" type="text" disabled defaultValue={user?.user_info.job_title}/>
+                                    <Input id="job-title" type="text" disabled
+                                           defaultValue={user?.user_info.job_title}/>
+                                </div>
+                                {/*used to show the department of the current user*/}
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="department">Department</Label>
+                                    <Input id="department" type="text" disabled
+                                           defaultValue={user?.user_info.department}/>
+                                </div>
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="Teams">Team(s)</Label>
+                                    <Input id="teams" type="text" disabled
+                                           defaultValue={user?.user_info.teams}/>
                                 </div>
                             </div>
                         </CardContent>

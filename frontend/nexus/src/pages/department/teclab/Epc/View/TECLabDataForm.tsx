@@ -1,4 +1,4 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@components/ui/card.tsx";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@components/ui/card.tsx";
 import FieldDate from "@pages/department/teclab/Epc/helpers/FieldDate.tsx";
 import FieldDropDown from "@pages/department/teclab/Epc/helpers/FieldDropDown.tsx";
 import FieldText from "@pages/department/teclab/Epc/helpers/FieldText.tsx";
@@ -52,7 +52,8 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
         "all_engineers": [],
         "all_plat_engineers": [],
         "all_counties": [],
-        "all_homesiting_drafters": []
+        "all_homesiting_drafters": [],
+        "all_field_ops_members": []
     })
 
     const [updateTECLabDataStatus, setUpdateTECLabDataStatus] = useState<"initial" | "loading" | "failed" | "success">("initial");
@@ -96,6 +97,7 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
             const platEngineersResponse = await axios.get('/eagle/plat-engineers');
             const countiesResponse = await axios.get('/eagle/counties');
             const homesitingDraftersResponse = await axios.get('/department/teclab/homesiting-drafters')
+            const fieldOpsMembersResponse = await axios.get('/department/teclab/fieldops-members')
             setFormData({
                 all_communities: communitiesResponse.data,
                 all_products: productsResponse.data,
@@ -104,7 +106,8 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
                 all_engineers: engineersResponse.data,
                 all_plat_engineers: platEngineersResponse.data,
                 all_counties: countiesResponse.data,
-                all_homesiting_drafters:homesitingDraftersResponse.data
+                all_homesiting_drafters: homesitingDraftersResponse.data,
+                all_field_ops_members: fieldOpsMembersResponse.data
             })
         }
 
@@ -405,6 +408,7 @@ const TECLabDataForm = ({project_id, project_uid, statusEPCDataFetch, setStatusE
                         />
                       </CardContent>
                     </Card>
+
 
                       {/* 8: Notes */}
                     <Card className="min-w-[27%] m-4">

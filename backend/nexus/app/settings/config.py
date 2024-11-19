@@ -42,4 +42,5 @@ elif env == "test":
 elif env == "dev":
     settings = Settings(_env_file="./.env.dev")
 else:
+    print("curr dir", os.getcwd())
     settings = Settings(_env_file="./.env.dev")

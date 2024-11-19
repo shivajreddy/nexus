@@ -55,8 +55,20 @@ def update_db():
     # projects_coll.update_many({'project_info.project_uid': '826a5f29-ab9f-4d44-aa84-5659ffe9b948'},
     # ! update all projects with new fields
     projects_coll.update_many({},
-                              {'$set': {'teclab_data.epc_data.homesiting_completed_by': None,
-                                        'teclab_data.epc_data.homesiting_completed_on': None}
+                              {'$set': {
+                                    # 'teclab_data.fosc_data.assigned_pm': "",
+                                    # 'teclab_data.fosc_data.assigned_director': "",
+                                    # 'teclab_data.fosc_data.notes': ""
+                                    'teclab_data.fosc_data.mep_scan_status': None,
+                                    'teclab_data.fosc_data.mep_scanner': None,
+                                    'teclab_data.fosc_data.mep_scan_date': None,
+                                    'teclab_data.fosc_data.mep_report_status': None,
+                                    'teclab_data.fosc_data.mep_reporter': None,
+                                    'teclab_data.fosc_data.mep_report_date': None,
+                                    'teclab_data.fosc_data.mep_emailed': None,
+                                    'teclab_data.fosc_data.mep_uploaded': None,
+
+                              }
                                })
 
     # ! update all projects that are 2018,19,20,21,22 as finished
@@ -122,7 +134,7 @@ def get_epc_data_with_project_uid(project_uid: str):
 
 @router.post('/edit', dependencies=[Depends(get_current_user_data)])
 def update_teclab_data_for_project(new_data: UpdateTECLabData):
-    # print("given new_data", new_data)
+    print("given new_data", new_data)
     # Check if the project exists
     existing_project = projects_coll.find_one({"project_info.project_uid": new_data.project_uid})
 

@@ -1,4 +1,6 @@
 // + This should align with FastAPI modal schema
+import {stringify} from "uuid/index";
+
 type TECLabEPCData = {
     // project-info
     project_uid: string;
@@ -88,8 +90,6 @@ type TECLabEPCData = {
     // notes?: string;
 
 }
-
-
 export {
     type TECLabEPCData,
 }

@@ -22,6 +22,8 @@ import {MdEmail, MdModeEditOutline} from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 import {BASE_URL} from "@/services/api";
 import {ColDef, ColGroupDef, GridOptions} from "ag-grid-community";
+import {useAppSelector} from "@redux/hooks.ts";
+import {selectCurrentUser} from "@/features/auth/authSlice.ts";
 
 
 function Epc() {
@@ -43,10 +45,9 @@ function Epc() {
                 const response = await axios.get('/department/teclab/epc/live');
                 // const response = await axios.get('/department/teclab/epc/all');
                 // console.log("response=", response);
-                // console.log("😆 response.data=", response.data);
+                console.log("😆 response.data=", response.data);
                 // setLotData(response.data);
                 const backendData = response.data;
-
                 // Data transformation
                 const transformedData = backendData.map((item: any) => ({
 
@@ -94,10 +95,14 @@ function Epc() {
         });
     }, [])
 
+
+
     // + Set column defs based on user roles
     const [finalEpcColDefs] = useState(() => {
+
             const viewerColDef = epcColumnDefinitions;
             const editorColDef: ColGroupDef[] = [
+
                 {
                     headerName: "✍🏻",
                     children: [

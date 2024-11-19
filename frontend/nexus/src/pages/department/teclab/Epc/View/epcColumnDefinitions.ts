@@ -72,6 +72,7 @@ const epcColumnDefinitions: ColGroupDef[] = [
         ],
         marryChildren: true
     },
+
     {
         headerName: 'Notes',
         children: [
