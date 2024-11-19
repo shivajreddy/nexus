@@ -15,9 +15,7 @@ import {Separator} from "@components/ui/separator.tsx";
 import {MdEmail, MdOutlineStorage} from "react-icons/md";
 import {useNavigate} from "react-router-dom";
 import {CgMenuGridO} from "react-icons/cg";
-import {hasRoles} from "@/features/utils/utils.ts";
 import {Button} from "@components/ui/button.tsx";
-import {BASE_URL} from "@/services/api";
 
 
 function FoscMenu() {
@@ -69,15 +67,6 @@ function FoscMenu() {
                         </button>
                     </div>
 
-
-                    <div className="flex justify-center items-center bg-default-bg1 mx-4">
-                        <Button
-                            onClick={() => navigate('/fosc/fosc')}
-                            className="min-w-[10em]">
-                            <p className="pr-2"><MdEmail/></p>
-                            Email Me Summary
-                        </Button>
-                    </div>
 
 
                 </SheetContent>

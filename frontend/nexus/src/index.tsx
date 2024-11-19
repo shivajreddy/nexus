@@ -88,10 +88,6 @@ const router = createBrowserRouter(
                         <Route path="summary" element={<FOSCSummary/>}/>
                         <Route path="current" element={<FOSCCurrent/>}/>
 
-                        <Route path="fosc" element={<Fosc/>}/>
-
-
-
                         <Route path="edit" element={<SearchAndUpdateFOSCData/>}/>
                         <Route path="edit/:project_uid" element={<EditFOSCData/>}/>
                     </Route>
