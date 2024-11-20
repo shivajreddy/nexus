@@ -22,6 +22,10 @@ TECLAB/FOSC endpoint
 
 router = APIRouter(prefix="/department/teclab/fosc")
 
+@router.get('/')
+def get():
+    print("inside fosc")
+
 
 # """
 # Filter out all finished and released lots
@@ -126,75 +130,80 @@ def get_all_lots():
 
 
 # """
+
+def communities_logic():
+    result_data = {}
+    for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
+        p_community = doc["project_info"]["community"]
+        # if community hasn't been added, other checks can be done here if needed
+        """
+            format of the each item
+                "community_name": (s/r_foundation, s/r_slab, s/r_frame, s/r_mep, total, finished)
+            """
+        if p_community not in result_data:
+            result_data[p_community] = [0, 0, 0, 0, 0, 0, 0, 0, 0, -1]
+
+        # creates a Dict with the required information for the summary
+        final_object = {
+            "community": p_community,
+            "s_foundation": doc["teclab_data"]["fosc_data"]["foundation_scan_status"],
+            "r_foundation": doc["teclab_data"]["fosc_data"]["foundation_report_status"],
+            "s_slab": doc["teclab_data"]["fosc_data"]["slab_scan_status"],
+            "r_slab": doc["teclab_data"]["fosc_data"]["slab_report_status"],
+            "s_frame": doc["teclab_data"]["fosc_data"]["frame_scan_status"],
+            "r_frame": doc["teclab_data"]["fosc_data"]["frame_report_status"],
+            "s_mep": doc["teclab_data"]["fosc_data"]["mep_scan_status"],
+            "r_mep": doc["teclab_data"]["fosc_data"]["mep_report_status"],
+            "finished": doc["teclab_data"]["fosc_data"]["lot_status_finished"]
+        }
+
+        # if the community was correctly put into result_data increment the list for the corresponding value
+        if final_object["community"] in result_data:
+            if final_object["r_foundation"]:
+                result_data[p_community][1] += 1
+                result_data[p_community][0] += 1
+            elif final_object["s_foundation"]:
+                result_data[p_community][0] += 1
+
+            if final_object["r_slab"]:
+                result_data[p_community][3] += 1
+                result_data[p_community][2] += 1
+            elif final_object["s_slab"]:
+                result_data[p_community][2] += 1
+
+            if final_object["r_frame"]:
+                result_data[p_community][5] += 1
+                result_data[p_community][4] += 1
+            elif final_object["s_frame"]:
+                result_data[p_community][4] += 1
+
+            if final_object["r_mep"]:
+                result_data[p_community][7] += 1
+                result_data[p_community][6] += 1
+            elif final_object["s_mep"]:
+                result_data[p_community][6] += 1
+
+            # running counter to have a number for total homes
+            result_data[p_community][8] += 1
+            # will not show communities that are 100% finished
+            if not final_object["finished"] and result_data[p_community][9] != 1:
+                result_data[p_community][9] = 1
+
+    result = {k: v for k, v in result_data.items() if v[9] == 1}
+    # print(result)
+    return result
+
 # Filters all lots into relevant data for each community regarding scans
 @router.get('/summary', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
-def get_all_communities(temp: Optional[bool] = False):
+def get_all_communities():
     try:
-        result_data = {}
-        for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
-            p_community = doc["project_info"]["community"]
-            # if community hasn't been added, other checks can be done here if needed
-            """
-                format of the each item
-                    "community_name": (s/r_foundation, s/r_slab, s/r_frame, s/r_mep, total, finished)
-                """
-            if p_community not in result_data:
-                result_data[p_community] = [0, 0, 0, 0, 0, 0, 0, 0, 0, -1]
-
-            # creates a Dict with the required information for the summary
-            final_object = {
-                "community": p_community,
-                "s_foundation": doc["teclab_data"]["fosc_data"]["foundation_scan_status"],
-                "r_foundation": doc["teclab_data"]["fosc_data"]["foundation_report_status"],
-                "s_slab": doc["teclab_data"]["fosc_data"]["slab_scan_status"],
-                "r_slab": doc["teclab_data"]["fosc_data"]["slab_report_status"],
-                "s_frame": doc["teclab_data"]["fosc_data"]["frame_scan_status"],
-                "r_frame": doc["teclab_data"]["fosc_data"]["frame_report_status"],
-                "s_mep": doc["teclab_data"]["fosc_data"]["mep_scan_status"],
-                "r_mep": doc["teclab_data"]["fosc_data"]["mep_report_status"],
-                "finished": doc["teclab_data"]["fosc_data"]["lot_status_finished"]
-            }
-
-            # if the community was correctly put into result_data increment the list for the corresponding value
-            if final_object["community"] in result_data:
-                if final_object["r_foundation"]:
-                    result_data[p_community][1] += 1
-                    result_data[p_community][0] += 1
-                elif final_object["s_foundation"]:
-                    result_data[p_community][0] += 1
-
-                if final_object["r_slab"]:
-                    result_data[p_community][3] += 1
-                    result_data[p_community][2] += 1
-                elif final_object["s_slab"]:
-                    result_data[p_community][2] += 1
-
-                if final_object["r_frame"]:
-                    result_data[p_community][5] += 1
-                    result_data[p_community][4] += 1
-                elif final_object["s_frame"]:
-                    result_data[p_community][4] += 1
-
-                if final_object["r_mep"]:
-                    result_data[p_community][7] += 1
-                    result_data[p_community][6] += 1
-                elif final_object["s_mep"]:
-                    result_data[p_community][6] += 1
-
-                # running counter to have a number for total homes
-                result_data[p_community][8] += 1
-                # will not show communities that are 100% finished
-                if not final_object["finished"] and result_data[p_community][9] != 1:
-                    result_data[p_community][9] = 1
+        result_data = communities_logic()
 
         # creates result which transforms result_data into a list of dicts
         result = [{"community_name": community, "values": values} for community, values in result_data.items()
                   if result_data[community][9] == 1]
-        # print(result_data)
-        if temp:
-            return result_data
-        else:
-            return result
+
+        return result
 
     except Exception as e:
         # print("error: ", e)
@@ -248,8 +257,8 @@ def update_teclab_data_for_project(new_data: UpdateFOSCData):
         )
 
     if new_data.fosc_data.assigned_director != existing_project["teclab_data"]["fosc_data"]["assigned_director"]:
-        print(existing_project["teclab_data"]["fosc_data"]["assigned_director"])
-        print(new_data.fosc_data.assigned_director)
+        # print(existing_project["teclab_data"]["fosc_data"]["assigned_director"])
+        # print(new_data.fosc_data.assigned_director)
         update_community_directors(new_data.fosc_data.assigned_director, existing_project["project_info"]["community"])
     # Update the project in the database
     projects_coll.update_one(
@@ -264,10 +273,49 @@ def update_teclab_data_for_project(new_data: UpdateFOSCData):
 
 # """
 # :: Feature: email FOSC data
+# Formats the dates to remove the time
+def format_date(date_string):
+    if date_string:
+        return date_string.strftime("%m/%d/%Y")
+    return None
+
+# create email with attachment
+def generate_email(current_user_data, csv_filename, today_date, email):
+    message = MIMEMultipart()
+    message['Subject'] = 'Field Ops Backlog Tracker'
+    message['From'] = 'nexus@tecofva.com'
+    message['To'] = current_user_data.username
+    if email == 1:
+        message.attach(MIMEText('FOSC Summary Tracker as of today', 'plain'))
+    elif email == 2:
+        message.attach(MIMEText('FOSC Live Tracker as of today', 'plain'))
+    elif email == 3:
+        message.attach(MIMEText('FOSC All Tracker as of today', 'plain'))
+
+    # attach the csv file to message
+    with open(csv_filename, 'r') as file:
+        attachment = MIMEText(file.read())
+        if email == 1:
+            attachment.add_header('Content-Disposition', 'attachment',
+                                  filename=(today_date + "-FieldOpsSummaryTracker.csv"))
+        elif email == 2:
+            attachment.add_header('Content-Disposition', 'attachment',
+                                  filename=(today_date + "-FieldOpsLiveTracker.csv"))
+        elif email == 3:
+            attachment.add_header('Content-Disposition', 'attachment',
+                                  filename=(today_date + "-FieldOpsAllTracker.csv"))
+        message.attach(attachment)
+
+    send_email_with_given_message_and_attachment(
+        current_user_data.username,
+        message
+    )
+
+# Creates spreadsheet for the summary page
 @router.get('/fosc-summary-tracker')
 def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
     # query the data
-    result_data = get_all_communities(temp = True)
+    result_data = communities_logic()
 
     # create the csv file
     today_date = datetime.now().strftime("%d-%m-%y")
@@ -289,30 +337,118 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
         ])
         for k, v in result_data.items():
             csv_writer.writerow([k] + v[:-1])
-
     # create email with attachment
-    message = MIMEMultipart()
-    message['Subject'] = 'Field Ops Summary Tracker'
-    message['From'] = 'nexus@tecofva.com'
-    message['To'] = current_user_data.username
-    message.attach(MIMEText('FOSC Summary Tracker as of today', 'plain'))
-
-    # attach the csv file to message
-    with open(csv_filename, 'r') as file:
-        attachment = MIMEText(file.read())
-        attachment.add_header('Content-Disposition', 'attachment', filename=(today_date + "-FieldOpsSummaryTracker.csv"))
-        message.attach(attachment)
-
-    send_email_with_given_message_and_attachment(
-        current_user_data.username,
-        message
-    )
+    generate_email(current_user_data, csv_filename, today_date, 1)
 
     return {
         # "total": len(filtered_lots),
         "email_data": result_data,
     }
 
+# Creates a spreadsheet for the live page
+@router.get('/fosc-live-tracker')
+def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+    # query the data
+    result_data = get_live_lots()
+
+    # create the csv file
+    today_date = datetime.now().strftime("%d-%m-%y")
+    csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsLiveTracker.csv")
+    print("filename=", csv_filename)
+    with open(csv_filename, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow([
+            "Community", "Section", "Lot", "PM", "Director",
+
+            "Foundation Scanned", "Date", "Scanner",
+            "Slab Scanned", "Date", "Scanner",
+            "Frame Scanned", "Date", "Scanner",
+            "MEP Scanned", "Date", "Scanner",
+
+            "Foundation Reported", "Date", "Reporter",
+            "Slab Reported", "Date", "Reporter",
+            "Frame Reported", "Date", "Reporter",
+            "MEP Reported", "Date", "Reporter",
+        ])
+        for i in result_data:
+            row = [
+                i.get("community"),
+                i.get("section_number"),
+                i.get("lot_number"),
+                i.get("assigned_pm"),
+                i.get("assigned_director"),
+
+                i.get("foundation_scan_status"), format_date(i.get("foundation_scan_date")), i.get("foundation_scanner"),
+                i.get("slab_scan_status"), format_date(i.get("slab_scan_date")), i.get("slab_scanner"),
+                i.get("frame_scan_status"), format_date(i.get("frame_scan_date")), i.get("frame_scanner"),
+                i.get("mep_scan_status"), format_date(i.get("mep_scan_date")), i.get("mep_scanner"),
+
+                i.get("foundation_report_status"), format_date(i.get("foundation_report_date")), i.get("foundation_reporter"),
+                i.get("slab_report_status"), format_date(i.get("slab_report_date")), i.get("slab_reporter"),
+                i.get("frame_report_status"), format_date(i.get("frame_report_date")), i.get("frame_reporter"),
+                i.get("mep_report_status"), format_date(i.get("mep_report_date")), i.get("mep_reporter"),
+            ]
+            csv_writer.writerow(row)
+    # create email with attachment
+    generate_email(current_user_data, csv_filename, today_date, 2)
+
+    return {
+        # "total": len(filtered_lots),
+        "email_data": result_data,
+    }
+
+# Creates a spreadsheet for the all page
+@router.get('/fosc-all-tracker')
+def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+    # query the data
+    result_data = get_all_lots()
+
+    # create the csv file
+    today_date = datetime.now().strftime("%d-%m-%y")
+    csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsAllTracker.csv")
+    print("filename=", csv_filename)
+    with open(csv_filename, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow([
+            "Community", "Section", "Lot", "PM", "Director",
+
+            "Foundation Scanned", "Date", "Scanner",
+            "Slab Scanned", "Date", "Scanner",
+            "Frame Scanned", "Date", "Scanner",
+            "MEP Scanned", "Date", "Scanner",
+
+            "Foundation Reported", "Date", "Reporter",
+            "Slab Reported", "Date", "Reporter",
+            "Frame Reported", "Date", "Reporter",
+            "MEP Reported", "Date", "Reporter",
+        ])
+        for j in result_data:
+            row = [
+                j.get("community"),
+                j.get("section_number"),
+                j.get("lot_number"),
+                j.get("assigned_pm"),
+                j.get("assigned_director"),
+
+                j.get("foundation_scan_status"), format_date(j.get("foundation_scan_date")), j.get("foundation_scanner"),
+                j.get("slab_scan_status"), format_date(j.get("slab_scan_date")), j.get("slab_scanner"),
+                j.get("frame_scan_status"), format_date(j.get("frame_scan_date")), j.get("frame_scanner"),
+                j.get("mep_scan_status"), format_date(j.get("mep_scan_date")), j.get("mep_scanner"),
+
+                j.get("foundation_report_status"), format_date(j.get("foundation_report_date")), j.get("foundation_reporter"),
+                j.get("slab_report_status"), format_date(j.get("slab_report_date")), j.get("slab_reporter"),
+                j.get("frame_report_status"), format_date(j.get("frame_report_date")), j.get("frame_reporter"),
+                j.get("mep_report_status"), format_date(j.get("mep_report_date")), j.get("mep_reporter"),
+            ]
+            csv_writer.writerow(row)
+
+    # create email with attachment
+    generate_email(current_user_data, csv_filename, today_date, 3)
+
+    return {
+        # "total": len(filtered_lots),
+        "email_data": result_data,
+    }
 # """
 
 

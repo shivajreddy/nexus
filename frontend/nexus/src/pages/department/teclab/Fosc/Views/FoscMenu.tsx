@@ -16,10 +16,18 @@ import {MdEmail, MdOutlineStorage} from "react-icons/md";
 import {useNavigate} from "react-router-dom";
 import {CgMenuGridO} from "react-icons/cg";
 import {Button} from "@components/ui/button.tsx";
+import {BASE_URL} from "@/services/api";
+import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
+import {hasRoles} from "@/features/utils/utils.ts";
+import {useUserRoles} from "@hooks/useUserRoles.ts";
 
 
 function FoscMenu() {
     const navigate = useNavigate();
+
+    const axios = useAxiosPrivate();
+
+    const userRoles = useUserRoles();
 
     return (
         <div style={{position: "absolute", right: "2em"}}>
@@ -67,7 +75,41 @@ function FoscMenu() {
                         </button>
                     </div>
 
+                    <Separator/>
+                    <p>Tracker Emails</p>
 
+                    {hasRoles(userRoles, [213]) &&
+                        <div className="flex justify-center items-center bg-default-bg1 mx-4">
+                            <Button
+                                onClick={() => axios.get(BASE_URL + '/department/teclab/fosc/fosc-summary-tracker')}
+                                className="min-w-[10em]">
+                                <p className="pr-2"><MdEmail/></p>
+                                Summary Page
+                            </Button>
+                        </div>
+                    }
+
+                    {hasRoles(userRoles, [213]) &&
+                        <div className="flex justify-center items-center bg-default-bg1 mx-4">
+                            <Button
+                                onClick={() => axios.get(BASE_URL + '/department/teclab/fosc/fosc-live-tracker')}
+                                className="min-w-[10em]">
+                                <p className="pr-2"><MdEmail/></p>
+                                Live-Lots Page
+                            </Button>
+                        </div>
+                    }
+
+                    {hasRoles(userRoles, [213]) &&
+                        <div className="flex justify-center items-center bg-default-bg1 mx-4">
+                            <Button
+                                onClick={() => axios.get(BASE_URL + '/department/teclab/fosc/fosc-all-tracker')}
+                                className="min-w-[10em]">
+                                <p className="pr-2"><MdEmail/></p>
+                                All-Lots Page
+                            </Button>
+                        </div>
+                    }
 
                 </SheetContent>
             </Sheet>
