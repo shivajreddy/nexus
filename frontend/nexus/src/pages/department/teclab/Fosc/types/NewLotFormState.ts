@@ -1,5 +1,4 @@
 // + This should align with FastAPI modal schema
-import {stringify} from "uuid/index";
 
 type TECLabFOSCData = {
     // project-info
@@ -21,7 +20,7 @@ type TECLabFOSCData = {
 
     // Foundation
     foundation_scan_status?: boolean;
-    foundation_scaner?: string;
+    foundation_scanner?: string;
     foundation_scan_date?: Date;
     foundation_report_status?: boolean;
     foundation_reporter?: string;
@@ -58,6 +57,9 @@ type TECLabFOSCData = {
     // Misc (warranty, extra)
     misc_scan_status?: boolean;
     misc_report_status?: boolean;
+    foundation_needed?: boolean;
+    slab_needed?: boolean;
+    mep_needed?: boolean;
 
     // Notes
     notes?: string;

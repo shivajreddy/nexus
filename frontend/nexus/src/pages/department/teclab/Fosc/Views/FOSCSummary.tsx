@@ -133,10 +133,10 @@ function FOSCSummary() {
                     value_7: item.values[6],
                     value_8: item.values[7],
 
-                    math_1: item.values[8]-item.values[0],
-                    math_2: item.values[8]-item.values[2],
+                    math_1: item.values[8]-item.values[10],
+                    math_2: item.values[8]-item.values[11],
                     math_3: item.values[8]-item.values[4],
-                    math_4: item.values[8]-item.values[6],
+                    math_4: item.values[8]-item.values[12],
 
                 }));
 

@@ -63,7 +63,7 @@ function Fosc() {
                     lot_number: item.lot_number,
 
                     foundation_scan_status: item.foundation_scan_status,
-                    foundation_scaner: item.foundation_scaner,
+                    foundation_scanner: item.foundation_scanner,
                     foundation_scan_date: item.foundation_scan_date ? format(new Date(item.foundation_scan_date), 'MM/dd/yyyy') : null,
                     foundation_report_status: item.foundation_report_status,
                     foundation_reporter: item.foundation_reporter,

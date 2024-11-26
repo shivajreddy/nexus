@@ -57,7 +57,7 @@ const columnDefinitionsData = [
         headerName: 'Foundation',
         children: [
             {headerName: 'Scanned', field: 'foundation_scan_status'},
-            {headerName: 'Scanner', field: 'foundation_scaner'},
+            {headerName: 'Scanner', field: 'foundation_scanner'},
             {headerName: 'Date', field: 'foundation_scan_date'},
             {headerName: 'Reported', field: 'foundation_report_status'},
             {headerName: 'Reporter', field: 'foundation_reporter'},
@@ -171,7 +171,7 @@ function FOSCCurrent() {
                     assigned_director: item.assigned_director,
 
                     foundation_scan_status: item.foundation_scan_status,
-                    foundation_scaner: item.foundation_scaner,
+                    foundation_scanner: item.foundation_scanner,
                     foundation_scan_date: item.foundation_scan_date ? format(new Date(item.foundation_scan_date), 'MM/dd/yyyy') : null,
                     foundation_report_status: item.foundation_report_status,
                     foundation_reporter: item.foundation_reporter,

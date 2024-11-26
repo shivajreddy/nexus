@@ -26,7 +26,7 @@ const foscColumnDefinitions: ColGroupDef[] = [
         headerName: 'Foundation',
         children: [
             {headerName: 'Scanned', field: 'foundation_scan_status'},
-            {headerName: 'Scanner', field: 'foundation_scaner'},
+            {headerName: 'Scanner', field: 'foundation_scanner'},
             {headerName: 'Date', field: 'foundation_scan_date'},
             {headerName: 'Reported', field: 'foundation_report_status'},
             {headerName: 'Reporter', field: 'foundation_reporter'},
