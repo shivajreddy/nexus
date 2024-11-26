@@ -18,9 +18,8 @@ import {format} from "date-fns";
 import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
-import {MdEmail, MdModeEditOutline} from "react-icons/md";
+import {MdModeEditOutline} from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
-import {BASE_URL} from "@/services/api";
 import {ColDef, ColGroupDef, GridOptions} from "ag-grid-community";
 // import {useAppSelector} from "@redux/hooks.ts";
 // import {selectCurrentUser} from "@/features/auth/authSlice.ts";
@@ -208,15 +207,6 @@ function Fosc() {
                                 <Button onClick={() => navigate('edit')} className="min-w-[10em]">
                                     <p className="pr-2"><MdModeEditOutline/></p>
                                     Search Lots
-                                </Button>
-                            </div>
-                        }
-                        {hasRoles(userRoles, [213]) &&
-                            <div className="flex justify-center items-center bg-default-bg1 mx-4">
-                                <Button onClick={() => axios.get(BASE_URL + '/department/teclab/fosc/fosc-summary-tracker')}
-                                        className="min-w-[10em]">
-                                    <p className="pr-2"><MdEmail/></p>
-                                    Email Me Summary
                                 </Button>
                             </div>
                         }

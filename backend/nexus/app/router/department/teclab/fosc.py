@@ -82,18 +82,19 @@ def get_current_lots():
                 mep_status = doc["teclab_data"]["fosc_data"]["mep_report_status"]
 
                 if foundation_date is not None:
-                    timeLimit = datetime.now() - timedelta(days=21)
+                    beforeTime = datetime.now() - timedelta(days=14)
+                    afterTime = datetime.now() + timedelta(days=21)
 
-                    if foundation_date >= timeLimit and not foundation_status:
+                    if beforeTime <= foundation_date <= afterTime and not foundation_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
-                    elif slab_date >= timeLimit and not slab_status:
+                    elif beforeTime <= slab_date <= afterTime and not slab_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
-                    elif frame_date >= timeLimit and not frame_status:
+                    elif beforeTime <= frame_date <= afterTime and not frame_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
-                    elif mep_date >= timeLimit and not mep_status:
+                    elif beforeTime <= mep_date <= afterTime and not mep_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
 
@@ -130,7 +131,6 @@ def get_all_lots():
 
 
 # """
-
 def communities_logic():
     result_data = {}
     for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
@@ -159,6 +159,7 @@ def communities_logic():
 
         # if the community was correctly put into result_data increment the list for the corresponding value
         if final_object["community"] in result_data:
+
             if final_object["r_foundation"]:
                 result_data[p_community][1] += 1
                 result_data[p_community][0] += 1
@@ -458,9 +459,7 @@ def update_db():
     # ! update all projects with new fields
     projects_coll.update_many({},
                                 # $set $unset
-                                {'$unset': {
-                                    'project_info.fosc_data': None,
-
+                                {'': {
 
                                 }})
     res = projects_coll.find()

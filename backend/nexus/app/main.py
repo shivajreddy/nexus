@@ -1,5 +1,5 @@
-# from starlette.middleware.cors import CORSMiddleware
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 from app.database.database import connect_mongodb, department_data_coll, users_coll, eagle_data_coll, projects_coll
@@ -87,8 +87,8 @@ app.mount("/ws", sio_app)
 # Front-end origins that should be allowed
 
 origins = [
-    "http://localhost:3000",
     "http://192.168.18.72:3000",
+    "http://localhost:3000",
     # "http://34.148.73.253:3000",
     # "http://nexus.tecofva.com",
 ]
