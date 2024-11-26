@@ -141,7 +141,7 @@ def communities_logic():
                 "community_name": (s/r_foundation, s/r_slab, s/r_frame, s/r_mep, total, finished)
             """
         if p_community not in result_data:
-            result_data[p_community] = [0, 0, 0, 0, 0, 0, 0, 0, 0, -1]
+            result_data[p_community] = [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0 ,0]
 
         # creates a Dict with the required information for the summary
         final_object = {
@@ -154,7 +154,10 @@ def communities_logic():
             "r_frame": doc["teclab_data"]["fosc_data"]["frame_report_status"],
             "s_mep": doc["teclab_data"]["fosc_data"]["mep_scan_status"],
             "r_mep": doc["teclab_data"]["fosc_data"]["mep_report_status"],
-            "finished": doc["teclab_data"]["fosc_data"]["lot_status_finished"]
+            "finished": doc["teclab_data"]["fosc_data"]["lot_status_finished"],
+            "f_needed": doc["teclab_data"]["fosc_data"]["foundation_needed"],
+            "s_needed": doc["teclab_data"]["fosc_data"]["slab_needed"],
+            "m_needed": doc["teclab_data"]["fosc_data"]["mep_needed"]
         }
 
         # if the community was correctly put into result_data increment the list for the corresponding value
@@ -184,15 +187,22 @@ def communities_logic():
             elif final_object["s_mep"]:
                 result_data[p_community][6] += 1
 
+            if not final_object["f_needed"]:
+                result_data[p_community][10] += 1
+            if not final_object["s_needed"]:
+                result_data[p_community][11] += 1
+            if not final_object["m_needed"]:
+                result_data[p_community][12] += 1
+
             # running counter to have a number for total homes
             result_data[p_community][8] += 1
             # will not show communities that are 100% finished
-            if not final_object["finished"] and result_data[p_community][9] != 1:
+            if result_data[p_community][9] != 1 and not final_object["finished"]:
                 result_data[p_community][9] = 1
 
     result = {k: v for k, v in result_data.items() if v[9] == 1}
-    # print(result)
     return result
+
 
 # Filters all lots into relevant data for each community regarding scans
 @router.get('/summary', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
@@ -214,6 +224,7 @@ def get_all_communities():
 
 
 # """
+# Updating project data when given a specific project UID
 @router.get(
     path='/get/{project_uid}',
     # response_model=
@@ -231,7 +242,7 @@ def get_fosc_data_with_project_uid(project_uid: str):
 
 
 # """
-# filters
+# Updates the director for each community change its changed
 def update_community_directors(new_data: str, other_communty: str):
     try:
         for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
@@ -245,6 +256,7 @@ def update_community_directors(new_data: str, other_communty: str):
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
+# Updating project data
 @router.post('/edit', dependencies=[Depends(get_current_user_data)])
 def update_teclab_data_for_project(new_data: UpdateFOSCData):
     # print("given new_data", new_data)
@@ -315,7 +327,6 @@ def generate_email(current_user_data, csv_filename, today_date, email):
 # Creates spreadsheet for the summary page
 @router.get('/fosc-summary-tracker')
 def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
-    # query the data
     result_data = communities_logic()
 
     # create the csv file
@@ -337,7 +348,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
             "Total",
         ])
         for k, v in result_data.items():
-            csv_writer.writerow([k] + v[:-1])
+            csv_writer.writerow([k] + v[:-4])
     # create email with attachment
     generate_email(current_user_data, csv_filename, today_date, 1)
 
@@ -349,7 +360,6 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 # Creates a spreadsheet for the live page
 @router.get('/fosc-live-tracker')
 def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
-    # query the data
     result_data = get_live_lots()
 
     # create the csv file
@@ -401,7 +411,6 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 # Creates a spreadsheet for the all page
 @router.get('/fosc-all-tracker')
 def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
-    # query the data
     result_data = get_all_lots()
 
     # create the csv file
@@ -454,12 +463,58 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 
 
 # """
+# Used to update the database for needed changes
 @router.get('/update-db')
 def update_db():
     # ! update all projects with new fields
     projects_coll.update_many({},
                                 # $set $unset
-                                {'': {
+                                {'$set': {
+
+                                    # 'teclab_data.fosc_data.lot_status_started': True,
+                                    # 'teclab_data.fosc_data.lot_status_finished': False,
+                                    # 'teclab_data.fosc_data.assigned_pm': None,
+                                    # 'teclab_data.fosc_data.assigned_director': None,
+                                    #
+                                    # 'teclab_data.fosc_data.foundation_scan_status': None,
+                                    # 'teclab_data.fosc_data.foundation_scanner': None,
+                                    # 'teclab_data.fosc_data.foundation_scan_date': None,
+                                    # 'teclab_data.fosc_data.foundation_report_status': None,
+                                    # 'teclab_data.fosc_data.foundation_reporter': None,
+                                    # 'teclab_data.fosc_data.foundation_report_date': None,
+                                    # 'teclab_data.fosc_data.foundation_uploaded': None,
+                                    #
+                                    # 'teclab_data.fosc_data.slab_scan_status': None,
+                                    # 'teclab_data.fosc_data.slab_scanner': None,
+                                    # 'teclab_data.fosc_data.slab_scan_date': None,
+                                    # 'teclab_data.fosc_data.slab_report_status': None,
+                                    # 'teclab_data.fosc_data.slab_reporter': None,
+                                    # 'teclab_data.fosc_data.slab_report_date': None,
+                                    # 'teclab_data.fosc_data.slab_uploaded': None,
+                                    #
+                                    # 'teclab_data.fosc_data.frame_scan_status': None,
+                                    # 'teclab_data.fosc_data.frame_scanner': None,
+                                    # 'teclab_data.fosc_data.frame_scan_date': None,
+                                    # 'teclab_data.fosc_data.frame_report_status': None,
+                                    # 'teclab_data.fosc_data.frame_reporter': None,
+                                    # 'teclab_data.fosc_data.frame_report_date': None,
+                                    # 'teclab_data.fosc_data.frame_uploaded': None,
+                                    #
+                                    # 'teclab_data.fosc_data.mep_scan_status': None,
+                                    # 'teclab_data.fosc_data.mep_scanner': None,
+                                    # 'teclab_data.fosc_data.mep_scan_date': None,
+                                    # 'teclab_data.fosc_data.mep_report_status': None,
+                                    # 'teclab_data.fosc_data.mep_reporter': None,
+                                    # 'teclab_data.fosc_data.mep_report_date': None,
+                                    # 'teclab_data.fosc_data.mep_uploaded': None,
+                                    #
+                                    # 'teclab_data.fosc_data.misc_scan_status': None,
+                                    # 'teclab_data.fosc_data.misc_report_status': None,
+                                    # 'teclab_data.fosc_data.notes': None,
+
+                                    'teclab_data.fosc_data.foundation_needed': True,
+                                    'teclab_data.fosc_data.slab_needed': True,
+                                    'teclab_data.fosc_data.mep_needed': True,
 
                                 }})
     res = projects_coll.find()

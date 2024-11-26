@@ -56,17 +56,7 @@ def update_db():
     # ! update all projects with new fields
     projects_coll.update_many({},
                               {'$set': {
-                                    # 'teclab_data.fosc_data.assigned_pm': "",
-                                    # 'teclab_data.fosc_data.assigned_director': "",
                                     # 'teclab_data.fosc_data.notes': ""
-                                    'teclab_data.fosc_data.mep_scan_status': None,
-                                    'teclab_data.fosc_data.mep_scanner': None,
-                                    'teclab_data.fosc_data.mep_scan_date': None,
-                                    'teclab_data.fosc_data.mep_report_status': None,
-                                    'teclab_data.fosc_data.mep_reporter': None,
-                                    'teclab_data.fosc_data.mep_report_date': None,
-                                    'teclab_data.fosc_data.mep_emailed': None,
-                                    'teclab_data.fosc_data.mep_uploaded': None,
 
                               }
                                })
