@@ -15,7 +15,7 @@ function EditFOSCData() {
         <MainLayout>
             <div className="epc-header bg-default-bg2 m-4 mb-0 rounded-md rounded-b-none py-2 border-b border-b0">
                 <div className="border-r flex items-center">
-                    <p className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console</p>
+                    <p className="font-semibold lg:text-2xl pl-4"> Field Ops Scans Console</p>
                     <p className="ml-4 font-semibold text-secondary text-xl">EDIT</p>
                 </div>
 

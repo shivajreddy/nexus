@@ -44,6 +44,7 @@ import EditFOSCData from "@pages/department/teclab/Fosc/Views/EditFOSCData.tsx";
 import FOSCSummary from "@pages/department/teclab/Fosc/Views/FOSCSummary.tsx";
 import FOSCCurrent from "@pages/department/teclab/Fosc/Views/FOSCCurrent.tsx";
 import FOSCAll from "@pages/department/teclab/Fosc/Views/FOSCAll.tsx";
+import AddFOSCProject from "@pages/department/teclab/Fosc/Views/AddFOSCProject.tsx";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -83,11 +84,11 @@ const router = createBrowserRouter(
 
                     <Route path="fosc">
                         <Route index element={<Fosc/>}/>
-                        {/*<Route path="fosc2" element={<Epc2/>}/>*/}
                         <Route path="all-lots" element={<FOSCAll/>}/>
                         <Route path="summary" element={<FOSCSummary/>}/>
                         <Route path="current" element={<FOSCCurrent/>}/>
 
+                        <Route path="add" element={<AddFOSCProject/>}/>
                         <Route path="edit" element={<SearchAndUpdateFOSCData/>}/>
                         <Route path="edit/:project_uid" element={<EditFOSCData/>}/>
                     </Route>

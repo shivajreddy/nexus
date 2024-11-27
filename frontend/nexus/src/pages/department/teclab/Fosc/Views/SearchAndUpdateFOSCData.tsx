@@ -29,8 +29,8 @@ function SearchAndUpdateFOSCData() {
             <div className="border rounded bg-default-bg2 m-4 pb-2">
                 <div className="epc-header bg-default-bg2 rounded rounded-b-none py-2 border-b">
                     <div className="border-r flex items-center">
-                        <p className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console</p>
-                        <p className="ml-4 font-semibold text-primary text-xl">New Lot</p>
+                        <p className="font-semibold lg:text-2xl pl-4"> Field Ops Scans Console</p>
+                        <p className="ml-4 font-semibold text-primary text-xl">Search Lots</p>
                     </div>
 
                     <div className="flex mx-10 items-center">

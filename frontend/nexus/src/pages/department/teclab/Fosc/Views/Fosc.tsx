@@ -18,7 +18,7 @@ import {format} from "date-fns";
 import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
-import {MdModeEditOutline} from "react-icons/md";
+import {MdDownload, MdModeEditOutline} from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 import {ColDef, ColGroupDef, GridOptions} from "ag-grid-community";
 // import {useAppSelector} from "@redux/hooks.ts";
@@ -219,7 +219,7 @@ function Fosc() {
                                     className="min-w-[10em]"
                                     onClick={() => navigate('add')}>
 
-                                    <p className="pr-2"><MdModeEditOutline/></p>
+                                    <p className="pr-2"><MdDownload/></p>
                                     Add Project
                                 </Button>
                             </div>
