@@ -204,14 +204,29 @@ function Fosc() {
                     <div className="flex mx-10">
                         {hasRoles(userRoles, [102]) &&
                             <div className="flex justify-center items-center bg-default-bg1">
-                                <Button onClick={() => navigate('edit')} className="min-w-[10em]">
+                                <Button
+                                    className="min-w-[10em]"
+                                    onClick={() => navigate('edit')}>
+
                                     <p className="pr-2"><MdModeEditOutline/></p>
-                                    Search Lots
+                                    Search & Update
                                 </Button>
                             </div>
                         }
+                        {hasRoles(userRoles, [102]) &&
+                            <div className="flex justify-center items-center bg-default-bg1 mx-3">
+                                <Button
+                                    className="min-w-[10em]"
+                                    onClick={() => navigate('add')}>
 
-                        <FoscMenu/>
+                                    <p className="pr-2"><MdModeEditOutline/></p>
+                                    Add Project
+                                </Button>
+                            </div>
+                        }
+                        {hasRoles(userRoles, [213]) &&
+                            <FoscMenu/>
+                        }
                     </div>
                 </div>
                 <div className="epc-body">

@@ -21,7 +21,7 @@ interface Iprops {
 }
 
 
-const TECLabDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFOSCDataFetch, className}: Iprops) => {
+const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFOSCDataFetch, className}: Iprops) => {
 
     const [selectedProjectsTECLabFOSCData, setSelectedProjectsTECLabFOSCData] = useState<TECLabFOSCData>({
         // these are the fields of type text, and must be initiated as empty string
@@ -164,6 +164,7 @@ const TECLabDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatus
                     misc_report_status: lotData.fosc_data.misc_report_status,
                     foundation_needed: lotData.fosc_data.foundation_needed,
                     slab_needed: lotData.fosc_data.slab_needed,
+                    frame_needed: lotData.fosc_data.frame_needed,
                     mep_needed: lotData.fosc_data.mep_needed,
 
 
@@ -345,7 +346,8 @@ const TECLabDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatus
                                                  onUpdate={() => handleStateChange('foundation_uploaded', !selectedProjectsTECLabFOSCData.foundation_uploaded)}
                                     />
                                     <FieldToggle id="4_foundation_needed"
-                                                 name="Foundation Needed? "
+                                                 disabled
+                                                 name="Foundation Needed?"
                                                  isChecked={selectedProjectsTECLabFOSCData.foundation_needed}
                                                  onUpdate={() => handleStateChange('foundation_needed', !selectedProjectsTECLabFOSCData.foundation_needed)}
                                     />
@@ -398,6 +400,7 @@ const TECLabDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatus
                                                  onUpdate={() => handleStateChange('slab_uploaded', !selectedProjectsTECLabFOSCData.slab_uploaded)}
                                     />
                                     <FieldToggle id="4_slab_needed"
+                                                 disabled
                                                  name="Slab Needed?"
                                                  isChecked={selectedProjectsTECLabFOSCData.slab_needed}
                                                  onUpdate={() => handleStateChange('slab_needed', !selectedProjectsTECLabFOSCData.slab_needed)}
@@ -450,6 +453,12 @@ const TECLabDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatus
                                                  isChecked={selectedProjectsTECLabFOSCData.frame_uploaded}
                                                  onUpdate={() => handleStateChange('frame_uploaded', !selectedProjectsTECLabFOSCData.frame_uploaded)}
                                     />
+                                    <FieldToggle id="4_frame_needed"
+                                                 disabled
+                                                 name="Frame Needed?"
+                                                 isChecked={selectedProjectsTECLabFOSCData.frame_needed}
+                                                 onUpdate={() => handleStateChange('frame_needed', !selectedProjectsTECLabFOSCData.frame_needed)}
+                                    />
                                 </CardContent>
                             </Card>
 
@@ -498,6 +507,7 @@ const TECLabDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatus
                                                  onUpdate={() => handleStateChange('mep_uploaded', !selectedProjectsTECLabFOSCData.mep_uploaded)}
                                     />
                                     <FieldToggle id="4_mep_needed"
+                                                 disabled
                                                  name="MEP Needed?"
                                                  isChecked={selectedProjectsTECLabFOSCData.mep_needed}
                                                  onUpdate={() => handleStateChange('mep_needed', !selectedProjectsTECLabFOSCData.mep_needed)}
@@ -552,4 +562,4 @@ const TECLabDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatus
                     );
                 };
 
-                export default TECLabDataForm;
+                export default FOSCDataForm;

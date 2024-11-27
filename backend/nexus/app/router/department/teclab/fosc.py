@@ -511,10 +511,11 @@ def update_db():
                                     # 'teclab_data.fosc_data.misc_scan_status': None,
                                     # 'teclab_data.fosc_data.misc_report_status': None,
                                     # 'teclab_data.fosc_data.notes': None,
-
-                                    'teclab_data.fosc_data.foundation_needed': True,
-                                    'teclab_data.fosc_data.slab_needed': True,
-                                    'teclab_data.fosc_data.mep_needed': True,
+                                    #
+                                    # 'teclab_data.fosc_data.foundation_needed': True,
+                                    # 'teclab_data.fosc_data.slab_needed': True,
+                                    'teclab_data.fosc_data.frame_needed': True,
+                                    # 'teclab_data.fosc_data.mep_needed': False,
 
                                 }})
     res = projects_coll.find()

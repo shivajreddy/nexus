@@ -101,7 +101,7 @@ class FOSCData(BaseModel):
     foundation_reporter: Optional[str] = None
     foundation_report_date: Optional[datetime] = None
     foundation_uploaded: Optional[bool] = None
-    foundation_needed: Optional[bool] = None
+    foundation_needed: Optional[bool] = True
 
     # Slab
     slab_scan_status: Optional[bool] = None
@@ -111,7 +111,7 @@ class FOSCData(BaseModel):
     slab_reporter: Optional[str] = None
     slab_report_date: Optional[datetime] = None
     slab_uploaded: Optional[bool] = None
-    slab_needed: Optional[bool] = None
+    slab_needed: Optional[bool] = True
 
     # Frame
     frame_scan_status: Optional[bool] = None
@@ -121,6 +121,7 @@ class FOSCData(BaseModel):
     frame_reporter: Optional[str] = None
     frame_report_date: Optional[datetime] = None
     frame_uploaded: Optional[bool] = None
+    frame_needed: Optional[bool] = True
 
     # MEP
     mep_scan_status: Optional[bool] = None
@@ -130,7 +131,7 @@ class FOSCData(BaseModel):
     mep_reporter: Optional[str] = None
     mep_report_date: Optional[datetime] = None
     mep_uploaded: Optional[bool] = None
-    mep_needed: Optional[bool] = None
+    mep_needed: Optional[bool] = True
 
     # Misc (warranty, extra)
     misc_scan_status: Optional[bool] = None

@@ -59,6 +59,7 @@ type TECLabFOSCData = {
     misc_report_status?: boolean;
     foundation_needed?: boolean;
     slab_needed?: boolean;
+    frame_needed?: boolean;
     mep_needed?: boolean;
 
     // Notes
