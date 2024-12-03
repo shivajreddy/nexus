@@ -106,6 +106,10 @@ const columnDefinitionsData = [
         children: [
             {headerName: 'Scanned', field: 'misc_scan_status'},
             {headerName: 'Reported', field: 'misc_report_status'},
+            {headerName: 'Foundation Needs', field: 'foundation_needed'},
+            {headerName: 'Slab Needs', field: 'slab_needed'},
+            {headerName: 'Frame Needs', field: 'frame_needed'},
+            {headerName: 'MEP Needs', field: 'mep_needed'},
         ],
     },
     {
@@ -204,6 +208,10 @@ function FOSCAll() {
 
                     warranty_scan_status: item.warranty_scan_status,
                     warranty_report_status: item.warranty_report_status,
+                    foundation_needed: item.foundation_needed,
+                    slab_needed: item.slab_needed,
+                    frame_needed: item.frame_needed,
+                    mep_needed: item.mep_needed,
 
                     notes: item.notes,
                 }));

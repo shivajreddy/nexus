@@ -242,20 +242,6 @@ def get_fosc_data_with_project_uid(project_uid: str):
 
 
 # """
-# Updates the director for each community change its changed
-def update_community_directors(new_data: str, other_communty: str):
-    try:
-        for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
-            if doc["project_info"]["community"] == other_communty:
-                projects_coll.update_many(
-                    {"project_info.project_uid": doc["project_info"]["project_uid"]},
-                    {"$set": {"teclab_data.fosc_data.assigned_director": new_data}}
-                )
-    except Exception as e:
-        print("error: ", e)
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-
-
 # Updating project data
 @router.post('/edit', dependencies=[Depends(get_current_user_data)])
 def update_teclab_data_for_project(new_data: UpdateFOSCData):
@@ -422,21 +408,23 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
         csv_writer.writerow([
             "Community", "Section", "Lot", "PM", "Director",
 
-            "Foundation Scanned", "Date", "Scanner",
-            "Slab Scanned", "Date", "Scanner",
-            "Frame Scanned", "Date", "Scanner",
-            "MEP Scanned", "Date", "Scanner",
+            "Foundation Scanned", "Foundation S-Date", "Foundation Scanner",
+            "Slab Scanned", "Slab S-Date", "Slab Scanner",
+            "Frame Scanned", "Frame S-Date", "Frame Scanner",
+            "MEP Scanned", "MEP S-Date", "MEP Scanner",
 
-            "Foundation Reported", "Date", "Reporter",
-            "Slab Reported", "Date", "Reporter",
-            "Frame Reported", "Date", "Reporter",
-            "MEP Reported", "Date", "Reporter",
+            "Foundation Reported", "Foundation R-Date", "Foundation Reporter",
+            "Slab Reported", "Slab R-Date", "Slab Reporter",
+            "Frame Reported", "Frame R-Date", "Frame Reporter",
+            "MEP Reported", "MEP R-Date", "MEP Reporter",
+
+            "Foundation Needed", "Slab Needed", "Frame Needed", "MEP Needed",
         ])
         for j in result_data:
             row = [
                 j.get("community"),
                 j.get("section_number"),
-                j.get("lot_number"),
+                "'"+j.get("lot_number"),
                 j.get("assigned_pm"),
                 j.get("assigned_director"),
 
@@ -449,6 +437,8 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
                 j.get("slab_report_status"), format_date(j.get("slab_report_date")), j.get("slab_reporter"),
                 j.get("frame_report_status"), format_date(j.get("frame_report_date")), j.get("frame_reporter"),
                 j.get("mep_report_status"), format_date(j.get("mep_report_date")), j.get("mep_reporter"),
+
+                j.get("foundation_needed"), j.get("slab_needed"), j.get("frame_needed"), j.get("mep_needed")
             ]
             csv_writer.writerow(row)
 
@@ -463,6 +453,240 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 
 
 # """
+# Updates the director for each community change its changed
+def update_community_directors(new_data: str, other_communty: str):
+    try:
+        for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
+            if doc["project_info"]["community"] == other_communty and\
+                    doc["teclab_data"]["fosc_data"]["assigned_director"] != new_data:
+
+                projects_coll.update_many(
+                    {"project_info.project_uid": doc["project_info"]["project_uid"]},
+                    {"$set": {"teclab_data.fosc_data.assigned_director": new_data}}
+                )
+    except Exception as e:
+        print("error: ", e)
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
+
+def update_project_fosc_data(new_data: list, header: list):
+    new_data[2] = new_data[2][1:]
+    this_project = projects_coll.find_one({
+        "project_info.community": new_data[0],
+        "project_info.section": new_data[1],
+        "project_info.lot_number": new_data[2]
+    })
+    if this_project is None:
+        raise ValueError(f"No project found for the given data: {new_data}")
+    del new_data[:3]
+
+    # print(this_project["project_info"])
+    try:
+        for count, i in enumerate(new_data):
+            if i != "":
+                # print("valid data: ", new_data[count], "header: ", header[count])
+                if header[count] == "PM":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.assigned_pm": new_data[count].strip()}})
+                #     Foundation Scans
+                elif header[count] == "Foundation Scanned":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.foundation_scan_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.foundation_scan_status": False}})
+                elif header[count] == "Foundation S-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.foundation_scan_date": new_data[count].strip()}})
+                elif header[count] == "Foundation Scanner":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.foundation_scanner": new_data[count].strip()}})
+                #     Slab Scans
+                elif header[count] == "Slab Scanned":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.slab_scan_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.slab_scan_status": False}})
+                elif header[count] == "Slab S-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.slab_scan_date": new_data[count].strip()}})
+                elif header[count] == "Slab Scanner":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.slab_scanner": new_data[count].strip()}})
+                #     Frame Scans
+                elif header[count] == "Frame Scanned":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.frame_scan_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.frame_scan_status": False}})
+                elif header[count] == "Frame S-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.frame_scan_date": new_data[count].strip()}})
+                elif header[count] == "Frame Scanner":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.frame_scanner": new_data[count].strip()}})
+                #     MEP Scans
+                elif header[count] == "MEP Scanned":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.mep_scan_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.mep_scan_status": False}})
+                elif header[count] == "MEP S-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.mep_scan_date": new_data[count].strip()}})
+                elif header[count] == "MEP Scanner":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.mep_scanner": new_data[count].strip()}})
+
+                #     Foundation Reports
+                elif header[count] == "Foundation Reported":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.foundation_report_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.foundation_report_status": False}})
+                elif header[count] == "Foundation R-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.foundation_report_date": new_data[count].strip()}})
+                elif header[count] == "Foundation Reporter":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.foundation_reporter": new_data[count].strip()}})
+                #     Slab Reports
+                elif header[count] == "Slab Reported":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.slab_report_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.slab_report_status": False}})
+                elif header[count] == "Slab R-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.slab_report_date": new_data[count].strip()}})
+                elif header[count] == "Slab Reporter":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.slab_reporter": new_data[count].strip()}})
+                #     Frame Reports
+                elif header[count] == "Frame Reported":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.frame_report_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.frame_report_status": False}})
+                elif header[count] == "Frame R-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.frame_report_date": new_data[count].strip()}})
+                elif header[count] == "Frame Reporter":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.frame_reporter": new_data[count].strip()}})
+                #     MEP Reports
+                elif header[count] == "MEP Reported":
+                    if new_data[count] == "TRUE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.mep_report_status": True}})
+                    elif new_data[count] == "FALSE":
+                        projects_coll.update_one(
+                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                            {"$set": {"teclab_data.fosc_data.mep_report_status": False}})
+                elif header[count] == "MEP R-Date":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.mep_report_date": new_data[count].strip()}})
+                elif header[count] == "MEP Reporter":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.mep_reporter": new_data[count].strip()}})
+
+                #     Needed Status
+                elif header[count] == "Foundation Needed":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.foundation_needed": new_data[count].strip()}})
+                elif header[count] == "Slab Needed":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.slab_needed": new_data[count].strip()}})
+                elif header[count] == "Frame Needed":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.frame-needed": new_data[count].strip()}})
+                elif header[count] == "MEP Needed":
+                    projects_coll.update_one(
+                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                        {"$set": {"teclab_data.fosc_data.mep_needed": new_data[count].strip()}})
+
+
+    except Exception as e:
+        print("error: ", e)
+        print("lot: ", new_data)
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
+
+# Used to import data from a csv file to update the db
+@router.get('/csv-upload')
+def csv_upload():
+    csv_file_path = "./app/files/input\csv-upload.csv"
+    with open(csv_file_path, mode='r', newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file)
+        header = next(csv_reader)
+
+        if header[1] == "Director":
+            print("Director csv")
+            for row in csv_reader:
+                update_community_directors(row[1], row[0])
+
+            return "Updated all Directors to given CSV file."
+        elif header[1] == "Section":
+            print("All Lots csv")
+            del header[:3]
+            for row in csv_reader:
+                update_project_fosc_data(row, header)
+
+            return "Updated ALL-LOTS to given CSV file."
+
+        else:
+            raise HTTPException(status_code=422, detail=f"Unprocessable entity")
+
+
+# """
 # Used to update the database for needed changes
 @router.get('/update-db')
 def update_db():
@@ -471,51 +695,51 @@ def update_db():
                                 # $set $unset
                                 {'$set': {
 
-                                    # 'teclab_data.fosc_data.lot_status_started': True,
+                                    # 'teclab_data.fosc_data.lot_status_started': False,
                                     # 'teclab_data.fosc_data.lot_status_finished': False,
-                                    # 'teclab_data.fosc_data.assigned_pm': None,
+                                    'teclab_data.fosc_data.assigned_pm': None,
                                     # 'teclab_data.fosc_data.assigned_director': None,
                                     #
-                                    # 'teclab_data.fosc_data.foundation_scan_status': None,
-                                    # 'teclab_data.fosc_data.foundation_scanner': None,
-                                    # 'teclab_data.fosc_data.foundation_scan_date': None,
-                                    # 'teclab_data.fosc_data.foundation_report_status': None,
-                                    # 'teclab_data.fosc_data.foundation_reporter': None,
-                                    # 'teclab_data.fosc_data.foundation_report_date': None,
-                                    # 'teclab_data.fosc_data.foundation_uploaded': None,
-                                    #
-                                    # 'teclab_data.fosc_data.slab_scan_status': None,
-                                    # 'teclab_data.fosc_data.slab_scanner': None,
-                                    # 'teclab_data.fosc_data.slab_scan_date': None,
-                                    # 'teclab_data.fosc_data.slab_report_status': None,
-                                    # 'teclab_data.fosc_data.slab_reporter': None,
-                                    # 'teclab_data.fosc_data.slab_report_date': None,
-                                    # 'teclab_data.fosc_data.slab_uploaded': None,
-                                    #
-                                    # 'teclab_data.fosc_data.frame_scan_status': None,
-                                    # 'teclab_data.fosc_data.frame_scanner': None,
-                                    # 'teclab_data.fosc_data.frame_scan_date': None,
-                                    # 'teclab_data.fosc_data.frame_report_status': None,
-                                    # 'teclab_data.fosc_data.frame_reporter': None,
-                                    # 'teclab_data.fosc_data.frame_report_date': None,
-                                    # 'teclab_data.fosc_data.frame_uploaded': None,
-                                    #
-                                    # 'teclab_data.fosc_data.mep_scan_status': None,
-                                    # 'teclab_data.fosc_data.mep_scanner': None,
-                                    # 'teclab_data.fosc_data.mep_scan_date': None,
-                                    # 'teclab_data.fosc_data.mep_report_status': None,
-                                    # 'teclab_data.fosc_data.mep_reporter': None,
-                                    # 'teclab_data.fosc_data.mep_report_date': None,
-                                    # 'teclab_data.fosc_data.mep_uploaded': None,
+                                    'teclab_data.fosc_data.foundation_scan_status': None,
+                                    'teclab_data.fosc_data.foundation_scanner': None,
+                                    'teclab_data.fosc_data.foundation_scan_date': None,
+                                    'teclab_data.fosc_data.foundation_report_status': None,
+                                    'teclab_data.fosc_data.foundation_reporter': None,
+                                    'teclab_data.fosc_data.foundation_report_date': None,
+                                    'teclab_data.fosc_data.foundation_uploaded': None,
+
+                                    'teclab_data.fosc_data.slab_scan_status': None,
+                                    'teclab_data.fosc_data.slab_scanner': None,
+                                    'teclab_data.fosc_data.slab_scan_date': None,
+                                    'teclab_data.fosc_data.slab_report_status': None,
+                                    'teclab_data.fosc_data.slab_reporter': None,
+                                    'teclab_data.fosc_data.slab_report_date': None,
+                                    'teclab_data.fosc_data.slab_uploaded': None,
+
+                                    'teclab_data.fosc_data.frame_scan_status': None,
+                                    'teclab_data.fosc_data.frame_scanner': None,
+                                    'teclab_data.fosc_data.frame_scan_date': None,
+                                    'teclab_data.fosc_data.frame_report_status': None,
+                                    'teclab_data.fosc_data.frame_reporter': None,
+                                    'teclab_data.fosc_data.frame_report_date': None,
+                                    'teclab_data.fosc_data.frame_uploaded': None,
+
+                                    'teclab_data.fosc_data.mep_scan_status': None,
+                                    'teclab_data.fosc_data.mep_scanner': None,
+                                    'teclab_data.fosc_data.mep_scan_date': None,
+                                    'teclab_data.fosc_data.mep_report_status': None,
+                                    'teclab_data.fosc_data.mep_reporter': None,
+                                    'teclab_data.fosc_data.mep_report_date': None,
+                                    'teclab_data.fosc_data.mep_uploaded': None,
                                     #
                                     # 'teclab_data.fosc_data.misc_scan_status': None,
                                     # 'teclab_data.fosc_data.misc_report_status': None,
                                     # 'teclab_data.fosc_data.notes': None,
                                     #
-                                    # 'teclab_data.fosc_data.foundation_needed': True,
-                                    # 'teclab_data.fosc_data.slab_needed': True,
+                                    'teclab_data.fosc_data.foundation_needed': True,
+                                    'teclab_data.fosc_data.slab_needed': True,
                                     'teclab_data.fosc_data.frame_needed': True,
-                                    # 'teclab_data.fosc_data.mep_needed': False,
+                                    'teclab_data.fosc_data.mep_needed': False,
 
                                 }})
     res = projects_coll.find()
