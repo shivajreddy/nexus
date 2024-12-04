@@ -482,176 +482,61 @@ def update_project_fosc_data(new_data: list, header: list):
 
     # print(this_project["project_info"])
     try:
+        csv_map = {
+            "PM": "teclab_data.fosc_data.assigned_pm",
+            "Foundation Scanned": "teclab_data.fosc_data.foundation_scan_status",
+            "Foundation S-Date": "teclab_data.fosc_data.foundation_scan_date",
+            "Foundation Scanner": "teclab_data.fosc_data.foundation_scanner",
+            "Slab Scanned": "teclab_data.fosc_data.slab_scan_status",
+            "Slab S-Date": "teclab_data.fosc_data.slab_scan_date",
+            "Slab Scanner": "teclab_data.fosc_data.slab_scanner",
+            "Frame Scanned": "teclab_data.fosc_data.frame_scan_status",
+            "Frame S-Date": "teclab_data.fosc_data.frame_scan_date",
+            "Frame Scanner": "teclab_data.fosc_data.frame_scanner",
+            "MEP Scanned": "teclab_data.fosc_data.mep_scan_status",
+            "MEP S-Date": "teclab_data.fosc_data.mep_scan_date",
+            "MEP Scanner": "teclab_data.fosc_data.mep_scanner",
+            "Foundation Reported": "teclab_data.fosc_data.foundation_report_status",
+            "Foundation R-Date": "teclab_data.fosc_data.foundation_report_date",
+            "Foundation Reporter": "teclab_data.fosc_data.foundation_reporter",
+            "Slab Reported": "teclab_data.fosc_data.slab_report_status",
+            "Slab R-Date": "teclab_data.fosc_data.slab_report_date",
+            "Slab Reporter": "teclab_data.fosc_data.slab_reporter",
+            "Frame Reported": "teclab_data.fosc_data.frame_report_status",
+            "Frame R-Date": "teclab_data.fosc_data.frame_report_date",
+            "Frame Reporter": "teclab_data.fosc_data.frame_reporter",
+            "MEP Reported": "teclab_data.fosc_data.mep_report_status",
+            "MEP R-Date": "teclab_data.fosc_data.mep_report_date",
+            "MEP Reporter": "teclab_data.fosc_data.mep_reporter",
+            "Foundation Needed": "teclab_data.fosc_data.foundation_needed",
+            "Slab Needed": "teclab_data.fosc_data.slab_needed",
+            "Frame Needed": "teclab_data.fosc_data.frame_needed",
+            "MEP Needed": "teclab_data.fosc_data.mep_needed",
+        }
+
+        # Function to perform the update
+        def update_field(update_type, update):
+            projects_coll.update_one(
+                {"project_info.project_uid": this_project["project_info"]["project_uid"]},
+                {"$set": {update_type: update}}
+            )
+
+        print(">", this_project["project_info"]["project_id"])
+
         for count, i in enumerate(new_data):
-            if i != "":
-                # print("valid data: ", new_data[count], "header: ", header[count])
-                if header[count] == "PM":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.assigned_pm": new_data[count].strip()}})
-                #     Foundation Scans
-                elif header[count] == "Foundation Scanned":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.foundation_scan_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.foundation_scan_status": False}})
-                elif header[count] == "Foundation S-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.foundation_scan_date": new_data[count].strip()}})
-                elif header[count] == "Foundation Scanner":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.foundation_scanner": new_data[count].strip()}})
-                #     Slab Scans
-                elif header[count] == "Slab Scanned":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.slab_scan_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.slab_scan_status": False}})
-                elif header[count] == "Slab S-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.slab_scan_date": new_data[count].strip()}})
-                elif header[count] == "Slab Scanner":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.slab_scanner": new_data[count].strip()}})
-                #     Frame Scans
-                elif header[count] == "Frame Scanned":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.frame_scan_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.frame_scan_status": False}})
-                elif header[count] == "Frame S-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.frame_scan_date": new_data[count].strip()}})
-                elif header[count] == "Frame Scanner":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.frame_scanner": new_data[count].strip()}})
-                #     MEP Scans
-                elif header[count] == "MEP Scanned":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.mep_scan_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.mep_scan_status": False}})
-                elif header[count] == "MEP S-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.mep_scan_date": new_data[count].strip()}})
-                elif header[count] == "MEP Scanner":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.mep_scanner": new_data[count].strip()}})
+            if i.strip():
+                update_type = csv_map.get(header[count])
+                test = this_project["teclab_data"]["fosc_data"][update_type.rsplit(".", 1)[-1]]
 
-                #     Foundation Reports
-                elif header[count] == "Foundation Reported":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.foundation_report_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.foundation_report_status": False}})
-                elif header[count] == "Foundation R-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.foundation_report_date": new_data[count].strip()}})
-                elif header[count] == "Foundation Reporter":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.foundation_reporter": new_data[count].strip()}})
-                #     Slab Reports
-                elif header[count] == "Slab Reported":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.slab_report_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.slab_report_status": False}})
-                elif header[count] == "Slab R-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.slab_report_date": new_data[count].strip()}})
-                elif header[count] == "Slab Reporter":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.slab_reporter": new_data[count].strip()}})
-                #     Frame Reports
-                elif header[count] == "Frame Reported":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.frame_report_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.frame_report_status": False}})
-                elif header[count] == "Frame R-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.frame_report_date": new_data[count].strip()}})
-                elif header[count] == "Frame Reporter":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.frame_reporter": new_data[count].strip()}})
-                #     MEP Reports
-                elif header[count] == "MEP Reported":
-                    if new_data[count] == "TRUE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.mep_report_status": True}})
-                    elif new_data[count] == "FALSE":
-                        projects_coll.update_one(
-                            {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                            {"$set": {"teclab_data.fosc_data.mep_report_status": False}})
-                elif header[count] == "MEP R-Date":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.mep_report_date": new_data[count].strip()}})
-                elif header[count] == "MEP Reporter":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.mep_reporter": new_data[count].strip()}})
-
-                #     Needed Status
-                elif header[count] == "Foundation Needed":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.foundation_needed": new_data[count].strip()}})
-                elif header[count] == "Slab Needed":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.slab_needed": new_data[count].strip()}})
-                elif header[count] == "Frame Needed":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.frame-needed": new_data[count].strip()}})
-                elif header[count] == "MEP Needed":
-                    projects_coll.update_one(
-                        {"project_info.project_uid": this_project["project_info"]["project_uid"]},
-                        {"$set": {"teclab_data.fosc_data.mep_needed": new_data[count].strip()}})
+                if update_type:
+                    if i.strip() == test or i.strip()[0].upper() + i.strip()[1:].lower() == test:
+                        print(update_type.rsplit(".", 1)[-1], "Not Changed")
+                    elif i.upper() == "TRUE":
+                        update_field(update_type, True)
+                    elif i.upper() == "FALSE":
+                        update_field(update_type, False)
+                    else:
+                        update_field(update_type, i.strip())
 
 
     except Exception as e:
