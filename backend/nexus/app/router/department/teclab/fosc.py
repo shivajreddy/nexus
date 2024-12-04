@@ -131,6 +131,53 @@ def get_all_lots():
 
 
 # """
+# Updating project data when given a specific project UID
+@router.get(
+    path='/get/{project_uid}',
+    # response_model=
+    dependencies=[Depends(get_current_user_data)])
+def get_fosc_data_with_project_uid(project_uid: str):
+    target_project = find_project(project_uid)
+
+    result_project = {
+        "project_info": target_project["project_info"],
+        "fosc_data": target_project["teclab_data"]["fosc_data"]
+    }
+    return result_project
+
+# """
+
+
+# """
+# Updating project data
+@router.post('/edit', dependencies=[Depends(get_current_user_data)])
+def update_teclab_data_for_project(new_data: UpdateFOSCData):
+    # print("given new_data", new_data)
+    # Check if the project exists
+    existing_project = projects_coll.find_one({"project_info.project_uid": new_data.project_uid})
+
+    if not existing_project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"{new_data.project_uid} doesn't exist in Projects"
+        )
+
+    if new_data.fosc_data.assigned_director != existing_project["teclab_data"]["fosc_data"]["assigned_director"]:
+        # print(existing_project["teclab_data"]["fosc_data"]["assigned_director"])
+        # print(new_data.fosc_data.assigned_director)
+        update_community_directors(new_data.fosc_data.assigned_director, existing_project["project_info"]["community"])
+    # Update the project in the database
+    projects_coll.update_one(
+        {"project_info.project_uid": new_data.project_uid},
+        {"$set": {"teclab_data.fosc_data": new_data.fosc_data.model_dump()}}
+    )
+
+    return {"message": f"Project {new_data.project_uid} updated successfully"}
+
+# """
+
+
+# """
 def communities_logic():
     result_data = {}
     for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
@@ -221,54 +268,6 @@ def get_all_communities():
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 # """
-
-
-# """
-# Updating project data when given a specific project UID
-@router.get(
-    path='/get/{project_uid}',
-    # response_model=
-    dependencies=[Depends(get_current_user_data)])
-def get_fosc_data_with_project_uid(project_uid: str):
-    target_project = find_project(project_uid)
-
-    result_project = {
-        "project_info": target_project["project_info"],
-        "fosc_data": target_project["teclab_data"]["fosc_data"]
-    }
-    return result_project
-
-# """
-
-
-# """
-# Updating project data
-@router.post('/edit', dependencies=[Depends(get_current_user_data)])
-def update_teclab_data_for_project(new_data: UpdateFOSCData):
-    # print("given new_data", new_data)
-    # Check if the project exists
-    existing_project = projects_coll.find_one({"project_info.project_uid": new_data.project_uid})
-
-    if not existing_project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"{new_data.project_uid} doesn't exist in Projects"
-        )
-
-    if new_data.fosc_data.assigned_director != existing_project["teclab_data"]["fosc_data"]["assigned_director"]:
-        # print(existing_project["teclab_data"]["fosc_data"]["assigned_director"])
-        # print(new_data.fosc_data.assigned_director)
-        update_community_directors(new_data.fosc_data.assigned_director, existing_project["project_info"]["community"])
-    # Update the project in the database
-    projects_coll.update_one(
-        {"project_info.project_uid": new_data.project_uid},
-        {"$set": {"teclab_data.fosc_data": new_data.fosc_data.model_dump()}}
-    )
-
-    return {"message": f"Project {new_data.project_uid} updated successfully"}
-
-# """
-
 
 # """
 # :: Feature: email FOSC data
@@ -454,10 +453,10 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 
 # """
 # Updates the director for each community change its changed
-def update_community_directors(new_data: str, other_communty: str):
+def update_community_directors(new_data: str, community: str):
     try:
-        for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
-            if doc["project_info"]["community"] == other_communty and\
+        for doc in projects_coll.find({"project_info.community": community}).sort("project_info.meta_info.created_at", -1):
+            if not doc["teclab_data"]["fosc_data"]["lot_status_finished"] and\
                     doc["teclab_data"]["fosc_data"]["assigned_director"] != new_data:
 
                 projects_coll.update_many(

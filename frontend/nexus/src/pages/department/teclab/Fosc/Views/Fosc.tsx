@@ -202,7 +202,7 @@ function Fosc() {
                         }
                     </div>
                     <div className="flex mx-10">
-                        {hasRoles(userRoles, [102]) &&
+                        {hasRoles(userRoles, [103]) &&
                             <div className="flex justify-center items-center bg-default-bg1">
                                 <Button
                                     className="min-w-[10em]"
@@ -213,7 +213,7 @@ function Fosc() {
                                 </Button>
                             </div>
                         }
-                        {hasRoles(userRoles, [102]) &&
+                        {hasRoles(userRoles, [203]) &&
                             <div className="flex justify-center items-center bg-default-bg1 mx-3">
                                 <Button
                                     className="min-w-[10em]"
@@ -224,7 +224,7 @@ function Fosc() {
                                 </Button>
                             </div>
                         }
-                        {hasRoles(userRoles, [213]) &&
+                        {hasRoles(userRoles, [103]) &&
                             <FoscMenu/>
                         }
                     </div>
