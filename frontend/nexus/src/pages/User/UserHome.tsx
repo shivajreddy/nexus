@@ -6,6 +6,7 @@ import {Label} from "@/components/ui/label";
 // import UserPlaceholderDp from '@images/user/placeholder-dp.png'
 
 import "@assets/pages/User/userhome.css";
+
 // import ThemeToggle from "@/features/themes/ThemeToggle.tsx";
 import {removeAuthState, selectCurrentUser} from "@/features/auth/authSlice";
 import {useAppDispatch, useAppSelector} from "@/redux/hooks";
@@ -52,7 +53,7 @@ function UserHome() {
                             <div className="grid w-full items-center gap-4">
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="first_name">First Name</Label>
-                                    <Input id="first_name" disabled type="text"
+                                    <Input id="last_name" disabled type="text"
                                            defaultValue={user?.user_info.first_name}/>
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
@@ -64,17 +65,6 @@ function UserHome() {
                                     <Label htmlFor="job-title">Title</Label>
                                     <Input id="job-title" type="text" disabled
                                            defaultValue={user?.user_info.job_title}/>
-                                </div>
-                                {/*used to show the department of the current user*/}
-                                <div className="flex flex-col space-y-1.5">
-                                    <Label htmlFor="department">Department</Label>
-                                    <Input id="department" type="text" disabled
-                                           defaultValue={user?.user_info.department}/>
-                                </div>
-                                <div className="flex flex-col space-y-1.5">
-                                    <Label htmlFor="Teams">Team(s)</Label>
-                                    <Input id="teams" type="text" disabled
-                                           defaultValue={user?.user_info.teams}/>
                                 </div>
                             </div>
                         </CardContent>

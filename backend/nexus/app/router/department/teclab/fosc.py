@@ -1,6 +1,6 @@
 import csv
 import os
-from datetime import datetime
+from datetime import datetime, date
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import List, Annotated, Dict, Optional
@@ -81,20 +81,41 @@ def get_current_lots():
                 frame_status = doc["teclab_data"]["fosc_data"]["frame_report_status"]
                 mep_status = doc["teclab_data"]["fosc_data"]["mep_report_status"]
 
-                if foundation_date is not None:
-                    beforeTime = datetime.now() - timedelta(days=14)
-                    afterTime = datetime.now() + timedelta(days=21)
+                date_format = "%m/%d/%Y"
 
+                def parse_date(date_str):
+                    if date_str is not None and isinstance(date_str, str):
+                        return datetime.strptime(date_str, date_format)
+                    return date_str
+
+                foundation_date = parse_date(foundation_date)
+                slab_date = parse_date(slab_date)
+                frame_date = parse_date(frame_date)
+                mep_date = parse_date(mep_date)
+
+                beforeTime = datetime.now() - timedelta(days=14)
+                afterTime = datetime.now() + timedelta(days=21)
+
+                beforeTime_str = beforeTime.strftime("%m/%d/%Y")
+                afterTime_str = afterTime.strftime("%m/%d/%Y")
+
+                if foundation_date is not None:
                     if beforeTime <= foundation_date <= afterTime and not foundation_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
-                    elif beforeTime <= slab_date <= afterTime and not slab_status:
+
+                if slab_date is not None:
+                    if beforeTime <= slab_date <= afterTime and not slab_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
-                    elif beforeTime <= frame_date <= afterTime and not frame_status:
+
+                if frame_date is not None:
+                    if beforeTime <= frame_date <= afterTime and not frame_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
-                    elif beforeTime <= mep_date <= afterTime and not mep_status:
+
+                if mep_date is not None:
+                    if beforeTime <= mep_date <= afterTime and not mep_status:
                         final_object.update(project["teclab_data"]["fosc_data"])
                         result.append(final_object)
 
@@ -163,9 +184,8 @@ def update_teclab_data_for_project(new_data: UpdateFOSCData):
         )
 
     if new_data.fosc_data.assigned_director != existing_project["teclab_data"]["fosc_data"]["assigned_director"]:
-        # print(existing_project["teclab_data"]["fosc_data"]["assigned_director"])
-        # print(new_data.fosc_data.assigned_director)
         update_community_directors(new_data.fosc_data.assigned_director, existing_project["project_info"]["community"])
+
     # Update the project in the database
     projects_coll.update_one(
         {"project_info.project_uid": new_data.project_uid},
@@ -315,7 +335,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
     result_data = communities_logic()
 
     # create the csv file
-    today_date = datetime.now().strftime("%d-%m-%y")
+    today_date = datetime.now().strftime("%m-%d-%Y")
     csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsSummaryTracker.csv")
     print("filename=", csv_filename)
     with open(csv_filename, 'w', newline='') as csvfile:
@@ -348,7 +368,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
     result_data = get_live_lots()
 
     # create the csv file
-    today_date = datetime.now().strftime("%d-%m-%y")
+    today_date = datetime.now().strftime("%m-%d-%Y")
     csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsLiveTracker.csv")
     print("filename=", csv_filename)
     with open(csv_filename, 'w', newline='') as csvfile:
@@ -399,7 +419,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
     result_data = get_all_lots()
 
     # create the csv file
-    today_date = datetime.now().strftime("%d-%m-%y")
+    today_date = datetime.now().strftime("%m-%d-%Y")
     csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsAllTracker.csv")
     print("filename=", csv_filename)
     with open(csv_filename, 'w', newline='') as csvfile:
@@ -511,6 +531,8 @@ def update_project_fosc_data(new_data: list, header: list):
             "Slab Needed": "teclab_data.fosc_data.slab_needed",
             "Frame Needed": "teclab_data.fosc_data.frame_needed",
             "MEP Needed": "teclab_data.fosc_data.mep_needed",
+            "Lot Started": "teclab_data.fosc_data.lot_status_started",
+            "Lot Finished": "teclab_data.fosc_data.lot_status_finished"
         }
 
         # Function to perform the update
