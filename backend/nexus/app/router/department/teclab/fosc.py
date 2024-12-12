@@ -199,77 +199,97 @@ def update_teclab_data_for_project(new_data: UpdateFOSCData):
 
 # """
 def communities_logic():
-    result_data = {}
-    for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
-        p_community = doc["project_info"]["community"]
-        # if community hasn't been added, other checks can be done here if needed
-        """
-            format of the each item
-                "community_name": (s/r_foundation, s/r_slab, s/r_frame, s/r_mep, total, finished)
+    try:
+        result_data = {}
+        total_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
+            p_community = doc["project_info"]["community"]
+            # if community hasn't been added, other checks can be done here if needed
             """
-        if p_community not in result_data:
-            result_data[p_community] = [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0 ,0]
+                format of the each item
+                    "community_name": (s/r_foundation, s/r_slab, s/r_frame, s/r_mep, total, finished)
+                """
+            if p_community not in result_data:
+                result_data[p_community] = [0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,]
+                                            # 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-        # creates a Dict with the required information for the summary
-        final_object = {
-            "community": p_community,
-            "s_foundation": doc["teclab_data"]["fosc_data"]["foundation_scan_status"],
-            "r_foundation": doc["teclab_data"]["fosc_data"]["foundation_report_status"],
-            "s_slab": doc["teclab_data"]["fosc_data"]["slab_scan_status"],
-            "r_slab": doc["teclab_data"]["fosc_data"]["slab_report_status"],
-            "s_frame": doc["teclab_data"]["fosc_data"]["frame_scan_status"],
-            "r_frame": doc["teclab_data"]["fosc_data"]["frame_report_status"],
-            "s_mep": doc["teclab_data"]["fosc_data"]["mep_scan_status"],
-            "r_mep": doc["teclab_data"]["fosc_data"]["mep_report_status"],
-            "finished": doc["teclab_data"]["fosc_data"]["lot_status_finished"],
-            "f_needed": doc["teclab_data"]["fosc_data"]["foundation_needed"],
-            "s_needed": doc["teclab_data"]["fosc_data"]["slab_needed"],
-            "m_needed": doc["teclab_data"]["fosc_data"]["mep_needed"]
-        }
 
-        # if the community was correctly put into result_data increment the list for the corresponding value
-        if final_object["community"] in result_data:
+            # creates a Dict with the required information for the summary
+            final_object = {
+                "community": p_community,
+                "s_foundation": doc["teclab_data"]["fosc_data"]["foundation_scan_status"],
+                "r_foundation": doc["teclab_data"]["fosc_data"]["foundation_report_status"],
+                "s_slab": doc["teclab_data"]["fosc_data"]["slab_scan_status"],
+                "r_slab": doc["teclab_data"]["fosc_data"]["slab_report_status"],
+                "s_frame": doc["teclab_data"]["fosc_data"]["frame_scan_status"],
+                "r_frame": doc["teclab_data"]["fosc_data"]["frame_report_status"],
+                "s_mep": doc["teclab_data"]["fosc_data"]["mep_scan_status"],
+                "r_mep": doc["teclab_data"]["fosc_data"]["mep_report_status"],
+                "finished": doc["teclab_data"]["fosc_data"]["lot_status_finished"],
+                "f_needed": doc["teclab_data"]["fosc_data"]["foundation_needed"],
+                "s_needed": doc["teclab_data"]["fosc_data"]["slab_needed"],
+                "m_needed": doc["teclab_data"]["fosc_data"]["mep_needed"]
+            }
 
-            if final_object["r_foundation"]:
-                result_data[p_community][1] += 1
-                result_data[p_community][0] += 1
-            elif final_object["s_foundation"]:
-                result_data[p_community][0] += 1
+            # if the community was correctly put into result_data increment the list for the corresponding value
+            if final_object["community"] in result_data:
 
-            if final_object["r_slab"]:
-                result_data[p_community][3] += 1
-                result_data[p_community][2] += 1
-            elif final_object["s_slab"]:
-                result_data[p_community][2] += 1
+                if final_object["s_foundation"]:
+                    result_data[p_community][0] += 1
+                    total_data[1] += 1
+                    if final_object["r_foundation"]:
+                        result_data[p_community][1] += 1
+                        total_data[2] += 1
+                else: total_data[0] += 1
 
-            if final_object["r_frame"]:
-                result_data[p_community][5] += 1
-                result_data[p_community][4] += 1
-            elif final_object["s_frame"]:
-                result_data[p_community][4] += 1
+                if final_object["s_slab"]:
+                    result_data[p_community][2] += 1
+                    total_data[4] += 1
+                    if final_object["r_slab"]:
+                        result_data[p_community][3] += 1
+                        total_data[5] += 1
+                else:
+                    total_data[3] += 1
 
-            if final_object["r_mep"]:
-                result_data[p_community][7] += 1
-                result_data[p_community][6] += 1
-            elif final_object["s_mep"]:
-                result_data[p_community][6] += 1
+                if final_object["s_frame"]:
+                    result_data[p_community][4] += 1
+                    total_data[7] += 1
+                    if final_object["r_frame"]:
+                        result_data[p_community][5] += 1
+                        total_data[8] += 1
+                else:
+                    total_data[6] += 1
 
-            if not final_object["f_needed"]:
-                result_data[p_community][10] += 1
-            if not final_object["s_needed"]:
-                result_data[p_community][11] += 1
-            if not final_object["m_needed"]:
-                result_data[p_community][12] += 1
+                if final_object["s_mep"]:
+                    result_data[p_community][6] += 1
+                    total_data[10] += 1
+                    if final_object["r_mep"]:
+                        result_data[p_community][7] += 1
+                        total_data[11] += 1
+                else:
+                    total_data[9] += 1
 
-            # running counter to have a number for total homes
-            result_data[p_community][8] += 1
-            # will not show communities that are 100% finished
-            if result_data[p_community][9] != 1 and not final_object["finished"]:
-                result_data[p_community][9] = 1
+                if not final_object["f_needed"]:
+                    result_data[p_community][10] += 1
+                if not final_object["s_needed"]:
+                    result_data[p_community][11] += 1
+                if not final_object["m_needed"]:
+                    result_data[p_community][12] += 1
 
-    result = {k: v for k, v in result_data.items() if v[9] == 1}
-    return result
+                # running counter to have a number for total homes
+                result_data[p_community][8] += 1
+                # will not show communities that are 100% finished
+                if result_data[p_community][9] != 1 and not final_object["finished"]:
+                    result_data[p_community][9] = 1
 
+        for community, data in result_data.items():
+            result_data[community] = data + total_data
+        result = {k: v for k, v in result_data.items() if v[9] == 1}
+        return result
+
+    except Exception as e:
+        # print("error: ", e)
+        raise HTTPException(status_code=501, detail=f"Internal Server Error: {str(e)}")
 
 # Filters all lots into relevant data for each community regarding scans
 @router.get('/summary', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
@@ -438,6 +458,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
             "MEP Reported", "MEP R-Date", "MEP Reporter",
 
             "Foundation Needed", "Slab Needed", "Frame Needed", "MEP Needed",
+            "Lot Started", "Lot Finished",
         ])
         for j in result_data:
             row = [
@@ -457,7 +478,8 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
                 j.get("frame_report_status"), format_date(j.get("frame_report_date")), j.get("frame_reporter"),
                 j.get("mep_report_status"), format_date(j.get("mep_report_date")), j.get("mep_reporter"),
 
-                j.get("foundation_needed"), j.get("slab_needed"), j.get("frame_needed"), j.get("mep_needed")
+                j.get("foundation_needed"), j.get("slab_needed"), j.get("frame_needed"), j.get("mep_needed"),
+                j.get("lot_status_started"), j.get("lot_status_finished")
             ]
             csv_writer.writerow(row)
 

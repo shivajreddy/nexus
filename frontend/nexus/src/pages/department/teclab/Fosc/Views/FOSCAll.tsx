@@ -110,6 +110,8 @@ const columnDefinitionsData = [
             {headerName: 'Slab Needs', field: 'slab_needed'},
             {headerName: 'Frame Needs', field: 'frame_needed'},
             {headerName: 'MEP Needs', field: 'mep_needed'},
+            {headerName: 'Lot Started', field: 'lot_status_started'},
+            {headerName: 'lot Finished', field: 'lot_status_finished'},
         ],
     },
     {
@@ -212,6 +214,8 @@ function FOSCAll() {
                     slab_needed: item.slab_needed,
                     frame_needed: item.frame_needed,
                     mep_needed: item.mep_needed,
+                    lot_status_started: item.lot_status_started,
+                    lot_status_finished: item.lot_status_finished,
 
                     notes: item.notes,
                 }));

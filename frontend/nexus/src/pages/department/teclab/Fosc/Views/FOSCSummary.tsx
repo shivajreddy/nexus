@@ -22,7 +22,6 @@ import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {Skeleton} from "@components/ui/skeleton.tsx";
 import {TiArrowBack} from "react-icons/ti";
 
-
 const defaultColumnSettings = {
     sortable: true,
     filter: true,
@@ -47,33 +46,45 @@ const columnDefinitionsData = [
     {
         headerName: 'Foundation',
         children: [
-            {headerName: 'Unscanned', field: 'math_1'},
-            {headerName: 'Scanned', field: 'value_1'},
-            {headerName: 'Reported', field: 'value_2'},
+            {headerName: 'Unscanned', field: 'math_1',
+                children: [{headerName: `total_1`, field: 'math_1'}]},
+            {headerName: 'Scanned', field: 'value_1',
+                children: [{headerName: 'total_2', field: 'value_1'}]},
+            {headerName: 'Reported', field: 'value_2',
+                children: [{headerName: 'total_3', field: 'value_2'}]},
         ],
     },
     {
         headerName: 'Slab',
         children: [
-            {headerName: 'Unscanned', field: 'math_2'},
-            {headerName: 'Scanned', field: 'value_3'},
-            {headerName: 'Reported', field: 'value_4'},
+            {headerName: 'Unscanned', field: 'math_2',
+                children: [{headerName: 'total_4', field: 'math_2'}]},
+            {headerName: 'Scanned', field: 'value_3',
+                children: [{headerName: 'total_5', field: 'value_3'}]},
+            {headerName: 'Reported', field: 'value_4',
+                children: [{headerName: 'total_6', field: 'value_4'}]},
         ],
     },
     {
         headerName: 'Frame',
         children: [
-            {headerName: 'Unscanned', field: 'math_3'},
-            {headerName: 'Scanned', field: 'value_5'},
-            {headerName: 'Reported', field: 'value_6'},
+            {headerName: 'Unscanned', field: 'math_3',
+                children: [{headerName: 'total_7', field: 'math_3'}]},
+            {headerName: 'Scanned', field: 'value_5',
+                children: [{headerName: 'total_8', field: 'value_5'}]},
+            {headerName: 'Reported', field: 'value_6',
+                children: [{headerName: 'total_9', field: 'value_6'}]},
         ],
     },
     {
         headerName: 'Mep',
         children: [
-            {headerName: 'Unscanned', field: 'math_4'},
-            {headerName: 'Scanned',field: 'value_7'},
-            {headerName: 'Reported',field: 'value_8'},
+            {headerName: 'Unscanned', field: 'math_4',
+                children: [{headerName: 'total_10', field: 'math_4'}]},
+            {headerName: 'Scanned',field: 'value_7',
+                children: [{headerName: 'total_11', field: 'value_7'}]},
+            {headerName: 'Reported',field: 'value_8',
+                children: [{headerName: 'total_12', field: 'value_8'}]},
         ],
     },
 ];
@@ -97,28 +108,25 @@ const gridOptions = {
     // suppressMenuHide: true
 }
 
-
-function FOSCSummary() {
+const FOSCSummary = () => {
     const navigate = useNavigate();
 
     const axios = useAxiosPrivate();
 
-    // const userRoles = useUserRoles();
-
-    // TODO: specify the type of the Lot object. which should be parallel to EPCLot from python
     const [fetchLotDataStatus, setFetchLotDataStatus] = useState<'loading' | 'failed' | 'success'>('loading');
     const [fetchErrorDetails, setFetchErrorDetails] = useState('');
     const [allFOSCLots, setAllFOSCLots] = useState([]);
+    const [columnDefinitions, setColumnDefinitions] = useState(columnDefinitionsData);
 
-    // + Fetch all EPC lots
+    // + Fetch all FOSC lots
     useEffect(() => {
         const get_lots_data_from_server = async () => {
             try {
                 const response = await axios.get('/department/teclab/fosc/summary');
-                console.log("response=", response);
-                // console.log("response.data=", response.data);
-                // setLotData(response.data);
+                // console.log("response=", response);
+
                 const backendData = response.data;
+
                 // Data transformation
                 const transformedData = backendData.map((item: any) => ({
                     community_name: item.community_name,
@@ -133,12 +141,48 @@ function FOSCSummary() {
                     value_7: item.values[6],
                     value_8: item.values[7],
 
-                    math_1: item.values[8]-item.values[10]-item.values[0],
-                    math_2: item.values[8]-item.values[11]-item.values[2],
-                    math_3: item.values[8]-item.values[4],
-                    math_4: item.values[8]-item.values[12]-item.values[6],
+                    math_1: item.values[8] - item.values[10] - item.values[0],
+                    math_2: item.values[8] - item.values[11] - item.values[2],
+                    math_3: item.values[8] - item.values[4],
+                    math_4: item.values[8] - item.values[12] - item.values[6],
 
+                    total_1: item.values[13],
+                    total_2: item.values[14],
+                    total_3: item.values[15],
+                    total_4: item.values[16],
+                    total_5: item.values[17],
+                    total_6: item.values[18],
+                    total_7: item.values[19],
+                    total_8: item.values[20],
+                    total_9: item.values[21],
+                    total_10: item.values[22],
+                    total_11: item.values[23],
+                    total_12: item.values[24],
                 }));
+
+                // Update column definitions with totals directly from the data
+                const totalsFromData = transformedData[0]; // Assuming totals are the same across all items
+                const updatedColumnDefinitions = columnDefinitionsData.map((col) => {
+                    if (col.children) {
+                        return {
+                            ...col,
+                            children: col.children.map((child) => ({
+                                ...child,
+                                // @ts-ignore
+                                children: child.children?.map((subChild) => {
+                                    const totalKey = subChild.headerName; // "total_1", "total_2", etc.
+                                    return {
+                                        ...subChild,
+                                        headerName: `${totalsFromData[totalKey]}`,
+                                    };
+                                }),
+                            })),
+                        };
+                    }
+                    return col;
+                });
+
+                setColumnDefinitions(updatedColumnDefinitions);
 
                 // @ts-ignore
                 setAllFOSCLots(transformedData);
@@ -148,11 +192,9 @@ function FOSCSummary() {
                 setFetchErrorDetails(String(e));
                 setFetchLotDataStatus('failed');
             }
-        }
-        get_lots_data_from_server().then(() => {
-        });
-    }, [])
-
+        };
+        get_lots_data_from_server().then(() => {});
+    }, []);
 
     return (
         <MainLayout>
@@ -213,7 +255,7 @@ function FOSCSummary() {
                             >
                                 <AgGridReact
                                     rowData={allFOSCLots}
-                                    gridOptions={gridOptions}
+                                    gridOptions={{ ...gridOptions, columnDefs: columnDefinitions }}
                                 />
                             </div>
                     }
