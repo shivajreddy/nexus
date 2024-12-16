@@ -627,11 +627,11 @@ def update_db():
                                 # $set $unset
                                 {'$set': {
 
-                                    # 'teclab_data.fosc_data.lot_status_started': False,
-                                    # 'teclab_data.fosc_data.lot_status_finished': False,
+                                    'teclab_data.fosc_data.lot_status_started': False,
+                                    'teclab_data.fosc_data.lot_status_finished': False,
                                     'teclab_data.fosc_data.assigned_pm': None,
-                                    # 'teclab_data.fosc_data.assigned_director': None,
-                                    #
+                                    'teclab_data.fosc_data.assigned_director': None,
+
                                     'teclab_data.fosc_data.foundation_scan_status': None,
                                     'teclab_data.fosc_data.foundation_scanner': None,
                                     'teclab_data.fosc_data.foundation_scan_date': None,
@@ -663,11 +663,11 @@ def update_db():
                                     'teclab_data.fosc_data.mep_reporter': None,
                                     'teclab_data.fosc_data.mep_report_date': None,
                                     'teclab_data.fosc_data.mep_uploaded': None,
-                                    #
-                                    # 'teclab_data.fosc_data.misc_scan_status': None,
-                                    # 'teclab_data.fosc_data.misc_report_status': None,
-                                    # 'teclab_data.fosc_data.notes': None,
-                                    #
+
+                                    'teclab_data.fosc_data.misc_scan_status': None,
+                                    'teclab_data.fosc_data.misc_report_status': None,
+                                    'teclab_data.fosc_data.notes': None,
+
                                     'teclab_data.fosc_data.foundation_needed': True,
                                     'teclab_data.fosc_data.slab_needed': True,
                                     'teclab_data.fosc_data.frame_needed': True,
