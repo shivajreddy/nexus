@@ -1,16 +1,16 @@
 import csv
 import os
-from datetime import datetime, date
+from datetime import datetime 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import List, Annotated, Dict, Optional
+from typing import List, Annotated 
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.database.database import projects_coll, users_coll, client
-from app.database.schemas.department_data import UpdateFOSCData, FOSCData
-from app.database.schemas.user import UserInfo, User
+from app.database.database import projects_coll
+from app.database.schemas.department_data import UpdateFOSCData
+from app.database.schemas.user import User
 from app.email.utils import send_email_with_given_message_and_attachment
 from app.router.utils.find_project import find_project
 from app.security.oauth2 import get_current_user_data
@@ -96,8 +96,8 @@ def get_current_lots():
                 beforeTime = datetime.now() - timedelta(days=14)
                 afterTime = datetime.now() + timedelta(days=21)
 
-                beforeTime_str = beforeTime.strftime("%m/%d/%Y")
-                afterTime_str = afterTime.strftime("%m/%d/%Y")
+                # beforeTime_str = beforeTime.strftime("%m/%d/%Y")
+                # afterTime_str = afterTime.strftime("%m/%d/%Y")
 
                 if foundation_date is not None:
                     if beforeTime <= foundation_date <= afterTime and not foundation_status:
@@ -351,7 +351,7 @@ def generate_email(current_user_data, csv_filename, today_date, email):
 
 # Creates spreadsheet for the summary page
 @router.get('/fosc-summary-tracker')
-def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+def generate_send_csv_summary(current_user_data: Annotated[User, Depends(get_current_user_data)]):
     result_data = communities_logic()
 
     # create the csv file
@@ -384,7 +384,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 
 # Creates a spreadsheet for the live page
 @router.get('/fosc-live-tracker')
-def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+def generate_send_csv_live(current_user_data: Annotated[User, Depends(get_current_user_data)]):
     result_data = get_live_lots()
 
     # create the csv file
@@ -435,7 +435,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 
 # Creates a spreadsheet for the all page
 @router.get('/fosc-all-tracker')
-def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+def generate_send_csv_all(current_user_data: Annotated[User, Depends(get_current_user_data)]):
     result_data = get_all_lots()
 
     # create the csv file
@@ -495,7 +495,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 
 # """
 # Updates the director for each community change its changed
-def update_community_directors(new_data: str, community: str):
+def update_community_directors(new_data: str | None, community: str):
     try:
         for doc in projects_coll.find({"project_info.community": community}).sort("project_info.meta_info.created_at", -1):
             if not doc["teclab_data"]["fosc_data"]["lot_status_finished"] and\
@@ -569,6 +569,10 @@ def update_project_fosc_data(new_data: list, header: list):
         for count, i in enumerate(new_data):
             if i.strip():
                 update_type = csv_map.get(header[count])
+
+                if not update_type:
+                    return None
+
                 test = this_project["teclab_data"]["fosc_data"][update_type.rsplit(".", 1)[-1]]
 
                 if update_type:
@@ -591,7 +595,7 @@ def update_project_fosc_data(new_data: list, header: list):
 # Used to import data from a csv file to update the db
 @router.get('/csv-upload')
 def csv_upload():
-    csv_file_path = "./app/files/input\csv-upload.csv"
+    csv_file_path = "./app/files/input/csv-upload.csv"
     with open(csv_file_path, mode='r', newline='', encoding='utf-8') as file:
         csv_reader = csv.reader(file)
         header = next(csv_reader)

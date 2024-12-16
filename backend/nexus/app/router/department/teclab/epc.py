@@ -7,9 +7,9 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.database.database import projects_coll, users_coll, client
+from app.database.database import projects_coll 
 from app.database.schemas.department_data import UpdateTECLabData, EPCData
-from app.database.schemas.user import UserInfo, User
+from app.database.schemas.user import User
 from app.email.utils import send_email_with_given_message_and_attachment
 from app.router.utils.find_project import find_project
 from app.security.oauth2 import get_current_user_data
@@ -24,7 +24,7 @@ router = APIRouter(prefix="/department/teclab/epc")
 # """
 # Filter out all finished and released lots
 @router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
-def get_all_lots():
+def get_live_lots():
     try:
         result = []
         for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
@@ -209,7 +209,7 @@ def query_tracker_data():
                 result_data[p_community][5] += 1
 
     # sum the totals in each community
-    for k, v in result_data.items():
+    for _, v in result_data.items():
         v.append(sum(v))
 
     return filtered_lots, result_data
