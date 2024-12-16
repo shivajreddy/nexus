@@ -45,7 +45,7 @@ function Fosc() {
                 const response = await axios.get('/department/teclab/fosc/live');
                 // const response = await axios.get('/department/teclab/epc/all');
                 // console.log("response=", response);
-                console.log("😆 response.data=", response.data);
+                // console.log("😆 response.data=", response.data);
                 // setLotData(response.data);
                 const backendData = response.data;
                 // Data transformation
