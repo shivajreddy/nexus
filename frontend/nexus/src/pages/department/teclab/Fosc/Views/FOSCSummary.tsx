@@ -161,7 +161,7 @@ const FOSCSummary = () => {
                 }));
 
                 // Update column definitions with totals directly from the data
-                const totalsFromData = transformedData[0]; // Assuming totals are the same across all items
+                const totalsFromData = transformedData[0];
                 const updatedColumnDefinitions = columnDefinitionsData.map((col) => {
                     if (col.children) {
                         return {
@@ -170,7 +170,7 @@ const FOSCSummary = () => {
                                 ...child,
                                 // @ts-ignore
                                 children: child.children?.map((subChild) => {
-                                    const totalKey = subChild.headerName; // "total_1", "total_2", etc.
+                                    const totalKey = subChild.headerName;
                                     return {
                                         ...subChild,
                                         headerName: `${totalsFromData[totalKey]}`,
