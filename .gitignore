@@ -24,4 +24,8 @@ backend/nexus/app/files/archive
 docker-compose-dev.yml
 docker-compose-prod.yml
 
-
+# Environment & Secrets
+.env
+.env.prod
+.env.test
+.env.test

@@ -16,6 +16,30 @@ from app.router.testing.test1 import router as testing_router
 from app.router.projects.projects import router as projects_router
 from app.sockets.sockets import sio_app
 
+
+
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    connect_mongodb()  # + connect to database
+    app.include_router(auth_router)  # + include router's
+
+    app.include_router(eagle_router)
+    app.include_router(public_router)
+    app.include_router(users_router)
+    app.include_router(teclab_router)
+    app.include_router(teclab_epc_router)
+    app.include_router(teclab_cor_router)
+
+    # app.include_router(teclab_fosc_router)
+    app.include_router(testing_router)
+    app.include_router(projects_router)
+    yield
+
+
 app = FastAPI(
     title="Nexus",
     description="""Nexus is a central system designed for Home builders, to accelerate Home building.""",
@@ -27,7 +51,8 @@ app = FastAPI(
     license_info={
         "name": "MIT",
         "url": "https://github.com/git/git-scm.com/blob/main/MIT-LICENSE.txt"
-    }
+    },
+    lifespan=lifespan
 )
 
 app.mount("/ws", sio_app)
@@ -63,7 +88,6 @@ app.mount("/ws", sio_app)
 
 origins = [
     "http://localhost:3000",
-    "http://34.148.73.253",
     "http://nexus.tecofva.com",
 ]
 
@@ -76,6 +100,7 @@ app.add_middleware(
 )
 
 
+'''
 @app.on_event("startup")
 async def app_init():
     connect_mongodb()  # + connect to database
@@ -88,7 +113,7 @@ async def app_init():
     app.include_router(teclab_cor_router)
     app.include_router(testing_router)
     app.include_router(projects_router)
-
+'''
 
 @app.get("/api/healthchecker")
 def root():
