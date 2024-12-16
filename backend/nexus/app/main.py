@@ -21,37 +21,20 @@ from app.router.testing.test1 import router as testing_router
 from app.router.projects.projects import router as projects_router
 from app.sockets.sockets import sio_app
 
-
-<<<<<<< HEAD
-
-from contextlib import asynccontextmanager
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-
-    connect_mongodb()  # + connect to database
-    app.include_router(auth_router)  # + include router's
-
-=======
 # Include Routers into FASTAPI app
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     connect_mongodb()  # + connect to database
     app.include_router(auth_router)  # + include router's
->>>>>>> FOSC-dev
     app.include_router(eagle_router)
     app.include_router(public_router)
     app.include_router(users_router)
     app.include_router(teclab_router)
     app.include_router(teclab_epc_router)
     app.include_router(teclab_cor_router)
-<<<<<<< HEAD
 
     # app.include_router(teclab_fosc_router)
-=======
     app.include_router(teclab_fosc_router)
->>>>>>> FOSC-dev
     app.include_router(testing_router)
     app.include_router(projects_router)
     yield
@@ -76,11 +59,7 @@ app.mount("/ws", sio_app)
 
 # Front-end origins that should be allowed
 origins = [
-<<<<<<< HEAD
     "http://localhost:3000",
-=======
-    'http://localhost:3000',
->>>>>>> FOSC-dev
     "http://nexus.tecofva.com",
 ]
 
@@ -92,7 +71,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-<<<<<<< HEAD
 
 '''
 @app.on_event("startup")
@@ -108,12 +86,10 @@ async def app_init():
     app.include_router(testing_router)
     app.include_router(projects_router)
 '''
-=======
 @app.get('/')
 def test_public():
     return {"Hello World! from Nexus"}
 
->>>>>>> FOSC-dev
 
 @app.get("/api/healthchecker")
 def root():
