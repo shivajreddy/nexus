@@ -6,6 +6,7 @@ import {Label} from "@/components/ui/label";
 // import UserPlaceholderDp from '@images/user/placeholder-dp.png'
 
 import "@assets/pages/User/userhome.css";
+
 // import ThemeToggle from "@/features/themes/ThemeToggle.tsx";
 import {removeAuthState, selectCurrentUser} from "@/features/auth/authSlice";
 import {useAppDispatch, useAppSelector} from "@/redux/hooks";
@@ -52,15 +53,18 @@ function UserHome() {
                             <div className="grid w-full items-center gap-4">
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="first_name">First Name</Label>
-                                    <Input id="first_name" disabled type="text" defaultValue={user?.user_info.first_name}/>
+                                    <Input id="last_name" disabled type="text"
+                                           defaultValue={user?.user_info.first_name}/>
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="last_name">Last Name</Label>
-                                    <Input id="last_name" disabled type="text" defaultValue={user?.user_info.last_name}/>
+                                    <Input id="last_name" disabled type="text"
+                                           defaultValue={user?.user_info.last_name}/>
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="job-title">Title</Label>
-                                    <Input id="job-title" type="text" disabled defaultValue={user?.user_info.job_title}/>
+                                    <Input id="job-title" type="text" disabled
+                                           defaultValue={user?.user_info.job_title}/>
                                 </div>
                             </div>
                         </CardContent>

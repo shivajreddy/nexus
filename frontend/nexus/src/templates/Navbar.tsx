@@ -2,7 +2,7 @@ import UserNotifications from "@/features/notifications/UserNotifications";
 import {FaCircleUser} from "react-icons/fa6"
 import {NavLink, useNavigate} from "react-router-dom";
 import {ReactElement} from "react";
-import {FaRegCircle} from "react-icons/fa";
+import {FaExpand, FaRegCircle} from "react-icons/fa";
 
 import {BsCollection, BsHouses} from "react-icons/bs";
 import {PiGraphBold} from "react-icons/pi";
@@ -11,6 +11,7 @@ import {PiGraphBold} from "react-icons/pi";
 
 function Navbar() {
     const navigate = useNavigate();
+
 
     interface INavBarItem {
         name: string,
@@ -37,6 +38,12 @@ function Navbar() {
             name: "EPC",
             link: "/epc",
             icon: <FaRegCircle size={"1.5em"}/>,
+            isBeta: true,
+        },
+        {
+            name: "FOSC",
+            link: "/fosc",
+            icon: <FaExpand size={"1.5em"}/>,
             isBeta: true,
         },
         {

@@ -84,6 +84,63 @@ class EPCData(BaseModel):
     notes: Optional[str] = None
 
 
+class FOSCData(BaseModel):
+    # Status
+    lot_status_started: bool = True
+    lot_status_finished: bool = False
+
+    # Supervisors
+    assigned_pm: Optional[str] = None
+    assigned_director: Optional[str] = None
+
+    # Foundation
+    foundation_scan_status: Optional[bool] = None
+    foundation_scanner: Optional[str] = None
+    foundation_scan_date: Optional[datetime] = None
+    foundation_report_status: Optional[bool] = None
+    foundation_reporter: Optional[str] = None
+    foundation_report_date: Optional[datetime] = None
+    foundation_uploaded: Optional[bool] = None
+    foundation_needed: Optional[bool] = True
+
+    # Slab
+    slab_scan_status: Optional[bool] = None
+    slab_scanner: Optional[str] = None
+    slab_scan_date: Optional[datetime] = None
+    slab_report_status: Optional[bool] = None
+    slab_reporter: Optional[str] = None
+    slab_report_date: Optional[datetime] = None
+    slab_uploaded: Optional[bool] = None
+    slab_needed: Optional[bool] = True
+
+    # Frame
+    frame_scan_status: Optional[bool] = None
+    frame_scanner: Optional[str] = None
+    frame_scan_date: Optional[datetime] = None
+    frame_report_status: Optional[bool] = None
+    frame_reporter: Optional[str] = None
+    frame_report_date: Optional[datetime] = None
+    frame_uploaded: Optional[bool] = None
+    frame_needed: Optional[bool] = True
+
+    # MEP
+    mep_scan_status: Optional[bool] = None
+    mep_scanner: Optional[str] = None
+    mep_scan_date: Optional[datetime] = None
+    mep_report_status: Optional[bool] = None
+    mep_reporter: Optional[str] = None
+    mep_report_date: Optional[datetime] = None
+    mep_uploaded: Optional[bool] = None
+    mep_needed: Optional[bool] = True
+
+    # Misc (warranty, extra)
+    misc_scan_status: Optional[bool] = None
+    misc_report_status: Optional[bool] = None
+
+    # Notes
+    notes: Optional[str] = None
+
+
 class NewEPCLot(BaseModel):
     # project_uid: str
 
@@ -94,6 +151,9 @@ class UpdateTECLabData(BaseModel):
     project_uid: str
     epc_data: EPCData
 
+class UpdateFOSCData(BaseModel):
+    project_uid: str
+    fosc_data: FOSCData
 
 class CORData(BaseModel):
     product: str = ''

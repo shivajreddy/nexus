@@ -3,7 +3,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel
 
-from app.database.schemas.department_data import EPCData, CORData
+from app.database.schemas.department_data import EPCData, CORData, FOSCData
 
 """
 Schema for `project`
@@ -45,6 +45,7 @@ class ContractInfo(BaseModel):
 class TecLabProjectData(BaseModel):
     epc_data: 'EPCData'
     cor_data: 'CORData'
+    fosc_data: 'FOSCData'
 
 
 class SalesProjectData(BaseModel):

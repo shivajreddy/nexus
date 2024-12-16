@@ -1,6 +1,6 @@
 import MainLayout from "@templates/MainLayout.tsx";
 
-import EpcMenu from "./EpcMenu";
+import FoscMenu from "./FoscMenu";
 
 import {AgGridReact} from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
@@ -9,7 +9,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import "@assets/pages/Epc/Epc.css"
 
-import epcColumnDefinitions from "@pages/department/teclab/Epc/View/epcColumnDefinitions.ts";
+import foscColumnDefinitions from "@pages/department/teclab/Fosc/Views/foscColumnDefinitions.ts";
 import {useNavigate} from "react-router-dom";
 import {Button} from "@components/ui/button.tsx";
 import {useEffect, useMemo, useState} from "react";
@@ -18,15 +18,15 @@ import {format} from "date-fns";
 import {PiPencilSimpleFill} from "react-icons/pi";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";
-import {MdEmail, MdModeEditOutline} from "react-icons/md";
+import {MdDownload, MdModeEditOutline} from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
-import {BASE_URL} from "@/services/api";
 import {ColDef, ColGroupDef, GridOptions} from "ag-grid-community";
-import {useAppSelector} from "@redux/hooks.ts";
-import {selectCurrentUser} from "@/features/auth/authSlice.ts";
+// import {useAppSelector} from "@redux/hooks.ts";
+// import {selectCurrentUser} from "@/features/auth/authSlice.ts";
 
 
-function Epc() {
+
+function Fosc() {
     const navigate = useNavigate();
 
     const axios = useAxiosPrivate();
@@ -36,13 +36,13 @@ function Epc() {
     // TODO: specify the type of the Lot object. which should be parallel to EPCLot from python
     const [fetchLotDataStatus, setFetchLotDataStatus] = useState<'loading' | 'failed' | 'success'>('loading');
     const [fetchErrorDetails, setFetchErrorDetails] = useState('');
-    const [allEPCLots, setAllEPCLots] = useState([]);
+    const [allFOSCLots, setAllFOSCLots] = useState([]);
 
-    // + Fetch all EPC lots
+
     useEffect(() => {
         const get_lots_data_from_server = async () => {
             try {
-                const response = await axios.get('/department/teclab/epc/live');
+                const response = await axios.get('/department/teclab/fosc/live');
                 // const response = await axios.get('/department/teclab/epc/all');
                 // console.log("response=", response);
                 // console.log("😆 response.data=", response.data);
@@ -51,39 +51,57 @@ function Epc() {
                 // Data transformation
                 const transformedData = backendData.map((item: any) => ({
 
+                    lot_status_started: item.lot_status_started,
                     lot_status_finished: item.lot_status_finished,
-                    lot_status_released: item.lot_status_released,
 
-                    homesiting_completed_by: item.homesiting_completed_by,
-                    homesiting_completed_on: item.homesiting_completed_on ? format(new Date(item.homesiting_completed_on), 'MM/dd/yyyy') : null,
+                    assigned_pm: item.assigned_pm,
+                    assigned_director: item.assigned_director,
 
                     project_uid: item.project_uid,
                     community_name: item.community,
                     section_number: item.section_number,
                     lot_number: item.lot_number,
-                    contract_type: item.contract_type,
-                    // contract_date: item.contract_date ? format(new Date(item.contract_date), 'MM/dd/yyyy') : null,
-                    contract_date: item.contract_date ? format(new Date(item.contract_date), 'yyyy/MM/dd') : null,
-                    product: item.product_name,
-                    elevation: item.elevation_name,
-                    // Format date and handle null values as needed for another date fields
-                    drafting_assigned_on_date: item.drafting_assigned_on ? format(new Date(item.drafting_assigned_on), 'MM/dd/yyyy') : null,
-                    drafting_finished_date: item.drafting_finished ? format(new Date(item.drafting_finished), 'MM/dd/yyyy') : null,
-                    engineering_sent: item.engineering_sent ? format(new Date(item.engineering_sent), 'MM/dd/yyyy') : null,
-                    engineering_received: item.engineering_received ? format(new Date(item.engineering_received), 'MM/dd/yyyy') : null,
-                    plat_sent: item.plat_sent ? format(new Date(item.plat_sent), 'MM/dd/yyyy') : null,
-                    plat_received: item.plat_received ? format(new Date(item.plat_received), 'MM/dd/yyyy') : null,
-                    permit_submitted: item.permitting_submitted ? format(new Date(item.permitting_submitted), 'MM/dd/yyyy') : null,
-                    permit_received: item.permitting_received ? format(new Date(item.permitting_received), 'MM/dd/yyyy') : null,
-                    bbp_posted: item.bbp_posted ? format(new Date(item.bbp_posted), 'MM/dd/yyyy') : null,
-                    drafter_name: item.drafting_drafter,
-                    engineer_name: item.engineering_engineer,
-                    plat_name: item.plat_engineer,
-                    county: item.permitting_county_name,
-                    notes: item.notes,
+
+                    foundation_scan_status: item.foundation_scan_status,
+                    foundation_scanner: item.foundation_scanner,
+                    foundation_scan_date: item.foundation_scan_date ? format(new Date(item.foundation_scan_date), 'MM/dd/yyyy') : null,
+                    foundation_report_status: item.foundation_report_status,
+                    foundation_reporter: item.foundation_reporter,
+                    foundation_report_date: item.foundation_report_date ? format(new Date(item.foundation_report_date), 'MM/dd/yyyy') : null,
+                    foundation_uploaded: item.foundation_uploaded,
+
+                    slab_scan_status: item.slab_scan_status,
+                    slab_scanner: item.slab_scanner,
+                    slab_scan_date: item.slab_scan_date ? format(new Date(item.slab_scan_date), 'MM/dd/yyyy') : null,
+                    slab_report_status: item.slab_report_status,
+                    slab_reporter: item.slab_reporter,
+                    slab_report_date: item.slab_report_date ? format(new Date(item.slab_report_date), 'MM/dd/yyyy') : null,
+                    slab_uploaded: item.slab_uploaded,
+
+                    frame_scan_status: item.frame_scan_status,
+                    frame_scanner: item.frame_scanner,
+                    frame_scan_date: item.frame_scan_date ? format(new Date(item.frame_scan_date), 'MM/dd/yyyy') : null,
+                    frame_report_status: item.frame_report_status,
+                    frame_reporter: item.frame_reporter,
+                    frame_report_date: item.frame_report_date ? format(new Date(item.frame_report_date), 'MM/dd/yyyy') : null,
+                    frame_uploaded: item.frame_uploaded,
+
+                    mep_scan_status: item.mep_scan_status,
+                    mep_scanner: item.mep_scanner,
+                    mep_scan_date: item.mep_scan_date ? format(new Date(item.mep_scan_date), 'MM/dd/yyyy') : null,
+                    mep_report_status: item.mep_report_status,
+                    mep_reporter: item.mep_reporter,
+                    mep_report_date: item.mep_report_date ? format(new Date(item.mep_report_date), 'MM/dd/yyyy') : null,
+                    mep_uploaded: item.mep_uploaded,
+
+                    misc_scan_status: item.misc_scan_status,
+                    misc_report_status: item.misc_report_status,
+
+                    notes: item.notes
+
                 }));
                 // console.log("transformed 😇 data=", transformedData);
-                setAllEPCLots(transformedData);
+                setAllFOSCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
                 console.log("ERROR=", e);
@@ -95,12 +113,9 @@ function Epc() {
         });
     }, [])
 
+    const [finalfoscColDefs] = useState(() => {
 
-
-    // + Set column defs based on user roles
-    const [finalEpcColDefs] = useState(() => {
-
-            const viewerColDef = epcColumnDefinitions;
+            const viewerColDef = foscColumnDefinitions;
             const editorColDef: ColGroupDef[] = [
 
                 {
@@ -156,9 +171,9 @@ function Epc() {
     const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
         return [50, 100, 200];
     }, []);
-    const epcGridOptions: GridOptions = {
+    const foscGridOptions: GridOptions = {
         defaultColDef: defaultColumnSettings,
-        columnDefs: finalEpcColDefs,
+        columnDefs: finalfoscColDefs,
         groupHeaderHeight: 30,
         headerHeight: 30,
         floatingFiltersHeight: 40,
@@ -177,7 +192,7 @@ function Epc() {
             <div className="epc-container rounded-md m-4 bg-default-bg2">
                 <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
                     <div className="border-r flex items-center">
-                        <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
+                        <h1 className="font-semibold lg:text-2xl pl-4"> Field Ops Scans Console </h1>
                         {fetchLotDataStatus === 'loading' ?
                             <p className="ml-4 font-semibold text-secondary text-xl">Loading</p>
                             : fetchLotDataStatus === 'failed' ?
@@ -186,27 +201,32 @@ function Epc() {
                                 <p className="ml-4 font-semibold text-primary text-xl">LIVE</p>
                         }
                     </div>
-
                     <div className="flex mx-10">
-                        {hasRoles(userRoles, [102]) &&
-                          <div className="flex justify-center items-center bg-default-bg1">
-                            <Button onClick={() => navigate('edit')} className="min-w-[10em]">
-                              <p className="pr-2"><MdModeEditOutline/></p>
-                              Search & Update
-                            </Button>
-                          </div>
+                        {hasRoles(userRoles, [103]) &&
+                            <div className="flex justify-center items-center bg-default-bg1">
+                                <Button
+                                    className="min-w-[10em]"
+                                    onClick={() => navigate('edit')}>
+
+                                    <p className="pr-2"><MdModeEditOutline/></p>
+                                    Search & Update
+                                </Button>
+                            </div>
                         }
-                        {hasRoles(userRoles, [213]) &&
-                          <div className="flex justify-center items-center bg-default-bg1 mx-4">
-                            <Button onClick={() => axios.get(BASE_URL + '/department/teclab/epc/epc-backlog-tracker')}
-                                    className="min-w-[10em]">
-                              <p className="pr-2"><MdEmail/></p>
-                              Email Me Backlog
-                            </Button>
-                          </div>
+                        {hasRoles(userRoles, [203]) &&
+                            <div className="flex justify-center items-center bg-default-bg1 mx-3">
+                                <Button
+                                    className="min-w-[10em]"
+                                    onClick={() => navigate('add')}>
+
+                                    <p className="pr-2"><MdDownload/></p>
+                                    Add Project
+                                </Button>
+                            </div>
                         }
-                        {/* :: For now only dev can see this, make it visible once menu is finished */}
-                        {hasRoles(userRoles, [999]) && <EpcMenu/>}
+                        {hasRoles(userRoles, [103]) &&
+                            <FoscMenu/>
+                        }
                     </div>
                 </div>
                 <div className="epc-body">
@@ -233,8 +253,8 @@ function Epc() {
                                 style={{height: '100%'}}
                             >
                                 <AgGridReact
-                                    rowData={allEPCLots}
-                                    gridOptions={epcGridOptions}
+                                    rowData={allFOSCLots}
+                                    gridOptions={foscGridOptions}
                                 />
                             </div>
                     }
@@ -245,4 +265,4 @@ function Epc() {
     );
 }
 
-export default Epc;
+export default Fosc;

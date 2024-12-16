@@ -6,6 +6,7 @@ interface IProps {
     name: string;
     isChecked?: boolean;
     onUpdate: ()=>void;
+    disabled?: boolean;
 }
 
 const FieldToggle = (props: IProps) => {
@@ -18,7 +19,7 @@ const FieldToggle = (props: IProps) => {
                 <div className="flex-grow border-t ml-4"></div>
             </div>
             {/*<div className="flex-1 flex items-center">*/}
-            <div className="basis-2/3 flex items-center">
+            <div className={`basis-2/3 font-semibold  ${props.disabled ? "pointer-events-none text-default-fg1" : "text-primary"}`}>
                 <Switch
                     checked={props.isChecked}
                     onCheckedChange={props.onUpdate}

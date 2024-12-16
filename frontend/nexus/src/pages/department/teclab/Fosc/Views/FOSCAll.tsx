@@ -2,7 +2,7 @@ import MainLayout from "@templates/MainLayout.tsx";
 
 import {AgGridReact} from "ag-grid-react";
 
-import EpcMenu from "./EpcMenu.tsx";
+import FoscMenu from "./FoscMenu.tsx";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -44,57 +44,81 @@ const columnDefinitionsData = [
             {headerName: 'Community', field: 'community_name', width: 200},
             {headerName: 'Section', field: 'section_number'},
             {headerName: 'Lot-#', field: 'lot_number'},
-            {headerName: 'Contract Date', field: 'contract_date'},
-            {headerName: 'Product', field: 'product'},
-            {headerName: 'Elevation', field: 'elevation', width: 120},
         ],
     },
     {
-        headerName: 'Drafting',
+        headerName: 'Supervisors',
         children: [
-            {headerName: 'Drafter', field: 'drafter_name'},
-            {headerName: 'Assigned', field: 'drafting_assigned_on_date'},
-            {headerName: 'Finished', field: 'drafting_finished_date'},
+            {headerName: 'Project Manager', field: 'assigned_pm', width: 160},
+            {headerName: 'Director', field: 'assigned_director', width: 150},
         ],
     },
     {
-      headerName: 'Home Siting',
-      children: [
-            {headerName: 'Completed On', field: 'home_siting_completed_on', width: 200},
-      ],
-    },
-    {
-        headerName: 'Engineering',
+        headerName: 'Foundation',
         children: [
-            {headerName: 'Engineer', field: 'engineer_name'},
-            {headerName: 'Sent', field: 'engineering_sent'},
-            {headerName: 'Received', field: 'engineering_received'},
+            {headerName: 'Scanned', field: 'foundation_scan_status'},
+            {headerName: 'Scanner', field: 'foundation_scanner'},
+            {headerName: 'Date', field: 'foundation_scan_date'},
+            {headerName: 'Reported', field: 'foundation_report_status'},
+            {headerName: 'Reporter', field: 'foundation_reporter'},
+            {headerName: 'Date', field: 'foundation_report_date'},
+            {headerName: 'Uploaded', field: 'foundation_uploaded'},
         ],
     },
     {
-        headerName: 'Plat',
+        headerName: 'Slab',
         children: [
-            {headerName: 'Plat Eng.', field: 'plat_name'},
-            {headerName: 'Sent', field: 'plat_sent'},
-            {headerName: 'Received', field: 'plat_received'},
+            {headerName: 'Scanned', field: 'slab_scan_status'},
+            {headerName: 'Scanner', field: 'slab_scanner'},
+            {headerName: 'Date', field: 'slab_scan_date'},
+            {headerName: 'Reported', field: 'slab_report_status'},
+            {headerName: 'Reporter', field: 'slab_reporter'},
+            {headerName: 'Date', field: 'slab_report_date'},
+            {headerName: 'Uploaded', field: 'slab_uploaded'},
         ],
     },
     {
-        headerName: 'Permitting',
+        headerName: 'Frame',
         children: [
-            {headerName: 'County', field: 'county'},
-            {headerName: 'Submitted', field: 'permit_submitted'},
-            {headerName: 'Received', field: 'permit_received'},
+            {headerName: 'Scanned', field: 'frame_scan_status'},
+            {headerName: 'Scanner', field: 'frame_scanner'},
+            {headerName: 'Date', field: 'frame_scan_date'},
+            {headerName: 'Reported', field: 'frame_report_status'},
+            {headerName: 'Reporter', field: 'frame_reporter'},
+            {headerName: 'Date', field: 'frame_report_date'},
+            {headerName: 'Uploaded', field: 'frame_uploaded'},
         ],
     },
     {
-        headerName: 'Build By Plans',
+        headerName: 'Mep',
         children: [
-            {headerName: 'Posted', field: 'bbp_posted'},
+            {headerName: 'Scanned', field: 'mep_scan_status'},
+            {headerName: 'Scanner', field: 'mep_scanner'},
+            {headerName: 'Date', field: 'mep_scan_date'},
+            {headerName: 'Reported', field: 'mep_report_status'},
+            {headerName: 'Reporter', field: 'mep_reporter'},
+            {headerName: 'Date', field: 'mep_report_date'},
+            {headerName: 'Uploaded', field: 'mep_uploaded'},
         ],
     },
     {
-        headerName: 'Notes', field: 'notes'
+        headerName: 'Warranty/Misc',
+        children: [
+            {headerName: 'Scanned', field: 'misc_scan_status'},
+            {headerName: 'Reported', field: 'misc_report_status'},
+            {headerName: 'Foundation Needs', field: 'foundation_needed'},
+            {headerName: 'Slab Needs', field: 'slab_needed'},
+            {headerName: 'Frame Needs', field: 'frame_needed'},
+            {headerName: 'MEP Needs', field: 'mep_needed'},
+            {headerName: 'Lot Started', field: 'lot_status_started'},
+            {headerName: 'lot Finished', field: 'lot_status_finished'},
+        ],
+    },
+    {
+        headerName: 'Notes',
+        children: [
+            {field: 'notes', headerName: 'notes', width: 300}
+        ],
     },
 ];
 
@@ -118,7 +142,7 @@ const gridOptions = {
 }
 
 
-function EPCAll() {
+function FOSCAll() {
     const navigate = useNavigate();
 
     const axios = useAxiosPrivate();
@@ -128,7 +152,7 @@ function EPCAll() {
     // TODO: specify the type of the Lot object. which should be parallel to EPCLot from python
     const [fetchLotDataStatus, setFetchLotDataStatus] = useState<'loading' | 'failed' | 'success'>('loading');
     const [fetchErrorDetails, setFetchErrorDetails] = useState('');
-    const [allEPCLots, setAllEPCLots] = useState([]);
+    const [allFOSCLots, setAllFOSCLots] = useState([]);
 
     const [columnDefinitions, setColumnDefinitions] = useState(columnDefinitionsData)
 
@@ -136,7 +160,7 @@ function EPCAll() {
     useEffect(() => {
         const get_lots_data_from_server = async () => {
             try {
-                const response = await axios.get('/department/teclab/epc/live');
+                const response = await axios.get('/department/teclab/fosc/all');
                 console.log("response=", response);
                 // console.log("response.data=", response.data);
                 // setLotData(response.data);
@@ -148,26 +172,54 @@ function EPCAll() {
                     community_name: item.community,
                     section_number: item.section_number,
                     lot_number: item.lot_number,
-                    contract_date: item.contract_date ? format(new Date(item.contract_date), 'MM/dd/yyyy') : null,
-                    product: item.product_name,
-                    elevation: item.elevation_name,
-                    // Format date and handle null values as needed for another date fields
-                    drafting_assigned_on_date: item.drafting_assigned_on ? format(new Date(item.drafting_assigned_on), 'MM/dd/yyyy') : null,
-                    drafting_finished_date: item.drafting_finished ? format(new Date(item.drafting_finished), 'MM/dd/yyyy') : null,
-                    engineering_sent: item.engineering_sent ? format(new Date(item.engineering_sent), 'MM/dd/yyyy') : null,
-                    engineering_received: item.engineering_received ? format(new Date(item.engineering_received), 'MM/dd/yyyy') : null,
-                    plat_sent: item.plat_sent ? format(new Date(item.plat_sent), 'MM/dd/yyyy') : null,
-                    plat_received: item.plat_received ? format(new Date(item.plat_received), 'MM/dd/yyyy') : null,
-                    permit_submitted: item.permitting_submitted ? format(new Date(item.permitting_submitted), 'MM/dd/yyyy') : null,
-                    permit_received: item.permitting_received ? format(new Date(item.permitting_received), 'MM/dd/yyyy') : null,
-                    bbp_posted: item.bbp_posted ? format(new Date(item.bbp_posted), 'MM/dd/yyyy') : null,
-                    drafter_name: item.drafting_drafter,
-                    engineer_name: item.engineering_engineer,
-                    plat_name: item.plat_engineer,
-                    county: item.permitting_county_name,
+
+                    assigned_pm: item.assigned_pm,
+                    assigned_director: item.assigned_director,
+
+                    foundation_scan_status: item.foundation_scan_status,
+                    foundation_scanner: item.foundation_scanner,
+                    foundation_scan_date: item.foundation_scan_date ? format(new Date(item.foundation_scan_date), 'MM/dd/yyyy') : null,
+                    foundation_report_status: item.foundation_report_status,
+                    foundation_reporter: item.foundation_reporter,
+                    foundation_report_date: item.foundation_report_date ? format(new Date(item.foundation_report_date), 'MM/dd/yyyy') : null,
+                    foundation_uploaded: item.foundation_uploaded,
+
+                    slab_scan_status: item.slab_scan_status,
+                    slab_scanner: item.slab_scanner,
+                    slab_scan_date: item.slab_scan_date ? format(new Date(item.slab_scan_date), 'MM/dd/yyyy') : null,
+                    slab_report_status: item.slab_report_status,
+                    slab_reporter: item.slab_reporter,
+                    slab_report_date: item.slab_report_date ? format(new Date(item.slab_report_date), 'MM/dd/yyyy') : null,
+                    slab_uploaded: item.slab_uploaded,
+
+                    frame_scan_status: item.frame_scan_status,
+                    frame_scanner: item.frame_scanner,
+                    frame_scan_date: item.frame_scan_date ? format(new Date(item.frame_scan_date), 'MM/dd/yyyy') : null,
+                    frame_report_status: item.frame_report_status,
+                    frame_reporter: item.frame_reporter,
+                    frame_report_date: item.frame_report_date ? format(new Date(item.frame_report_date), 'MM/dd/yyyy') : null,
+                    frame_uploaded: item.frame_uploaded,
+
+                    mep_scan_status: item.mep_scan_status,
+                    mep_scanner: item.mep_scanner,
+                    mep_scan_date: item.mep_scan_date ? format(new Date(item.mep_scan_date), 'MM/dd/yyyy') : null,
+                    mep_report_status: item.mep_report_status,
+                    mep_reporter: item.mep_reporter,
+                    mep_report_date: item.mep_report_date ? format(new Date(item.mep_report_date), 'MM/dd/yyyy') : null,
+                    mep_uploaded: item.mep_uploaded,
+
+                    warranty_scan_status: item.warranty_scan_status,
+                    warranty_report_status: item.warranty_report_status,
+                    foundation_needed: item.foundation_needed,
+                    slab_needed: item.slab_needed,
+                    frame_needed: item.frame_needed,
+                    mep_needed: item.mep_needed,
+                    lot_status_started: item.lot_status_started,
+                    lot_status_finished: item.lot_status_finished,
+
                     notes: item.notes,
                 }));
-                setAllEPCLots(transformedData);
+                setAllFOSCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
                 console.log("ERROR=", e);
@@ -204,7 +256,7 @@ function EPCAll() {
                                         // href={`edit/${params.data.project_uid}`}
                                         className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
                                         data-id={params.data.id}
-                                        onClick={()=>navigate(`/epc/edit/${params.data.project_uid}`)}
+                                        onClick={()=>navigate(`/fosc/edit/${params.data.project_uid}`)}
                                     >
                                         <PiPencilSimpleFill/>
                                     </a>
@@ -212,6 +264,7 @@ function EPCAll() {
                             },
                         }
                     ];
+                    // @ts-ignore
                     setColumnDefinitions(updatedColumnDefinitions);
                 }
             }
@@ -233,7 +286,7 @@ function EPCAll() {
 
                 <div className="epc-header border border-b-0 rounded rounded-b-none py-2">
                     <div className="border-r flex items-center">
-                        <h1 className="font-semibold lg:text-2xl pl-4"> Eagle Projects Console </h1>
+                        <h1 className="font-semibold lg:text-2xl pl-4"> Field Ops Scanning Console </h1>
                         {fetchLotDataStatus === 'loading' ?
                             <p className="ml-4 font-semibold text-secondary text-xl">Loading</p>
                             : fetchLotDataStatus === 'failed' ?
@@ -246,12 +299,12 @@ function EPCAll() {
                     <div className="flex mx-10">
 
                         <Button variant="outline" className="flex justify-center items-center"
-                                onClick={() => navigate('/epc')}>
+                                onClick={() => navigate('/fosc')}>
                             <p className="pr-2"><TiArrowBack/></p>
-                            Back to EPC
+                            Back to FOSC
                         </Button>
 
-                        <EpcMenu/>
+                        <FoscMenu/>
                     </div>
                 </div>
                 <div className="epc-body">
@@ -284,9 +337,10 @@ function EPCAll() {
                                 style={{height: '100%'}}
                             >
                                 <AgGridReact
-                                    rowData={allEPCLots}
+                                    rowData={allFOSCLots}
                                     gridOptions={gridOptions}
                                     columnDefs={columnDefinitions}
+
                                 />
                             </div>
                     }
@@ -297,4 +351,4 @@ function EPCAll() {
     );
 }
 
-export default EPCAll;
+export default FOSCAll;
