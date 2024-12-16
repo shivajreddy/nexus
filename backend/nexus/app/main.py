@@ -1,11 +1,14 @@
-from starlette.middleware.cors import CORSMiddleware
-# from fastapi.middleware.cors import CORSMiddleware
+# FASTAPI
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
+# IMPORT DATABASE
 from app.database.database import connect_mongodb, department_data_coll, users_coll, eagle_data_coll, projects_coll
 from app.database.setup_data.eagle_data import eagle_data_coll_initial_data, department_data_coll_initial_data, \
     projects_coll_initial_data
 
+# IMPORT ROUTERS
 from app.router.users.users import router as users_router
 from app.router.security.auth import router as auth_router
 from app.router.eagle.eagle import router as eagle_router
@@ -18,10 +21,8 @@ from app.router.testing.test1 import router as testing_router
 from app.router.projects.projects import router as projects_router
 from app.sockets.sockets import sio_app
 
-# '''
-from contextlib import asynccontextmanager
 
-
+# Include Routers into FASTAPI app
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     connect_mongodb()  # + connect to database
@@ -36,8 +37,6 @@ async def lifespan(app: FastAPI):
     app.include_router(testing_router)
     app.include_router(projects_router)
     yield
-
-# '''
 
 
 app = FastAPI(
@@ -57,41 +56,10 @@ app = FastAPI(
 
 app.mount("/ws", sio_app)
 
-# origins = [
-#     "https://34.139.78.157:3000",
-#     "https://34.139.78.157",
-#
-#     "http://34.139.78.157:3000",
-#     "http://34.139.78.157",
-#
-#     "34.139.78.157:3000",
-#     "34.139.78.157",
-#
-#     "http://34.139.78.157:3000/",
-#     "http://34.139.78.157/",
-#
-#     "http://localhost:3000",
-#     "http://localhost",
-#
-#     "http://0.0.0.0:3000",
-#     "http://0.0.0.0",
-#
-#     "http://localhost:8000",
-#     "http://34.139.78.157:8000/",
-
-# "http://localhost",
-# "http://34.148.73.253:8000/",
-# "http://nexus.tecofva.com:8000",
-# ]
-
 # Front-end origins that should be allowed
-
 origins = [
-    # 'http://192.168.18.72:3000',
     'http://localhost:3000',
-    # 'http://0.0.0.0:3000',
-    # "http://34.148.73.253:3000",
-    # "http://nexus.tecofva.com",
+    "http://nexus.tecofva.com",
 ]
 
 app.add_middleware(
@@ -102,24 +70,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-'''
-@app.on_event("startup")
-async def app_init():
-    connect_mongodb()  # + connect to database
-    app.include_router(auth_router)  # + include router's
-    app.include_router(eagle_router)
-    app.include_router(public_router)
-    app.include_router(users_router)
-    app.include_router(teclab_router)
-    app.include_router(teclab_epc_router)
-    app.include_router(teclab_cor_router)
-    app.include_router(testing_router)
-    app.include_router(projects_router)
-'''
-
 @app.get('/')
 def test_public():
     return {"Hello World! from Nexus"}
+
 
 @app.get("/api/healthchecker")
 def root():
