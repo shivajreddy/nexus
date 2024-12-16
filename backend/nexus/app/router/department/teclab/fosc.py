@@ -211,8 +211,6 @@ def communities_logic():
                 """
             if p_community not in result_data:
                 result_data[p_community] = [0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0,]
-                                            # 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
 
             # creates a Dict with the required information for the summary
             final_object = {
@@ -240,7 +238,8 @@ def communities_logic():
                     if final_object["r_foundation"]:
                         result_data[p_community][1] += 1
                         total_data[2] += 1
-                else: total_data[0] += 1
+                else: 
+                    total_data[0] += 1
 
                 if final_object["s_slab"]:
                     result_data[p_community][2] += 1
