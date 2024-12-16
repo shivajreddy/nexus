@@ -198,6 +198,7 @@ def update_teclab_data_for_project(new_data: UpdateFOSCData):
 
 
 # """
+# Get all information for each lot and sorts it by the community
 def communities_logic():
     try:
         result_data = {}
@@ -238,7 +239,7 @@ def communities_logic():
                     if final_object["r_foundation"]:
                         result_data[p_community][1] += 1
                         total_data[2] += 1
-                else: 
+                else:
                     total_data[0] += 1
 
                 if final_object["s_slab"]:
