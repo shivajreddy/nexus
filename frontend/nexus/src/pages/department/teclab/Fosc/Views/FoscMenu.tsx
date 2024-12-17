@@ -65,20 +65,21 @@ function FoscMenu() {
                         </button>
                     </div>
                     {/*List of all of the lots that exist and their status*/}
-                    <div className="flex justify-center items-center ml-8 bg-default-bg2">
-                        <button
-                            className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
-                            onClick={() => navigate('/fosc/all-lots')}
-                        >
-                            <p className="pr-2"><CgMenuGridO/></p>
-                            All Lots
-                        </button>
-                    </div>
-
+                    {hasRoles(userRoles, [999]) &&
+                        <div className="flex justify-center items-center ml-8 bg-default-bg2">
+                            <button
+                                className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
+                                onClick={() => navigate('/fosc/all-lots')}
+                            >
+                                <p className="pr-2"><CgMenuGridO/></p>
+                                All Lots
+                            </button>
+                        </div>
+                    }
                     <Separator/>
                     <p>Tracker Emails</p>
 
-                    {hasRoles(userRoles, [213]) &&
+                    {hasRoles(userRoles, [223]) &&
                         <div className="flex justify-center items-center bg-default-bg1 mx-4">
                             <Button
                                 onClick={() => axios.get(BASE_URL + '/department/teclab/fosc/fosc-summary-tracker')}
@@ -89,7 +90,7 @@ function FoscMenu() {
                         </div>
                     }
 
-                    {hasRoles(userRoles, [213]) &&
+                    {hasRoles(userRoles, [223]) &&
                         <div className="flex justify-center items-center bg-default-bg1 mx-4">
                             <Button
                                 onClick={() => axios.get(BASE_URL + '/department/teclab/fosc/fosc-live-tracker')}

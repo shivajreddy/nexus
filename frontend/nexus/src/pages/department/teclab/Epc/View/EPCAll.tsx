@@ -185,7 +185,7 @@ function EPCAll() {
         try {
             // TODO: why is this even in async ? remove if not needed
             async function get_current_user() {
-                const hasEditorRoles = hasRoles(userRoles, [101]);
+                const hasEditorRoles = hasRoles(userRoles, [211]);
                 if (hasEditorRoles) {
                     const updatedColumnDefinitions = [
                         ...columnDefinitions,
