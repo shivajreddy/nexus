@@ -26,4 +26,7 @@
         - 220 - FOSC viewer
         - 221 - FOSC editor
         - 223 - FOSC super user -> get emails, change form data
+9** - MASTER KEY 
+    999 - DEVELOPER -> access to everything
+
 ```
