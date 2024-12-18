@@ -16,7 +16,7 @@ import {MdEmail, MdOutlineStorage} from "react-icons/md";
 import {useNavigate} from "react-router-dom";
 import {CgMenuGridO} from "react-icons/cg";
 import {Button} from "@components/ui/button.tsx";
-import {BASE_URL} from "@/services/api";
+import {BASE_URL, FOSC_URL} from "@/services/api";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
 import {hasRoles} from "@/features/utils/utils.ts";
 import {useUserRoles} from "@hooks/useUserRoles.ts";

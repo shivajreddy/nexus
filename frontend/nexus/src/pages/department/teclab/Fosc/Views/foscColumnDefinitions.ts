@@ -26,7 +26,6 @@ const foscColumnDefinitions: ColGroupDef[] = [
         headerName: 'Foundation',
         children: [
             {headerName: 'Scanned', field: 'foundation_scan_status'},
-            {headerName: 'Scanner', field: 'foundation_scanner'},
             {headerName: 'Date', field: 'foundation_scan_date'},
             {headerName: 'Reported', field: 'foundation_report_status'},
             {headerName: 'Reporter', field: 'foundation_reporter'},
@@ -39,7 +38,6 @@ const foscColumnDefinitions: ColGroupDef[] = [
         headerName: 'Slab',
         children: [
             {headerName: 'Scanned', field: 'slab_scan_status'},
-            {headerName: 'Scanner', field: 'slab_scanner'},
             {headerName: 'Date', field: 'slab_scan_date'},
             {headerName: 'Reported', field: 'slab_report_status'},
             {headerName: 'Reporter', field: 'slab_reporter'},
@@ -52,7 +50,6 @@ const foscColumnDefinitions: ColGroupDef[] = [
         headerName: 'Frame',
         children: [
             {headerName: 'Scanned', field: 'frame_scan_status'},
-            {headerName: 'Scanner', field: 'frame_scanner'},
             {headerName: 'Date', field: 'frame_scan_date'},
             {headerName: 'Reported', field: 'frame_report_status'},
             {headerName: 'Reporter', field: 'frame_reporter'},
@@ -65,7 +62,6 @@ const foscColumnDefinitions: ColGroupDef[] = [
         headerName: 'Mep',
         children: [
             {headerName: 'Scanned', field: 'mep_scan_status'},
-            {headerName: 'Scanner', field: 'mep_scanner'},
             {headerName: 'Date', field: 'mep_scan_date'},
             {headerName: 'Reported', field: 'mep_report_status'},
             {headerName: 'Reporter', field: 'mep_reporter'},

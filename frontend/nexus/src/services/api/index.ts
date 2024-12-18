@@ -8,6 +8,8 @@ if (import.meta.env.VITE_APP_ENV === 'development') {
 
 export const BASE_URL = baseUrl;
 
+// fosc emailing endpoint
+export const FOSC_URL = "http://nexus.tecofva.com/fosc"
 
 // Auth related endpoints
 export const REFRESH_ENDPOINT = "/auth/refresh"

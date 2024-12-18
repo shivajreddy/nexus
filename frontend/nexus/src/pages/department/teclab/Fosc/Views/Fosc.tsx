@@ -63,7 +63,6 @@ function Fosc() {
                     lot_number: item.lot_number,
 
                     foundation_scan_status: item.foundation_scan_status,
-                    foundation_scanner: item.foundation_scanner,
                     foundation_scan_date: item.foundation_scan_date ? format(new Date(item.foundation_scan_date), 'MM/dd/yyyy') : null,
                     foundation_report_status: item.foundation_report_status,
                     foundation_reporter: item.foundation_reporter,
@@ -71,7 +70,6 @@ function Fosc() {
                     foundation_uploaded: item.foundation_uploaded,
 
                     slab_scan_status: item.slab_scan_status,
-                    slab_scanner: item.slab_scanner,
                     slab_scan_date: item.slab_scan_date ? format(new Date(item.slab_scan_date), 'MM/dd/yyyy') : null,
                     slab_report_status: item.slab_report_status,
                     slab_reporter: item.slab_reporter,
@@ -79,7 +77,6 @@ function Fosc() {
                     slab_uploaded: item.slab_uploaded,
 
                     frame_scan_status: item.frame_scan_status,
-                    frame_scanner: item.frame_scanner,
                     frame_scan_date: item.frame_scan_date ? format(new Date(item.frame_scan_date), 'MM/dd/yyyy') : null,
                     frame_report_status: item.frame_report_status,
                     frame_reporter: item.frame_reporter,
@@ -87,7 +84,6 @@ function Fosc() {
                     frame_uploaded: item.frame_uploaded,
 
                     mep_scan_status: item.mep_scan_status,
-                    mep_scanner: item.mep_scanner,
                     mep_scan_date: item.mep_scan_date ? format(new Date(item.mep_scan_date), 'MM/dd/yyyy') : null,
                     mep_report_status: item.mep_report_status,
                     mep_reporter: item.mep_reporter,
