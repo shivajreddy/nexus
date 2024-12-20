@@ -20,7 +20,6 @@ type TECLabFOSCData = {
 
     // Foundation
     foundation_scan_status?: boolean;
-    foundation_scanner?: string;
     foundation_scan_date?: Date;
     foundation_report_status?: boolean;
     foundation_reporter?: string;
@@ -29,7 +28,6 @@ type TECLabFOSCData = {
 
     // Slab
     slab_scan_status?: boolean;
-    slab_scanner?: string;
     slab_scan_date?: Date;
     slab_report_status?: boolean;
     slab_reporter?: string;
@@ -38,7 +36,6 @@ type TECLabFOSCData = {
 
     // Frame
     frame_scan_status?: boolean;
-    frame_scanner?: string;
     frame_scan_date?: Date;
     frame_report_status?: boolean;
     frame_reporter?: string;
@@ -47,7 +44,6 @@ type TECLabFOSCData = {
 
     // MEP
     mep_scan_status?: boolean;
-    mep_scanner?: string;
     mep_scan_date?: Date;
     mep_report_status?: boolean;
     mep_reporter?: string;

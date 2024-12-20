@@ -1,6 +1,6 @@
 import csv
 import os
-from datetime import datetime 
+from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import List, Annotated 
@@ -309,13 +309,20 @@ def get_all_communities():
 
 # """
 
+
 # """
 # :: Feature: email FOSC data
 # Formats the dates to remove the time
 def format_date(date_string):
     if date_string:
-        return date_string.strftime("%m/%d/%Y")
-    return None
+        print(date_string)
+        if isinstance(date_string, datetime):
+            # print("shifter")
+            return date_string.strftime("%m/%d/%Y")
+        else:
+            # print("keeper")
+            return date_string
+
 
 # create email with attachment
 def generate_email(current_user_data, csv_filename, today_date, email):
@@ -396,10 +403,10 @@ def generate_send_csv_live(current_user_data: Annotated[User, Depends(get_curren
         csv_writer.writerow([
             "Community", "Section", "Lot", "PM", "Director",
 
-            "Foundation Scanned", "Date", "Scanner",
-            "Slab Scanned", "Date", "Scanner",
-            "Frame Scanned", "Date", "Scanner",
-            "MEP Scanned", "Date", "Scanner",
+            "Foundation Scanned", "Date",
+            "Slab Scanned", "Date",
+            "Frame Scanned", "Date",
+            "MEP Scanned", "Date",
 
             "Foundation Reported", "Date", "Reporter",
             "Slab Reported", "Date", "Reporter",
@@ -414,10 +421,10 @@ def generate_send_csv_live(current_user_data: Annotated[User, Depends(get_curren
                 i.get("assigned_pm"),
                 i.get("assigned_director"),
 
-                i.get("foundation_scan_status"), format_date(i.get("foundation_scan_date")), i.get("foundation_scanner"),
-                i.get("slab_scan_status"), format_date(i.get("slab_scan_date")), i.get("slab_scanner"),
-                i.get("frame_scan_status"), format_date(i.get("frame_scan_date")), i.get("frame_scanner"),
-                i.get("mep_scan_status"), format_date(i.get("mep_scan_date")), i.get("mep_scanner"),
+                i.get("foundation_scan_status"), format_date(i.get("foundation_scan_date")),
+                i.get("slab_scan_status"), format_date(i.get("slab_scan_date")),
+                i.get("frame_scan_status"), format_date(i.get("frame_scan_date")),
+                i.get("mep_scan_status"), format_date(i.get("mep_scan_date")),
 
                 i.get("foundation_report_status"), format_date(i.get("foundation_report_date")), i.get("foundation_reporter"),
                 i.get("slab_report_status"), format_date(i.get("slab_report_date")), i.get("slab_reporter"),
@@ -447,10 +454,10 @@ def generate_send_csv_all(current_user_data: Annotated[User, Depends(get_current
         csv_writer.writerow([
             "Community", "Section", "Lot", "PM", "Director",
 
-            "Foundation Scanned", "Foundation S-Date", "Foundation Scanner",
-            "Slab Scanned", "Slab S-Date", "Slab Scanner",
-            "Frame Scanned", "Frame S-Date", "Frame Scanner",
-            "MEP Scanned", "MEP S-Date", "MEP Scanner",
+            "Foundation Scanned", "Foundation S-Date",
+            "Slab Scanned", "Slab S-Date",
+            "Frame Scanned", "Frame S-Date",
+            "MEP Scanned", "MEP S-Date",
 
             "Foundation Reported", "Foundation R-Date", "Foundation Reporter",
             "Slab Reported", "Slab R-Date", "Slab Reporter",
@@ -468,10 +475,10 @@ def generate_send_csv_all(current_user_data: Annotated[User, Depends(get_current
                 j.get("assigned_pm"),
                 j.get("assigned_director"),
 
-                j.get("foundation_scan_status"), format_date(j.get("foundation_scan_date")), j.get("foundation_scanner"),
-                j.get("slab_scan_status"), format_date(j.get("slab_scan_date")), j.get("slab_scanner"),
-                j.get("frame_scan_status"), format_date(j.get("frame_scan_date")), j.get("frame_scanner"),
-                j.get("mep_scan_status"), format_date(j.get("mep_scan_date")), j.get("mep_scanner"),
+                j.get("foundation_scan_status"), format_date(j.get("foundation_scan_date")),
+                j.get("slab_scan_status"), format_date(j.get("slab_scan_date")),
+                j.get("frame_scan_status"), format_date(j.get("frame_scan_date")),
+                j.get("mep_scan_status"), format_date(j.get("mep_scan_date")),
 
                 j.get("foundation_report_status"), format_date(j.get("foundation_report_date")), j.get("foundation_reporter"),
                 j.get("slab_report_status"), format_date(j.get("slab_report_date")), j.get("slab_reporter"),
@@ -527,16 +534,12 @@ def update_project_fosc_data(new_data: list, header: list):
             "PM": "teclab_data.fosc_data.assigned_pm",
             "Foundation Scanned": "teclab_data.fosc_data.foundation_scan_status",
             "Foundation S-Date": "teclab_data.fosc_data.foundation_scan_date",
-            "Foundation Scanner": "teclab_data.fosc_data.foundation_scanner",
             "Slab Scanned": "teclab_data.fosc_data.slab_scan_status",
             "Slab S-Date": "teclab_data.fosc_data.slab_scan_date",
-            "Slab Scanner": "teclab_data.fosc_data.slab_scanner",
             "Frame Scanned": "teclab_data.fosc_data.frame_scan_status",
             "Frame S-Date": "teclab_data.fosc_data.frame_scan_date",
-            "Frame Scanner": "teclab_data.fosc_data.frame_scanner",
             "MEP Scanned": "teclab_data.fosc_data.mep_scan_status",
             "MEP S-Date": "teclab_data.fosc_data.mep_scan_date",
-            "MEP Scanner": "teclab_data.fosc_data.mep_scanner",
             "Foundation Reported": "teclab_data.fosc_data.foundation_report_status",
             "Foundation R-Date": "teclab_data.fosc_data.foundation_report_date",
             "Foundation Reporter": "teclab_data.fosc_data.foundation_reporter",
@@ -624,7 +627,12 @@ def csv_upload():
 def update_db():
     # ! update all projects with new fields
     projects_coll.update_many({},
-                                # $set $unset
+                                # $unset
+                                # 'teclab_data.fosc_data.foundation_scanner': None,
+                                # 'teclab_data.fosc_data.slab_scanner': None,
+                                # 'teclab_data.fosc_data.frame_scanner': None,
+                                # 'teclab_data.fosc_data.mep_scanner': None,
+                                #
                                 {'$set': {
 
                                     'teclab_data.fosc_data.lot_status_started': False,
@@ -633,7 +641,6 @@ def update_db():
                                     'teclab_data.fosc_data.assigned_director': None,
 
                                     'teclab_data.fosc_data.foundation_scan_status': None,
-                                    'teclab_data.fosc_data.foundation_scanner': None,
                                     'teclab_data.fosc_data.foundation_scan_date': None,
                                     'teclab_data.fosc_data.foundation_report_status': None,
                                     'teclab_data.fosc_data.foundation_reporter': None,
@@ -641,7 +648,6 @@ def update_db():
                                     'teclab_data.fosc_data.foundation_uploaded': None,
 
                                     'teclab_data.fosc_data.slab_scan_status': None,
-                                    'teclab_data.fosc_data.slab_scanner': None,
                                     'teclab_data.fosc_data.slab_scan_date': None,
                                     'teclab_data.fosc_data.slab_report_status': None,
                                     'teclab_data.fosc_data.slab_reporter': None,
@@ -649,7 +655,6 @@ def update_db():
                                     'teclab_data.fosc_data.slab_uploaded': None,
 
                                     'teclab_data.fosc_data.frame_scan_status': None,
-                                    'teclab_data.fosc_data.frame_scanner': None,
                                     'teclab_data.fosc_data.frame_scan_date': None,
                                     'teclab_data.fosc_data.frame_report_status': None,
                                     'teclab_data.fosc_data.frame_reporter': None,
@@ -657,7 +662,6 @@ def update_db():
                                     'teclab_data.fosc_data.frame_uploaded': None,
 
                                     'teclab_data.fosc_data.mep_scan_status': None,
-                                    'teclab_data.fosc_data.mep_scanner': None,
                                     'teclab_data.fosc_data.mep_scan_date': None,
                                     'teclab_data.fosc_data.mep_report_status': None,
                                     'teclab_data.fosc_data.mep_reporter': None,

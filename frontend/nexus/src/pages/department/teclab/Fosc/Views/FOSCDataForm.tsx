@@ -129,7 +129,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                     assigned_director: lotData.fosc_data.assigned_director,
 
                     foundation_scan_status: lotData.fosc_data.foundation_scan_status,
-                    foundation_scanner: lotData.fosc_data.foundation_scanner,
                     foundation_scan_date: lotData.fosc_data.foundation_scan_date ? new Date(lotData.fosc_data.foundation_scan_date) : undefined,
                     foundation_report_status: lotData.fosc_data.foundation_report_status,
                     foundation_reporter: lotData.fosc_data.foundation_reporter,
@@ -137,7 +136,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                     foundation_uploaded: lotData.fosc_data.foundation_uploaded,
 
                     slab_scan_status: lotData.fosc_data.slab_scan_status,
-                    slab_scanner: lotData.fosc_data.slab_scanner,
                     slab_scan_date: lotData.fosc_data.slab_scan_date ? new Date(lotData.fosc_data.slab_scan_date) : undefined,
                     slab_report_status: lotData.fosc_data.slab_report_status,
                     slab_reporter: lotData.fosc_data.slab_reporter,
@@ -145,7 +143,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                     slab_uploaded: lotData.fosc_data.slab_uploaded,
 
                     frame_scan_status: lotData.fosc_data.frame_scan_status,
-                    frame_scanner: lotData.fosc_data.frame_scanner,
                     frame_scan_date: lotData.fosc_data.frame_scan_date ? new Date(lotData.fosc_data.frame_scan_date) : undefined,
                     frame_report_status: lotData.fosc_data.frame_report_status,
                     frame_reporter: lotData.fosc_data.frame_reporter,
@@ -153,7 +150,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                     frame_uploaded: lotData.fosc_data.frame_uploaded,
 
                     mep_scan_status: lotData.fosc_data.mep_scan_status,
-                    mep_scanner: lotData.fosc_data.mep_scanner,
                     mep_scan_date: lotData.fosc_data.mep_scan_date ? new Date(lotData.fosc_data.mep_scan_date) : undefined,
                     mep_report_status: lotData.fosc_data.mep_report_status,
                     mep_reporter: lotData.fosc_data.mep_reporter,
@@ -313,12 +309,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                                                  isChecked={selectedProjectsTECLabFOSCData.foundation_scan_status}
                                                  onUpdate={() => handleStateChange('foundation_scan_status', !selectedProjectsTECLabFOSCData.foundation_scan_status)}
                                     />
-                                    <FieldDropDown id="3_foundation_scanner"
-                                                   name={"Scanner"}
-                                                   dropdownData={formData.all_field_ops_members}
-                                                   value={selectedProjectsTECLabFOSCData.foundation_scanner}
-                                                   onUpdate={newValue => handleStateChange('foundation_scanner', newValue)}
-                                    />
                                     <FieldDate id="3_foundation_scan_date"
                                                name="Scan Date"
                                                value={selectedProjectsTECLabFOSCData.foundation_scan_date}
@@ -366,12 +356,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                                                  name="Scan Status"
                                                  isChecked={selectedProjectsTECLabFOSCData.slab_scan_status}
                                                  onUpdate={() => handleStateChange('slab_scan_status', !selectedProjectsTECLabFOSCData.slab_scan_status)}
-                                    />
-                                    <FieldDropDown id="3_slab_scanner"
-                                                   name={"Scanner"}
-                                                   dropdownData={formData.all_field_ops_members}
-                                                   value={selectedProjectsTECLabFOSCData.slab_scanner}
-                                                   onUpdate={newValue => handleStateChange('slab_scanner', newValue)}
                                     />
                                     <FieldDate id="3_slab_scan_date"
                                                name="Scan Date"
@@ -421,12 +405,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                                                  isChecked={selectedProjectsTECLabFOSCData.frame_scan_status}
                                                  onUpdate={() => handleStateChange('frame_scan_status', !selectedProjectsTECLabFOSCData.frame_scan_status)}
                                     />
-                                    <FieldDropDown id="3_frame_scanner"
-                                                   name={"Scanner"}
-                                                   dropdownData={formData.all_field_ops_members}
-                                                   value={selectedProjectsTECLabFOSCData.frame_scanner}
-                                                   onUpdate={newValue => handleStateChange('frame_scanner', newValue)}
-                                    />
                                     <FieldDate id="3_frame_scan_date"
                                                name="Scan Date"
                                                value={selectedProjectsTECLabFOSCData.frame_scan_date}
@@ -473,12 +451,6 @@ const FOSCDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatusFO
                                                  name="Scan Status"
                                                  isChecked={selectedProjectsTECLabFOSCData.mep_scan_status}
                                                  onUpdate={() => handleStateChange('mep_scan_status', !selectedProjectsTECLabFOSCData.mep_scan_status)}
-                                    />
-                                    <FieldDropDown id="3_mep_scanner"
-                                                   name={"Scanner"}
-                                                   dropdownData={formData.all_field_ops_members}
-                                                   value={selectedProjectsTECLabFOSCData.mep_scanner}
-                                                   onUpdate={newValue => handleStateChange('mep_scanner', newValue)}
                                     />
                                     <FieldDate id="3_mep_scan_date"
                                                name="Scan Date"

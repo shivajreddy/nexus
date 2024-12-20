@@ -14,14 +14,6 @@
 ## Roles
 
 ```txt
-2xx - TECLab Department
-21x - EPC related
-    - 101 - viewer
-    - 102 - lot-editor
-    - 211 - user
-    - 212 - lot-editor
-    - 213 - epc super user -> get emails, change form data
-
 1xx - Public
     - 101 - Public pages
 2xx - TECLab Department
@@ -33,5 +25,8 @@
     22x - Field OPS related
         - 220 - FOSC viewer
         - 221 - FOSC editor
-        - 221 - FOSC super user -> get emails, change form data
+        - 223 - FOSC super user -> get emails, change form data
+9** - MASTER KEY 
+    999 - DEVELOPER -> access to everything
+
 ```

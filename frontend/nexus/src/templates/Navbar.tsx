@@ -6,51 +6,62 @@ import {FaExpand, FaRegCircle} from "react-icons/fa";
 
 import {BsCollection, BsHouses} from "react-icons/bs";
 import {PiGraphBold} from "react-icons/pi";
+import {useUserRoles} from "@hooks/useUserRoles.ts";
+import {hasRoles} from "@/features/utils/utils.ts";
 // import {RiHome2Line} from "react-icons/ri";
 
 
 function Navbar() {
     const navigate = useNavigate();
 
+    const userRoles = useUserRoles();
 
     interface INavBarItem {
         name: string,
         link: string,
         icon: ReactElement,
-        isBeta: boolean
+        isBeta: boolean,
+        roles: [number],
     }
 
     // + Fetch the items based on user roles
+
     const HardCodedNavBarItems: INavBarItem[] = [
         {
             name: "Projects",
             link: "/projects",
             icon: <BsHouses size="1.5em"/>,
             isBeta: true,
+            roles: [101],
         },
         {
             name: "PipeLine",
             link: "/pipeline",
             icon: <PiGraphBold size="1.5em"/>,
             isBeta: true,
+            roles: [101],
         },
+
         {
             name: "EPC",
             link: "/epc",
             icon: <FaRegCircle size={"1.5em"}/>,
             isBeta: true,
+            roles: [101],
         },
         {
             name: "FOSC",
             link: "/fosc",
             icon: <FaExpand size={"1.5em"}/>,
             isBeta: true,
+            roles: [220],
         },
         {
             name: "CORD",
             link: "/core-dashboard",
             icon: <BsCollection size={"1.5em"}/>,
             isBeta: true,
+            roles: [101],
         },
     ]
 
@@ -65,8 +76,8 @@ function Navbar() {
                         <span
                             className="bg-default-bg1 rounded-md shadow-sm px-2 p-1 pointer-events-none absolute -bottom-9 left-2 w-max opacity-0 transition-opacity group-hover:opacity-100"
                         >
-                            {props.name}
-                        </span>
+                                {props.name}
+                            </span>
                     </div>
 
                 </NavLink>
@@ -95,13 +106,14 @@ function Navbar() {
                 <div className="flex-auto nav-menu flex justify-center">
 
                     {
-                        HardCodedNavBarItems.map((item) => (
+                        HardCodedNavBarItems.filter((item) => hasRoles(userRoles, item.roles)).map((item) => (
                             <LinkWithToolTip
                                 key={item.name}
                                 name={item.name}
                                 link={item.link}
                                 icon={item.icon}
                                 isBeta={item.isBeta}
+                                roles={item.roles}
                                 // sidebarIsOpen={sidebarStatusState}
                             />
                         ))

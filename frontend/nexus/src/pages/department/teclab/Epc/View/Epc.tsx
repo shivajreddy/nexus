@@ -134,7 +134,7 @@ function Epc() {
                     ]
                 }
             ];
-            if (hasRoles(userRoles, [102])) {
+            if (hasRoles(userRoles, [210])) {
                 return [...viewerColDef, ...editorColDef];
             }
             return viewerColDef
@@ -188,7 +188,7 @@ function Epc() {
                     </div>
 
                     <div className="flex mx-10">
-                        {hasRoles(userRoles, [102]) &&
+                        {hasRoles(userRoles, [211]) &&
                           <div className="flex justify-center items-center bg-default-bg1">
                             <Button onClick={() => navigate('edit')} className="min-w-[10em]">
                               <p className="pr-2"><MdModeEditOutline/></p>

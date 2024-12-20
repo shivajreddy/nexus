@@ -57,7 +57,6 @@ const columnDefinitionsData = [
         headerName: 'Foundation',
         children: [
             {headerName: 'Scanned', field: 'foundation_scan_status'},
-            {headerName: 'Scanner', field: 'foundation_scanner'},
             {headerName: 'Date', field: 'foundation_scan_date'},
             {headerName: 'Reported', field: 'foundation_report_status'},
             {headerName: 'Reporter', field: 'foundation_reporter'},
@@ -69,7 +68,6 @@ const columnDefinitionsData = [
         headerName: 'Slab',
         children: [
             {headerName: 'Scanned', field: 'slab_scan_status'},
-            {headerName: 'Scanner', field: 'slab_scanner'},
             {headerName: 'Date', field: 'slab_scan_date'},
             {headerName: 'Reported', field: 'slab_report_status'},
             {headerName: 'Reporter', field: 'slab_reporter'},
@@ -81,7 +79,6 @@ const columnDefinitionsData = [
         headerName: 'Frame',
         children: [
             {headerName: 'Scanned', field: 'frame_scan_status'},
-            {headerName: 'Scanner', field: 'frame_scanner'},
             {headerName: 'Date', field: 'frame_scan_date'},
             {headerName: 'Reported', field: 'frame_report_status'},
             {headerName: 'Reporter', field: 'frame_reporter'},
@@ -93,7 +90,6 @@ const columnDefinitionsData = [
         headerName: 'Mep',
         children: [
             {headerName: 'Scanned', field: 'mep_scan_status'},
-            {headerName: 'Scanner', field: 'mep_scanner'},
             {headerName: 'Date', field: 'mep_scan_date'},
             {headerName: 'Reported', field: 'mep_report_status'},
             {headerName: 'Reporter', field: 'mep_reporter'},
@@ -171,7 +167,6 @@ function FOSCCurrent() {
                     assigned_director: item.assigned_director,
 
                     foundation_scan_status: item.foundation_scan_status,
-                    foundation_scanner: item.foundation_scanner,
                     foundation_scan_date: item.foundation_scan_date ? format(new Date(item.foundation_scan_date), 'MM/dd/yyyy') : null,
                     foundation_report_status: item.foundation_report_status,
                     foundation_reporter: item.foundation_reporter,
@@ -179,7 +174,6 @@ function FOSCCurrent() {
                     foundation_uploaded: item.foundation_uploaded,
 
                     slab_scan_status: item.slab_scan_status,
-                    slab_scanner: item.slab_scanner,
                     slab_scan_date: item.slab_scan_date ? format(new Date(item.slab_scan_date), 'MM/dd/yyyy') : null,
                     slab_report_status: item.slab_report_status,
                     slab_reporter: item.slab_reporter,
@@ -187,7 +181,6 @@ function FOSCCurrent() {
                     slab_uploaded: item.slab_uploaded,
 
                     frame_scan_status: item.frame_scan_status,
-                    frame_scanner: item.frame_scanner,
                     frame_scan_date: item.frame_scan_date ? format(new Date(item.frame_scan_date), 'MM/dd/yyyy') : null,
                     frame_report_status: item.frame_report_status,
                     frame_reporter: item.frame_reporter,
@@ -195,7 +188,6 @@ function FOSCCurrent() {
                     frame_uploaded: item.frame_uploaded,
 
                     mep_scan_status: item.mep_scan_status,
-                    mep_scanner: item.mep_scanner,
                     mep_scan_date: item.mep_scan_date ? format(new Date(item.mep_scan_date), 'MM/dd/yyyy') : null,
                     mep_report_status: item.mep_report_status,
                     mep_reporter: item.mep_reporter,
@@ -225,7 +217,7 @@ function FOSCCurrent() {
         try {
             // TODO: why is this even in async ? remove if not needed
             async function get_current_user() {
-                const hasEditorRoles = hasRoles(userRoles, [101]);
+                const hasEditorRoles = hasRoles(userRoles, [221]);
                 if (hasEditorRoles) {
                     const updatedColumnDefinitions = [
                         ...columnDefinitions,

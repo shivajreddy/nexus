@@ -193,9 +193,10 @@ def get_all_homesiting_drafters_names():
 # :: Field Ops members ::
 @router.get('/fieldops-members', dependencies=[Depends(get_current_user_data)])
 def get_all_field_ops_members_names():
+    former_members = ["R.Spence", "T.Butterworth", "B.Chancellor", "A.Ward", "Archi-TEC-tonic"]
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
     all_teams = teclab_doc["data"]["teams"]
     for team in all_teams:
         print(team["team_name"])
         if team["team_name"] == "Field Ops":
-            return team["team_members"]
+            return team["team_members"] + former_members
