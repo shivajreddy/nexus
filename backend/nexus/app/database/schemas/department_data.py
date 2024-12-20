@@ -86,7 +86,7 @@ class EPCData(BaseModel):
 
 class FOSCData(BaseModel):
     # Status
-    lot_status_started: bool = True
+    lot_status_started: bool = False
     lot_status_finished: bool = False
 
     # Supervisors

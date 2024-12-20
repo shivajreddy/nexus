@@ -626,58 +626,61 @@ def csv_upload():
 @router.get('/update-db')
 def update_db():
     # ! update all projects with new fields
-    projects_coll.update_many({},
-                                # $unset
-                                # 'teclab_data.fosc_data.foundation_scanner': None,
-                                # 'teclab_data.fosc_data.slab_scanner': None,
-                                # 'teclab_data.fosc_data.frame_scanner': None,
-                                # 'teclab_data.fosc_data.mep_scanner': None,
+    projects_coll.update_many(
+        {
+                                '$unset': {
+                                'teclab_data.fosc_data.foundation_scanner': None,
+                                'teclab_data.fosc_data.slab_scanner': None,
+                                'teclab_data.fosc_data.frame_scanner': None,
+                                'teclab_data.fosc_data.mep_scanner': None,
+                                }
+        },
+                                # {'$set': {
                                 #
-                                {'$set': {
-
-                                    'teclab_data.fosc_data.lot_status_started': False,
-                                    'teclab_data.fosc_data.lot_status_finished': False,
-                                    'teclab_data.fosc_data.assigned_pm': None,
-                                    'teclab_data.fosc_data.assigned_director': None,
-
-                                    'teclab_data.fosc_data.foundation_scan_status': None,
-                                    'teclab_data.fosc_data.foundation_scan_date': None,
-                                    'teclab_data.fosc_data.foundation_report_status': None,
-                                    'teclab_data.fosc_data.foundation_reporter': None,
-                                    'teclab_data.fosc_data.foundation_report_date': None,
-                                    'teclab_data.fosc_data.foundation_uploaded': None,
-
-                                    'teclab_data.fosc_data.slab_scan_status': None,
-                                    'teclab_data.fosc_data.slab_scan_date': None,
-                                    'teclab_data.fosc_data.slab_report_status': None,
-                                    'teclab_data.fosc_data.slab_reporter': None,
-                                    'teclab_data.fosc_data.slab_report_date': None,
-                                    'teclab_data.fosc_data.slab_uploaded': None,
-
-                                    'teclab_data.fosc_data.frame_scan_status': None,
-                                    'teclab_data.fosc_data.frame_scan_date': None,
-                                    'teclab_data.fosc_data.frame_report_status': None,
-                                    'teclab_data.fosc_data.frame_reporter': None,
-                                    'teclab_data.fosc_data.frame_report_date': None,
-                                    'teclab_data.fosc_data.frame_uploaded': None,
-
-                                    'teclab_data.fosc_data.mep_scan_status': None,
-                                    'teclab_data.fosc_data.mep_scan_date': None,
-                                    'teclab_data.fosc_data.mep_report_status': None,
-                                    'teclab_data.fosc_data.mep_reporter': None,
-                                    'teclab_data.fosc_data.mep_report_date': None,
-                                    'teclab_data.fosc_data.mep_uploaded': None,
-
-                                    'teclab_data.fosc_data.misc_scan_status': None,
-                                    'teclab_data.fosc_data.misc_report_status': None,
-                                    'teclab_data.fosc_data.notes': None,
-
-                                    'teclab_data.fosc_data.foundation_needed': True,
-                                    'teclab_data.fosc_data.slab_needed': True,
-                                    'teclab_data.fosc_data.frame_needed': True,
-                                    'teclab_data.fosc_data.mep_needed': False,
-
-                                }})
+                                #     'teclab_data.fosc_data.lot_status_started': False,
+                                #     'teclab_data.fosc_data.lot_status_finished': False,
+                                #     'teclab_data.fosc_data.assigned_pm': None,
+                                #     'teclab_data.fosc_data.assigned_director': None,
+                                #
+                                #     'teclab_data.fosc_data.foundation_scan_status': None,
+                                #     'teclab_data.fosc_data.foundation_scan_date': None,
+                                #     'teclab_data.fosc_data.foundation_report_status': None,
+                                #     'teclab_data.fosc_data.foundation_reporter': None,
+                                #     'teclab_data.fosc_data.foundation_report_date': None,
+                                #     'teclab_data.fosc_data.foundation_uploaded': None,
+                                #
+                                #     'teclab_data.fosc_data.slab_scan_status': None,
+                                #     'teclab_data.fosc_data.slab_scan_date': None,
+                                #     'teclab_data.fosc_data.slab_report_status': None,
+                                #     'teclab_data.fosc_data.slab_reporter': None,
+                                #     'teclab_data.fosc_data.slab_report_date': None,
+                                #     'teclab_data.fosc_data.slab_uploaded': None,
+                                #
+                                #     'teclab_data.fosc_data.frame_scan_status': None,
+                                #     'teclab_data.fosc_data.frame_scan_date': None,
+                                #     'teclab_data.fosc_data.frame_report_status': None,
+                                #     'teclab_data.fosc_data.frame_reporter': None,
+                                #     'teclab_data.fosc_data.frame_report_date': None,
+                                #     'teclab_data.fosc_data.frame_uploaded': None,
+                                #
+                                #     'teclab_data.fosc_data.mep_scan_status': None,
+                                #     'teclab_data.fosc_data.mep_scan_date': None,
+                                #     'teclab_data.fosc_data.mep_report_status': None,
+                                #     'teclab_data.fosc_data.mep_reporter': None,
+                                #     'teclab_data.fosc_data.mep_report_date': None,
+                                #     'teclab_data.fosc_data.mep_uploaded': None,
+                                #
+                                #     'teclab_data.fosc_data.misc_scan_status': None,
+                                #     'teclab_data.fosc_data.misc_report_status': None,
+                                #     'teclab_data.fosc_data.notes': None,
+                                #
+                                #     'teclab_data.fosc_data.foundation_needed': True,
+                                #     'teclab_data.fosc_data.slab_needed': True,
+                                #     'teclab_data.fosc_data.frame_needed': True,
+                                #     'teclab_data.fosc_data.mep_needed': False,
+                                #
+                                # }}
+                              )
     res = projects_coll.find()
     result = []
     for doc in res:
