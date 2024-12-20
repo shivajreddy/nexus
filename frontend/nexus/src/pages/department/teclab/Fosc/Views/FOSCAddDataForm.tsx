@@ -113,7 +113,6 @@ const FOSCAddDataForm = ({project_id, project_uid, statusFOSCDataFetch, setStatu
                 const lotData = response.data;
                 console.log(":::lotData = ", lotData)
 
-                console.log("TRYING TO TRANSFORM");
                 // Data transformation
                 const transformedData: TECLabFOSCData = {
                     lot_status_started: lotData.fosc_data.lot_status_started,
