@@ -626,7 +626,7 @@ def csv_upload():
 @router.get('/update-db')
 def update_db():
     # ! update all projects with new fields
-    projects_coll.update_many(
+    projects_coll.update_many({},
         {
                                 '$unset': {
                                 'teclab_data.fosc_data.foundation_scanner': None,
