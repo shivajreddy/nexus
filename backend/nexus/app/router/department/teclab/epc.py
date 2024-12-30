@@ -214,6 +214,106 @@ def query_tracker_data():
 
     return filtered_lots, result_data
 
+# TEMPORARY FN, but you can use this logic later
+# download projects into CSCV
+# Filter for lots that are from&after 2024, That can be ongoing, can be finished, BUT cant be released 
+@router.get("/download")
+def download():
+    # Retrieve all documents from the collection
+    all_docs = list(projects_coll.find())
+
+    filtered_lots = []
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+        p_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # Skip the released lots
+        if p_epc_data.lot_status_released:
+            continue
+
+
+        # Skip lots without a contract date
+
+        if p_epc_data.contract_date is None:
+            continue
+
+        # Filter for lots from 2024 and onwards
+        if p_epc_data.contract_date.year < 2024:
+            continue
+
+        # Collect data for CSV
+        filtered_lots.append(p_epc_data)
+
+    # Prepare CSV filename
+    today_date = datetime.now().strftime("%d-%m-%y")
+
+    csv_dir = "./app/files/epc"
+    os.makedirs(csv_dir, exist_ok=True)  # Ensure directory exists
+    csv_filename = os.path.join(csv_dir, f"{today_date}-EPCData.csv")
+    print("filename=", csv_filename)
+
+    # Write to CSV
+    with open(csv_filename, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+
+        # Write header
+        csv_writer.writerow([
+            "lot_status_finished",
+            "lot_status_released",
+            "contract_date",
+            "contract_type",
+            "product_name",
+            "elevation_name",
+            "drafting_drafter",
+            "drafting_assigned_on",
+            "drafting_finished",
+            "engineering_engineer",
+            "engineering_sent",
+            "engineering_received",
+            "plat_engineer",
+            "plat_sent",
+            "plat_received",
+            "permitting_county_name",
+            "permitting_submitted",
+            "permitting_received",
+            "homesiting_completed_by",
+            "homesiting_completed_on",
+            "bbp_posted",
+            "notes"
+        ])
+
+        # Write rows
+        for epc_data in filtered_lots:
+            csv_writer.writerow([
+                epc_data.lot_status_finished,
+                epc_data.lot_status_released,
+                epc_data.contract_date.strftime("%Y-%m-%d") if epc_data.contract_date else None,
+                epc_data.contract_type,
+                epc_data.product_name,
+                epc_data.elevation_name,
+                epc_data.drafting_drafter,
+                epc_data.drafting_assigned_on.strftime("%Y-%m-%d") if epc_data.drafting_assigned_on else None,
+                epc_data.drafting_finished.strftime("%Y-%m-%d") if epc_data.drafting_finished else None,
+                epc_data.engineering_engineer,
+                epc_data.engineering_sent.strftime("%Y-%m-%d") if epc_data.engineering_sent else None,
+                epc_data.engineering_received.strftime("%Y-%m-%d") if epc_data.engineering_received else None,
+                epc_data.plat_engineer,
+                epc_data.plat_sent.strftime("%Y-%m-%d") if epc_data.plat_sent else None,
+                epc_data.plat_received.strftime("%Y-%m-%d") if epc_data.plat_received else None,
+                epc_data.permitting_county_name,
+
+                epc_data.permitting_submitted.strftime("%Y-%m-%d") if epc_data.permitting_submitted else None,
+                epc_data.permitting_received.strftime("%Y-%m-%d") if epc_data.permitting_received else None,
+                epc_data.homesiting_completed_by,
+                epc_data.homesiting_completed_on,
+                epc_data.bbp_posted.strftime("%Y-%m-%d") if epc_data.bbp_posted else None,
+                epc_data.notes
+            ])
+
+    return {"message": "CSV file created successfully", "filename": csv_filename}
+
 
 # Send Eagle back tracking email
 @router.get('/epc-backlog-tracker')
