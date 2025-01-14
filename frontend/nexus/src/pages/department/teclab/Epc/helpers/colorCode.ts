@@ -130,7 +130,7 @@ function colorCode(params: CellClassParams) {
     // console.log(params.column.getId(), params.data[target_id], params.value);
     if (params.column.getId() === 'drafting_finished_date') {
         // return getColorScheme(params.data['drafting_assigned_on_date'], params.value, 5);
-        return getStyle(params.data['drafting_assigned_on_date'], params.value, 5);
+        return getStyle(params.data['drafting_assigned_on_date'], params.value, 7);
     }
     if (params.column.getId() === 'engineering_received') {
         // return getColorScheme(params.data['engineering_sent'], params.value, 10);
