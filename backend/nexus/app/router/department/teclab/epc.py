@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import List, Annotated
 
+from app.database.schemas.project import ProjectInfo
 from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.database.database import projects_coll 
@@ -228,23 +229,31 @@ def download():
         # Remove MongoDB's `_id` field from the document
         project = {k: v for (k, v) in doc.items() if k != "_id"}
         p_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+        p_project_info: ProjectInfo = ProjectInfo(**project["project_info"])
 
         # Skip the released lots
         if p_epc_data.lot_status_released:
             continue
-
 
         # Skip lots without a contract date
 
         if p_epc_data.contract_date is None:
             continue
 
-        # Filter for lots from 2024 and onwards
+        # Filter for lots from 2024 and onwards i.e., skip anything before 2024
         if p_epc_data.contract_date.year < 2024:
             continue
 
+        # # combine the p_epc_data and p_project_info
+        # final_lot_data = {
+        #     **p_epc_data.model_dump(),
+        #     **p_project_info.model_dump()
+        # }
+
         # Collect data for CSV
-        filtered_lots.append(p_epc_data)
+        filtered_lots.append((p_epc_data, p_project_info))
+    # print(filtered_lots[0])
+    # return
 
     # Prepare CSV filename
     today_date = datetime.now().strftime("%d-%m-%y")
@@ -260,6 +269,10 @@ def download():
 
         # Write header
         csv_writer.writerow([
+            "community",
+            "section_number",
+            "lot_number",
+
             "lot_status_finished",
             "lot_status_released",
             "contract_date",
@@ -285,31 +298,36 @@ def download():
         ])
 
         # Write rows
-        for epc_data in filtered_lots:
+        for (lot_data, project_data) in filtered_lots:
             csv_writer.writerow([
-                epc_data.lot_status_finished,
-                epc_data.lot_status_released,
-                epc_data.contract_date.strftime("%Y-%m-%d") if epc_data.contract_date else None,
-                epc_data.contract_type,
-                epc_data.product_name,
-                epc_data.elevation_name,
-                epc_data.drafting_drafter,
-                epc_data.drafting_assigned_on.strftime("%Y-%m-%d") if epc_data.drafting_assigned_on else None,
-                epc_data.drafting_finished.strftime("%Y-%m-%d") if epc_data.drafting_finished else None,
-                epc_data.engineering_engineer,
-                epc_data.engineering_sent.strftime("%Y-%m-%d") if epc_data.engineering_sent else None,
-                epc_data.engineering_received.strftime("%Y-%m-%d") if epc_data.engineering_received else None,
-                epc_data.plat_engineer,
-                epc_data.plat_sent.strftime("%Y-%m-%d") if epc_data.plat_sent else None,
-                epc_data.plat_received.strftime("%Y-%m-%d") if epc_data.plat_received else None,
-                epc_data.permitting_county_name,
+                project_data.community,
+                project_data.section,
+                project_data.lot_number,
 
-                epc_data.permitting_submitted.strftime("%Y-%m-%d") if epc_data.permitting_submitted else None,
-                epc_data.permitting_received.strftime("%Y-%m-%d") if epc_data.permitting_received else None,
-                epc_data.homesiting_completed_by,
-                epc_data.homesiting_completed_on,
-                epc_data.bbp_posted.strftime("%Y-%m-%d") if epc_data.bbp_posted else None,
-                epc_data.notes
+                lot_data.lot_status_finished,
+                lot_data.lot_status_released,
+                lot_data.contract_date.strftime("%Y-%m-%d") if lot_data.contract_date else None,
+                lot_data.contract_type,
+                lot_data.product_name,
+                lot_data.elevation_name,
+                lot_data.drafting_drafter,
+                lot_data.drafting_assigned_on.strftime("%Y-%m-%d") if lot_data.drafting_assigned_on else None,
+                lot_data.drafting_finished.strftime("%Y-%m-%d") if lot_data.drafting_finished else None,
+                lot_data.engineering_engineer,
+                lot_data.engineering_sent.strftime("%Y-%m-%d") if lot_data.engineering_sent else None,
+                lot_data.engineering_received.strftime("%Y-%m-%d") if lot_data.engineering_received else None,
+                lot_data.plat_engineer,
+                lot_data.plat_sent.strftime("%Y-%m-%d") if lot_data.plat_sent else None,
+                lot_data.plat_received.strftime("%Y-%m-%d") if lot_data.plat_received else None,
+                lot_data.permitting_county_name,
+
+                lot_data.permitting_submitted.strftime("%Y-%m-%d") if lot_data.permitting_submitted else None,
+                lot_data.permitting_received.strftime("%Y-%m-%d") if lot_data.permitting_received else None,
+                lot_data.homesiting_completed_by,
+                lot_data.homesiting_completed_on,
+                # lot_data.homesiting_completed_on.strftime("%Y-%m-%d") if lot_data.homesiting_completed_on else None,
+                lot_data.bbp_posted.strftime("%Y-%m-%d") if lot_data.bbp_posted else None,
+                lot_data.notes
             ])
 
     return {"message": "CSV file created successfully", "filename": csv_filename}
