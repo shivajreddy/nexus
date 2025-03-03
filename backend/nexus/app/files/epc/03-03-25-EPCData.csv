@@ -1,0 +1,67 @@
+community,section_number,lot_number,lot_status_finished,lot_status_released,contract_date,contract_type,product_name,elevation_name,drafting_drafter,drafting_assigned_on,drafting_finished,engineering_engineer,engineering_sent,engineering_received,plat_engineer,plat_sent,plat_received,permitting_county_name,permitting_submitted,permitting_received,homesiting_completed_by,homesiting_completed_on,bbp_posted,notes
+West Broad Village Eastern Edge,5,01,False,False,2025-01-29,SPEC,Belmont Terrace,20 - Arts & Crafts,K.Fadl,2025-02-08,2025-02-03,Kempsville,2025-02-03,,EDA,2025-02-03,,Henrico,,,,,,initiated 1/28-draft complete on 02/03-lifestyle came in on 2/8
+West Broad Village Eastern Edge,5,02,False,False,2025-01-28,SPEC,Ridge Terrace,10 - Traditional,K.Fadl,2025-01-28,2025-02-05,Kempsville,2025-02-05,,Koontz,2025-02-05,,Henrico,,,,,,Ridge Terrace new product
+Womack,1,40,False,False,2025-01-30,SPEC,Magnolia,40 - European,M.Robinson,2025-01-30,2025-02-08,Kempsville,2025-02-08,2025-02-18,High Mark,2025-02-08,2025-02-18,Chesterfield,2025-02-21,2025-02-26,R.Arias,2025-02-13T05:00:00.000Z,2025-02-28,"Lot changed back to WM 37 after BBPs on 12/3/24- It was originally on 37 and changed twice.
+
+01-28-2025 A new spec was initiated.
+
+02-14-2025 ENG/PLAT Set resent due to house needing to be flipped (Expected return date 2/19/2025)"
+Settler's Ridge,e,67,False,False,2025-02-05,Contract,Pearl Ranch,20 - Craftsman,K.Fadl,2025-02-05,2025-02-07,Kempsville,2024-11-21,2024-12-04,Koontz,2025-02-07,2025-02-20,Henrico,2024-12-04,,R.Arias,,,"SPEC INITIATED 10/11/24
+PERMIT SENT 12/04/24
+SOLD W/LF CHANGES 02/04/25
+PLAT REVISION 02/07/2025
+LF change 02/17/25-EXISTING TRANSOM W/ TILE SURROUND ADDED"
+Readers Branch,6,42,False,False,2025-02-11,Contract,Belmont,10 - Traditional,Y.Wang,2025-02-25,2025-02-27,Struc Tech,,,EDA,,,Goochland,,,,,,"Lot moved to RB 40-6 on  11/22/24
+"
+The Preserve TH,5,193,False,False,2025-01-06,Permit & Hold,Highland,10 - Traditional,Y.Wang,2025-01-14,2025-02-06,Riverside,2025-02-06,2025-02-20,Foresite,2025-02-06,2025-02-13,Montgomery,,,,,,
+The Preserve TH,5,194,False,False,2025-01-06,Permit & Hold,Millcreek,10 - Traditional,Y.Wang,2025-01-14,2025-02-06,Riverside,2025-02-06,2025-02-20,Foresite,2025-02-06,2025-02-13,Montgomery,,,,,,
+The Preserve TH,5,195,False,False,2025-01-06,Permit & Hold,Millcreek,10 - Traditional,Y.Wang,2025-01-14,2025-02-06,Riverside,2025-02-06,2025-02-20,Foresite,2025-02-06,2025-02-13,Montgomery,,,,,,
+The Preserve TH,5,196,False,False,2025-01-07,Permit & Hold,Millcreek,10 - Traditional,Y.Wang,2025-01-14,2025-02-06,Riverside,2025-02-06,2025-02-20,Foresite,2025-02-06,2025-02-13,Montgomery,,,,,,
+The Preserve TH,5,197,False,False,2025-01-06,Permit & Hold,Highland,10 - Traditional,Y.Wang,2025-01-13,2025-02-06,Riverside,2025-02-06,2025-02-20,Foresite,2025-02-06,2025-02-13,Montgomery,,,,,,
+Readers Branch,6,19,False,False,2025-01-01,Contract,Linden III,30 - Craftsman,M.Robinson,2025-01-15,2025-01-28,Struc Tech,2025-01-28,2025-02-04,EDA,2025-01-28,,Goochland,,,R.Arias,2025-02-18T05:00:00.000Z,,reassigned to Matthew on 1/20/25
+Readers Branch,6,35,False,False,2025-01-01,Contract,Carlisle,10 - Traditional,R.Arias,2025-01-17,2025-02-05,Struc Tech,2025-02-06,2025-02-14,EDA,2025-02-06,2025-02-11,Goochland,2025-02-19,,R.Arias,2025-02-19T05:00:00.000Z,,LF DUE 01/14/25
+Readers Branch,6,34,False,False,2025-01-01,Contract,Fulton,A - Colonial,C.Zobel,2025-02-13,2025-02-17,Struc Tech,2025-02-17,2025-02-24,EDA,2025-02-17,,Goochland,,,,,,LF DUE 01/14/25 but they said more are coming on 1/20 and never heard back.
+Sweetspire,0,01,False,False,2025-01-31,SPEC,Linden III,25 - Folk Victorian,M.Robinson,2025-01-31,2025-02-05,Struc Tech,2025-02-06,2025-02-11,EDA,2025-02-06,,Henrico,2025-02-18,,R.Arias,2025-02-17T05:00:00.000Z,,
+Sweetspire,0,02,False,False,2025-01-31,SPEC,Belmont,30 - Arts & Crafts,M.Robinson,2025-01-31,2025-02-07,Struc Tech,2025-02-08,2025-02-11,EDA,2025-02-08,2025-02-17,Henrico,2025-02-21,,R.Arias,2025-02-18T05:00:00.000Z,,
+The Preserve,7,529,False,False,2025-01-11,Contract,Savannah,A - Folk Victorian,R.Arias,2025-02-21,2025-02-27,Riverside,,,Foresite,,,Montgomery,,,R.Arias,2025-02-28T05:00:00.000Z,,LF CHANGE ON 2/25- TRAY CEILING/DBL DOOR.
+The Preserve,7,533,False,False,2025-01-20,Contract,Linden Terrace,30 - Craftsman,C.Zobel,,,Riverside,,,Foresite,,,Montgomery,,,,,,Significant grading issues. please have Jamie review prior.
+Settler's Ridge,A,33,False,False,2025-01-21,Contract,Azalea,Craftsman,M.Robinson,2025-02-04,2025-02-11,Kempsville,2025-02-11,2025-02-18,Koontz,2025-02-11,,Henrico,2025-02-26,,,,,
+Foushee,0,01,False,False,2025-01-28,SPEC,Rowland,,Y.Wang,2025-01-28,2025-02-11,HBS,2025-02-11,,Townes,2025-02-11,,Richmond,,,,,,
+Foushee,0,02,False,False,2025-01-27,SPEC,Park,,Y.Wang,2025-01-27,2025-02-11,HBS,2025-02-11,,Townes,2025-02-11,,Richmond,,,,,,
+Foushee,0,03,False,False,2025-01-27,SPEC,Westmoreland,,Y.Wang,2025-01-27,2025-02-11,HBS,2025-02-11,,Townes,2025-02-11,,Richmond,,,,,,
+Foushee,0,04,False,False,2025-01-28,SPEC,Westmoreland,,Y.Wang,2025-01-27,2025-02-11,HBS,2025-02-11,,Townes,2025-02-11,,Richmond,,,,,,
+Foushee,0,05,False,False,2025-01-27,SPEC,Park,,Y.Wang,2025-01-27,2025-02-11,HBS,2025-02-11,,Townes,2025-02-11,,Richmond,,,,,,
+Foushee,0,06,False,False,2025-01-27,SPEC,Rowland,,Y.Wang,2025-01-27,2025-02-11,HBS,2025-02-11,,Townes,2025-02-11,,Richmond,,,,,,
+Sweetspire,0,14,False,False,2025-01-23,Contract,Belmont,20 - Craftsman,M.Robinson,2025-02-04,2025-02-12,Struc Tech,2025-02-12,2025-02-17,EDA,2025-02-12,,Henrico,,,,,,
+Readers Branch,7,28,False,False,2025-01-25,Contract,Linden Terrace,30 - Craftsman,C.Zobel,2025-02-26,,HBS,,,EDA,,,Goochland,,,,,,"LF on2/4 
+LF change coming 2/10/2025
+LF CHANGE 12/18/25
+LF change 2/25"
+Parke @ Westport,1,01,False,False,2025-01-29,SPEC,Davidson,10 - Traditional,K.Fadl,2025-01-29,2025-02-07,Kempsville,2025-02-07,,AES,2025-02-07,,James City,,,,,,Needed information about garage side and siting before drafting could start.
+Parke @ Westport,1,02,False,False,2025-01-24,SPEC,Pembroke,10 - Traditional,C.Zobel,2025-01-29,2025-02-10,Kempsville,2025-02-11,2025-02-19,AES,,,James City,,,,,,Needed information about garage side and siting before drafting could start.
+Sweetspire,0,13,False,False,2025-01-28,Contract,Fulton,A - Colonial,R.Arias,2025-02-21,2025-02-26,Struc Tech,2025-02-28,,EDA,2025-02-28,,Henrico,,,,,,
+Readers Branch,7,36,False,False,2025-01-28,Contract,Linden III,30 - Craftsman,C.Zobel,,,HBS,,,EDA,,,Goochland,,,,,,"W/ BASEMENT
+
+lot changed to RB 15-7 2/25/25"
+Brunswick,1,06,False,False,2025-01-29,Contract,Lillie,10 - Traditional,M.Robinson,2025-02-26,,Kempsville,,,Townes,,,Hanover,,,,,,"LF in 2/12/25 but cannot start until we get the rest of the building specs
+LF change coming- informed on 2/25/25
+LF#2 missing drawing- received 2/28/25"
+The Meadows,1,28,False,False,2025-01-30,Contract,Linden Terrace,10 - Traditional,C.Zobel,,,Riverside,,,High Mark,,,Christiansburg,,,,,,
+Brunswick,1,05,False,False,2025-01-28,Contract,Lillie,10 - Traditional,M.Robinson,,,Kempsville,,,Townes,,,Hanover,,,,,,LF in 2/12/25 but cannot start until we get the rest of the building specs
+Sweetspire,0,21,False,False,2025-01-31,Contract,Fulton,B - Folk Victorian,Y.Wang,2025-02-13,2025-02-13,Struc Tech,2025-02-13,2025-02-18,EDA,2025-02-13,,Henrico,,,,,,
+Readers Branch,6,32,False,False,2025-02-03,Contract,Fulton,BSE - Arts & Crafts,Y.Wang,2025-02-24,2025-02-25,Struc Tech,2025-02-25,,EDA,2025-02-25,,Goochland,,,,,,LF: ELEVATION CHANGE
+Sweetspire,0,05,False,False,2025-02-04,Contract,Corvallis,BSE - Arts & Crafts,M.Robinson,2025-02-18,2025-02-25,Struc Tech,2025-02-25,,EDA,2025-02-25,,Henrico,,,,,,LATE LF COMING 2/21
+Womack,1,20,False,False,2025-02-04,Contract,Azalea,Craftsman,M.Robinson,2025-02-19,2025-02-20,Kempsville,2025-02-20,2025-02-25,High Mark,2025-02-20,,Chesterfield,,,R.Arias,2025-02-28T05:00:00.000Z,,Late LF 02/25:P bath bench seat added
+Womack,1,45,False,False,2025-02-05,Contract,Magnolia,40 - European,R.Arias,,,Kempsville,,,High Mark,,,Chesterfield,,,,,,"LF complete 02/21/25
+Same house & elevation as WM 46; RFI sent to Sales on how to proceed 02/25
+"
+The Preserve,7,534,False,False,2025-02-04,Contract,Westminster,B - Craftsman,C.Zobel,2025-02-28,,Riverside,,,Foresite,,,Montgomery,,,,,,
+Brunswick,1,08,False,False,2025-02-24,SPEC,Lillie,10 - Traditional,M.Robinson,2025-02-25,,Kempsville,,,Townes,,,Hanover,,,,,,
+Brunswick,1,07,False,False,2025-02-24,SPEC,Brady,10 - Traditional,M.Robinson,2025-02-26,,Kempsville,,,Townes,,,Hanover,,,,,,
+Brunswick,1,38,False,False,2025-01-24,Contract,Lillie,10 - Traditional,M.Robinson,,,Kempsville,,,Townes,,,Hanover,,,,,,
+Readers Branch,5,45,False,False,2025-02-24,SPEC,Linden Terrace,30 - Craftsman,Y.Wang,2025-02-24,2025-02-25,HBS,2025-02-25,,EDA,2025-02-25,2025-02-25,Goochland,,,R.Arias,2025-01-13T05:00:00.000Z,,
+Readers Branch,7,15,False,False,2025-01-28,Contract,Linden III,30 - Craftsman,C.Zobel,2025-02-26,,HBS,,,EDA,,,Goochland,,,,,,original homesite 36-7 changed 2/25/25
+Readers Branch,5,28,False,False,2025-02-25,Permit & Hold,Belmont,10 - Traditional,Y.Wang,2025-02-26,2025-02-26,Struc Tech,2025-02-27,,EDA,2025-02-26,2025-02-26,Goochland,,,,,,
+Readers Branch,5,44,False,False,2025-02-25,Permit & Hold,Linden Terrace,10 - Traditional,Y.Wang,2025-02-26,2025-02-26,HBS,2025-02-27,,EDA,2025-02-26,2025-02-26,Goochland,,,,,,
+Readers Branch,5,02,False,False,2025-02-24,SPEC,Hartford Terrace,10 - Traditional,Y.Wang,2025-02-25,2025-02-25,HBS,2025-02-25,,EDA,2025-02-25,2025-02-25,Goochland,,,,,,
+Readers Branch,7,13,False,False,2025-02-26,Contract,Linden Terrace,30 - Craftsman,C.Zobel,,,HBS,,,EDA,,,Goochland,,,,,,

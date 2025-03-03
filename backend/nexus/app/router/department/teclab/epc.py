@@ -241,8 +241,8 @@ def download():
         if p_epc_data.contract_date is None:
             continue
 
-        # Filter for lots from 2024 and onwards i.e., skip anything before 2024
-        if p_epc_data.contract_date.year < 2024:
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if p_epc_data.contract_date.year < 2025:
             continue
 
         # # combine the p_epc_data and p_project_info
