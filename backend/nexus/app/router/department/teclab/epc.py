@@ -219,7 +219,7 @@ def query_tracker_data():
 # download projects into CSCV
 # Filter for lots that are from&after 2024, That can be ongoing, can be finished, BUT cant be released 
 # http://localhost:8000/department/teclab/epc/download
-# @router.get("/download") 
+# @router.get("/download")
 def download():
     # Retrieve all documents from the collection
     all_docs = list(projects_coll.find())
