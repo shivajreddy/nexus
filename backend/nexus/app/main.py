@@ -14,6 +14,7 @@ from app.router.security.auth import router as auth_router
 from app.router.eagle.eagle import router as eagle_router
 from app.router.public import router as public_router
 from app.router.department.teclab.teclab import router as teclab_router
+from app.router.department.teclab.dashboard import router as teclab_dashboard_router
 from app.router.department.teclab.epc import router as teclab_epc_router
 from app.router.department.teclab.cor import router as teclab_cor_router
 from app.router.department.teclab.fosc import router as teclab_fosc_router
@@ -30,6 +31,7 @@ async def lifespan(app: FastAPI):
     app.include_router(public_router)
     app.include_router(users_router)
     app.include_router(teclab_router)
+    app.include_router(teclab_dashboard_router)
     app.include_router(teclab_epc_router)
     app.include_router(teclab_cor_router)
 

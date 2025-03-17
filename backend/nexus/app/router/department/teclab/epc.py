@@ -5,11 +5,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import List, Annotated
 
-from app.database.schemas.project import ProjectInfo
+from app.database.schemas.project import ContractInfo, ProjectInfo, ProjectMetaInfo, SalesProjectData
 from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.database.database import projects_coll 
-from app.database.schemas.department_data import UpdateTECLabData, EPCData
+from app.database.schemas.department_data import CORData, UpdateTECLabData, EPCData
 from app.database.schemas.user import User
 from app.email.utils import send_email_with_given_message_and_attachment
 from app.router.utils.find_project import find_project
@@ -219,30 +219,35 @@ def query_tracker_data():
 # download projects into CSCV
 # Filter for lots that are from&after 2024, That can be ongoing, can be finished, BUT cant be released 
 # http://localhost:8000/department/teclab/epc/download
-# @router.get("/download")
+@router.get("/download")
 def download():
     # Retrieve all documents from the collection
     all_docs = list(projects_coll.find())
-
+    print(len(all_docs))
+    # return
     filtered_lots = []
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
         project = {k: v for (k, v) in doc.items() if k != "_id"}
-        p_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+        p_meta_info = ProjectMetaInfo(**project["meta_info"])
+        p_contract_info = ContractInfo(**project["contract_info"])
         p_project_info: ProjectInfo = ProjectInfo(**project["project_info"])
+        p_sales_data = SalesProjectData(**project["sales_data"])
+        # p_teclab_cor_data = CORData(**project["teclab_data"]["cor_data"])
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+        # p_teclab_fosc_data = CORData(**project["teclab_data"]["fosc_data"])
 
         # Skip the released lots
-        if p_epc_data.lot_status_released:
-            continue
+        # if p_teclab_epc_data.lot_status_released:
+            # continue
 
         # Skip lots without a contract date
-
-        if p_epc_data.contract_date is None:
-            continue
+        # if p_epc_data.contract_date is None:
+            # continue
 
         # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if p_epc_data.contract_date.year < 2025:
+        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
             continue
 
         # # combine the p_epc_data and p_project_info
@@ -252,7 +257,7 @@ def download():
         # }
 
         # Collect data for CSV
-        filtered_lots.append((p_epc_data, p_project_info))
+        filtered_lots.append((p_meta_info, p_project_info, p_contract_info, p_sales_data, p_teclab_epc_data))
     # print(filtered_lots[0])
     # return
 
@@ -270,65 +275,111 @@ def download():
 
         # Write header
         csv_writer.writerow([
-            "community",
-            "section_number",
-            "lot_number",
+            # Meta_info
+            "Created At",
+            "Created By",
 
-            "lot_status_finished",
-            "lot_status_released",
-            "contract_date",
-            "contract_type",
-            "product_name",
-            "elevation_name",
-            "drafting_drafter",
-            "drafting_assigned_on",
-            "drafting_finished",
-            "engineering_engineer",
-            "engineering_sent",
-            "engineering_received",
-            "plat_engineer",
-            "plat_sent",
-            "plat_received",
-            "permitting_county_name",
-            "permitting_submitted",
-            "permitting_received",
-            "homesiting_completed_by",
-            "homesiting_completed_on",
-            "bbp_posted",
-            "notes"
+            # Project_info
+            "Community",
+            "Lot Number",
+            "Project_id",
+            "Project_uid",
+            "Section Number",
+
+            # Contract_info
+            "Contract Date",
+            "Contract Type",
+
+            # Sales_data
+            "Sales Agent",
+            "Selections Finished On",
+
+            # Teclab-EPC-Data
+            "Lot Status Finished",
+            "Lot Status Released",
+            "Contract Date",
+            "Contract Type",
+            "Product Name",
+            "Elevation Name",
+            "Drafting Drafter",
+            "Drafting Assigned On",
+            "Drafting Finished",
+            "Engineering Engineer",
+            "Engineering Sent",
+            "Engineering Received",
+            "Plat Engineer",
+            "Plat Sent",
+            "Plat Received",
+            "Permitting County Name",
+            "Permitting Submitted",
+            "Permitting Received",
+            "Homesiting Completed By",
+            "Homesiting Completed On",
+            "BBP Posted",
+            "Notes"
+
+            # Teclab-COR-Data
+            # "Product",
+            # "Eleavtion",
+            # "Locations",
+            # "Categories",
+            # "Custom Notes",
         ])
 
         # Write rows
-        for (lot_data, project_data) in filtered_lots:
+        for (p_meta_info, p_project_info, p_contract_info, p_sales_data, p_teclab_epc_data) in filtered_lots:
             csv_writer.writerow([
-                project_data.community,
-                project_data.section,
-                project_data.lot_number,
+                #Meta_info
+                p_meta_info.created_at,
+                p_meta_info.created_by,
 
-                lot_data.lot_status_finished,
-                lot_data.lot_status_released,
-                lot_data.contract_date.strftime("%Y-%m-%d") if lot_data.contract_date else None,
-                lot_data.contract_type,
-                lot_data.product_name,
-                lot_data.elevation_name,
-                lot_data.drafting_drafter,
-                lot_data.drafting_assigned_on.strftime("%Y-%m-%d") if lot_data.drafting_assigned_on else None,
-                lot_data.drafting_finished.strftime("%Y-%m-%d") if lot_data.drafting_finished else None,
-                lot_data.engineering_engineer,
-                lot_data.engineering_sent.strftime("%Y-%m-%d") if lot_data.engineering_sent else None,
-                lot_data.engineering_received.strftime("%Y-%m-%d") if lot_data.engineering_received else None,
-                lot_data.plat_engineer,
-                lot_data.plat_sent.strftime("%Y-%m-%d") if lot_data.plat_sent else None,
-                lot_data.plat_received.strftime("%Y-%m-%d") if lot_data.plat_received else None,
-                lot_data.permitting_county_name,
+                # Project_info
+                p_project_info.community,
+                p_project_info.lot_number,
+                p_project_info.project_id,
+                p_project_info.project_uid,
+                p_project_info.section,
 
-                lot_data.permitting_submitted.strftime("%Y-%m-%d") if lot_data.permitting_submitted else None,
-                lot_data.permitting_received.strftime("%Y-%m-%d") if lot_data.permitting_received else None,
-                lot_data.homesiting_completed_by,
-                lot_data.homesiting_completed_on,
+                # Contract_info
+                p_contract_info.contract_date,
+                p_contract_info.contract_type,
+
+                # Sales_data
+                p_sales_data.salesman,
+                p_sales_data.selections_finished_on,
+
+                # Teclaba-EPC-Data
+                p_teclab_epc_data.lot_status_finished,
+                p_teclab_epc_data.lot_status_released,
+                p_teclab_epc_data.contract_date.strftime("%Y-%m-%d") if p_teclab_epc_data.contract_date else None,
+                p_teclab_epc_data.contract_type,
+                p_teclab_epc_data.product_name,
+                p_teclab_epc_data.elevation_name,
+                p_teclab_epc_data.drafting_drafter,
+                p_teclab_epc_data.drafting_assigned_on.strftime("%Y-%m-%d") if p_teclab_epc_data.drafting_assigned_on else None,
+                p_teclab_epc_data.drafting_finished.strftime("%Y-%m-%d") if p_teclab_epc_data.drafting_finished else None,
+                p_teclab_epc_data.engineering_engineer,
+                p_teclab_epc_data.engineering_sent.strftime("%Y-%m-%d") if p_teclab_epc_data.engineering_sent else None,
+                p_teclab_epc_data.engineering_received.strftime("%Y-%m-%d") if p_teclab_epc_data.engineering_received else None,
+                p_teclab_epc_data.plat_engineer,
+                p_teclab_epc_data.plat_sent.strftime("%Y-%m-%d") if p_teclab_epc_data.plat_sent else None,
+                p_teclab_epc_data.plat_received.strftime("%Y-%m-%d") if p_teclab_epc_data.plat_received else None,
+                p_teclab_epc_data.permitting_county_name,
+
+                p_teclab_epc_data.permitting_submitted.strftime("%Y-%m-%d") if p_teclab_epc_data.permitting_submitted else None,
+                p_teclab_epc_data.permitting_received.strftime("%Y-%m-%d") if p_teclab_epc_data.permitting_received else None,
+                p_teclab_epc_data.homesiting_completed_by,
+                p_teclab_epc_data.homesiting_completed_on,
                 # lot_data.homesiting_completed_on.strftime("%Y-%m-%d") if lot_data.homesiting_completed_on else None,
-                lot_data.bbp_posted.strftime("%Y-%m-%d") if lot_data.bbp_posted else None,
-                lot_data.notes
+                p_teclab_epc_data.bbp_posted.strftime("%Y-%m-%d") if p_teclab_epc_data.bbp_posted else None,
+                p_teclab_epc_data.notes,
+
+                # Teclaba-COR-Data
+                # p_teclab_cor_data.product,
+                # p_teclab_cor_data.elevation,
+                # p_teclab_cor_data.locations,
+                # p_teclab_cor_data.categories,
+                # p_teclab_cor_data.custom_notes
             ])
 
     return {"message": "CSV file created successfully", "filename": csv_filename}

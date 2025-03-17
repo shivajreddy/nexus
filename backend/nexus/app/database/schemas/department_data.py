@@ -76,6 +76,7 @@ class EPCData(BaseModel):
     # HomeSiting
     homesiting_completed_by: Optional[str] = None
     homesiting_completed_on: Optional[str] = None
+    homesiting_requested_on: Optional[str] = None
 
     # Build By Plans
     bbp_posted: Optional[datetime] = None

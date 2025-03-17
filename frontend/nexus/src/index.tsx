@@ -1,11 +1,11 @@
 import ReactDOM from "react-dom/client";
 import {
-    Route,
-    RouterProvider,
-    createBrowserRouter,
-    createRoutesFromElements,
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
 } from "react-router-dom";
-import {Provider} from "react-redux";
+import { Provider } from "react-redux";
 import store from "@/redux/store";
 import "@assets/index.css";
 import HomePage from "@/pages/HomePage/HomePage";
@@ -45,77 +45,82 @@ import FOSCSummary from "@pages/department/teclab/Fosc/Views/FOSCSummary.tsx";
 import FOSCCurrent from "@pages/department/teclab/Fosc/Views/FOSCCurrent.tsx";
 import FOSCAll from "@pages/department/teclab/Fosc/Views/FOSCAll.tsx";
 import AddFOSCProject from "@pages/department/teclab/Fosc/Views/AddFOSCProject.tsx";
+import DashboardHome from "./pages/department/teclab/Dashboard/DashboardHome";
 
 // # Router configuration
 const router = createBrowserRouter(
-    createRoutesFromElements(
-        <Route errorElement={<UiErrorPage/>}>
+  createRoutesFromElements(
+    <Route errorElement={<UiErrorPage />}>
 
-            {/* Public pages */}
-            <Route path="welcome" element={< PublicHomePage/>}/>
-            <Route path="login" element={< LoginPage/>}/>
-            <Route path="wtf" element={< SuccessfulRegistration/>}/>
-            <Route path="auth/confirm-registration/:user_email/:email_verification_key"
-                   element={< SuccessfulRegistration/>}/>
+      {/* Public pages */}
+      <Route path="welcome" element={< PublicHomePage />} />
+      <Route path="login" element={< LoginPage />} />
+      <Route path="wtf" element={< SuccessfulRegistration />} />
+      <Route path="auth/confirm-registration/:user_email/:email_verification_key"
+        element={< SuccessfulRegistration />} />
 
-            {/* Secured pages */}
-            <Route element={<PersistentLogin/>}>
-                <Route element={<AuthRequired/>}>
-                    <Route path="/" element={<HomePage/>}/>
-                    {/*<Route path="epc" element={<EpcTest1/>}/>*/}
+      {/* Secured pages */}
+      <Route element={<PersistentLogin />}>
+        <Route element={<AuthRequired />}>
+          <Route path="/" element={<HomePage />} />
+          {/*<Route path="epc" element={<EpcTest1/>}/>*/}
 
-                    <Route path="projects">
-                        <Route index element={<Projects/>}/>
-                        {/*<Route path="search" element={<FindProject/>}/>*/}
-                        {/*<Route path="new" element={}/>*/}
-                    </Route>
+          <Route path="projects">
+            <Route index element={<Projects />} />
+            {/* <Route path="search" element={<FindProject />} /> */}
+            {/* <Route path="new" element={} /> */}
+          </Route>
 
-                    <Route path="epc">
-                        <Route index element={<Epc/>}/>
-                        <Route path="epc2" element={<Epc2/>}/>
-                        <Route path="test" element={<DemoGrid/>}/>
-                        <Route path="all-lots" element={<EPCAll/>}/>
-                        {/*<Route path="lot/new" element={<EditTECLabData/>}/>*/}
-                        {/*<Route path="edit2" element={<EditTECLabData/>}/>*/}
-                        <Route path="edit" element={<SearchAndUpdateEPCTECLabData/>}/>
-                        <Route path="edit/:project_uid" element={<EditTECLabData/>}/>
-                        {/*<Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>*/}
-                    </Route>
+          <Route path="dashboard">
+            <Route index element={<DashboardHome />} />
+          </Route>
 
-                    <Route path="fosc">
-                        <Route index element={<Fosc/>}/>
-                        <Route path="all-lots" element={<FOSCAll/>}/>
-                        <Route path="summary" element={<FOSCSummary/>}/>
-                        <Route path="current" element={<FOSCCurrent/>}/>
+          <Route path="epc">
+            <Route index element={<Epc />} />
+            <Route path="epc2" element={<Epc2 />} />
+            <Route path="test" element={<DemoGrid />} />
+            <Route path="all-lots" element={<EPCAll />} />
+            {/*<Route path="lot/new" element={<EditTECLabData/>}/>*/}
+            {/*<Route path="edit2" element={<EditTECLabData/>}/>*/}
+            <Route path="edit" element={<SearchAndUpdateEPCTECLabData />} />
+            <Route path="edit/:project_uid" element={<EditTECLabData />} />
+            {/*<Route path="edit-newlot-form-data" element={<EditNewLotData/>}/>*/}
+          </Route>
 
-                        <Route path="add" element={<AddFOSCProject/>}/>
-                        <Route path="edit" element={<SearchAndUpdateFOSCData/>}/>
-                        <Route path="edit/:project_uid" element={<EditFOSCData/>}/>
-                    </Route>
+          <Route path="fosc">
+            <Route index element={<Fosc />} />
+            <Route path="all-lots" element={<FOSCAll />} />
+            <Route path="summary" element={<FOSCSummary />} />
+            <Route path="current" element={<FOSCCurrent />} />
 
-                    <Route path="pipeline" element={<Pipeline/>}/>
-                    <Route path="core-dashboard" element={<CoreDashboard/>}/>
-                    <Route path="updates" element={<Updates/>}/>
-                    <Route path="user" element={<UserHome/>}/>
+            <Route path="add" element={<AddFOSCProject />} />
+            <Route path="edit" element={<SearchAndUpdateFOSCData />} />
+            <Route path="edit/:project_uid" element={<EditFOSCData />} />
+          </Route>
 
-                    {/* Testing role specific page */}
-                    <Route path="/teclab" element={<AuthTecLab/>}>
-                        <Route index element={<TecLabHome/>}/> {/* This is the homepage for /teclab */}
-                    </Route>
+          <Route path="pipeline" element={<Pipeline />} />
+          <Route path="core-dashboard" element={<CoreDashboard />} />
+          <Route path="updates" element={<Updates />} />
+          <Route path="user" element={<UserHome />} />
 
-                    <Route path="sales" element={<AuthSales/>}>
-                        <Route index element={<SalesHome/>}/> {/* This is the homepage for /sales */}
-                        <Route path="page1" element={<SalesPageTest1/>}/>
-                        <Route path="page2" element={<SalesPageTest2/>}/>
-                    </Route>
-                </Route>
-            </Route>
+          {/* Testing role specific page */}
+          <Route path="/teclab" element={<AuthTecLab />}>
+            <Route index element={<TecLabHome />} /> {/* This is the homepage for /teclab */}
+          </Route>
 
-            {/* 404 Page */}
-            < Route path="*" element={< PageNotFound/>}/>
-
+          <Route path="sales" element={<AuthSales />}>
+            <Route index element={<SalesHome />} /> {/* This is the homepage for /sales */}
+            <Route path="page1" element={<SalesPageTest1 />} />
+            <Route path="page2" element={<SalesPageTest2 />} />
+          </Route>
         </Route>
-    )
+      </Route>
+
+      {/* 404 Page */}
+      < Route path="*" element={< PageNotFound />} />
+
+    </Route>
+  )
 );
 
 // const nexus_text_logo = (
@@ -130,8 +135,8 @@ const router = createBrowserRouter(
 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <Provider store={store}>
-        <RouterProvider router={router}/>
-    </Provider>
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider>
 );
 
