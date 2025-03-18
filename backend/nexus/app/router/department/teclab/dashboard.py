@@ -77,6 +77,34 @@ def engineeer_data_2():
     # print(engineers_map)
     return engineers_map
 
+@router.get("/county-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
+def county_data():
+    all_docs = list(projects_coll.find())
+    counties_map = {}
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date:
+            continue
+        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
+            continue
+
+        # THIS IS NOT SUPPOSED TO BE EMPTY
+        if p_teclab_epc_data.permitting_county_name == None or p_teclab_epc_data.permitting_county_name == "":
+            print("WAIT: ", project["project_info"]["project_id"])
+
+        if p_teclab_epc_data.permitting_county_name not in counties_map:
+            counties_map[p_teclab_epc_data.permitting_county_name] = 0
+        counties_map[p_teclab_epc_data.permitting_county_name] += 1
+
+    # print("counties_map:", counties_map)
+    return counties_map
+
+
 @router.get("/county-data-2", response_model=dict, dependencies=[Depends(get_current_user_data)])
 def county_data_2():
     all_docs = list(projects_coll.find())
@@ -110,34 +138,7 @@ def county_data_2():
             counties_map[p_teclab_epc_data.permitting_county_name] = [delta_days]
         counties_map[p_teclab_epc_data.permitting_county_name].append(delta_days)
 
-    print("Projects count", count)  # 7
-    print("counties_map.len", len(counties_map))    # 3
-    return counties_map
-
-@router.get("/county-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
-def county_data():
-    all_docs = list(projects_coll.find())
-    counties_map = {}
-    for doc in all_docs:
-        # Remove MongoDB's `_id` field from the document
-        project = {k: v for (k, v) in doc.items() if k != "_id"}
-
-        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
-
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date:
-            continue
-        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
-            continue
-
-        # THIS IS NOT SUPPOSED TO BE EMPTY
-        if p_teclab_epc_data.permitting_county_name == None or p_teclab_epc_data.permitting_county_name == "":
-            print("WAIT: ", project["project_info"]["project_id"])
-
-        if p_teclab_epc_data.permitting_county_name not in counties_map:
-            counties_map[p_teclab_epc_data.permitting_county_name] = 0
-        counties_map[p_teclab_epc_data.permitting_county_name] += 1
-
-    print("counties_map:", counties_map)
+    # print("Projects count", count)
+    # print("counties_map.len", len(counties_map))
     return counties_map
 

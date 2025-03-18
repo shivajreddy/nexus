@@ -17,8 +17,8 @@ function County_2() {
     async function fetchData() {
       try {
         const response = await axios.get("/department/teclab/dashboard/county-data-2");
-        console.log("response = ", response);
-        console.log("response.data = ", response.data);
+        // console.log("response = ", response);
+        // console.log("response.data = ", response.data);
 
         // Process the data to calculate average time and total projects
         const processedData: EngineerData[] = Object.entries(response.data).map(([engineer, timesArray]) => {
