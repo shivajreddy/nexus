@@ -1,20 +1,13 @@
-from fastapi import APIRouter
-
-from app.database.database import eagle_data_coll
-from app.database.database import projects_coll
-from app.security.oauth2 import get_current_user_data
-from typing import List, Annotated
-
-from fastapi import APIRouter, Depends, status, HTTPException
-
 """
 All public end points - visible to out of eagle
 """
 
+from fastapi import APIRouter
+
+from app.database.database import eagle_data_coll
+
+
 router = APIRouter(prefix="/public")
-
-
-
 
 
 @router.get('/test')
@@ -25,10 +18,11 @@ def test_public():
 @router.get(path='/departments')
 def get_all_departments():
     departments_doc = eagle_data_coll.find_one({"table_name": "departments"})
+    if not departments_doc: return
     all_departments = departments_doc["departments_names"]
     return all_departments
 
-# """
+"""
 # Filter out all finished and released lots
 @router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
 def get_all_lots():
@@ -51,6 +45,4 @@ def get_all_lots():
     except Exception as e:
         # print("error: ", e)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-
-
 # """

@@ -61,9 +61,9 @@ body {
 }
 
 /* charts created using Re-charts have some overflows being cut off, so this will fix it */
-.recharts-wrapper svg{
-  overflow: inherit !important;
-}
+/* .recharts-wrapper svg{ */
+/*   overflow: inherit !important; */
+/* } */
 
 @layer base {
     :root {

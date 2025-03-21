@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { log } from "console";
 
 type ChartData = {
   engineer: string;
@@ -11,16 +12,19 @@ type ChartData = {
 function Engineer_1() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const axios = useAxiosPrivate();
+  console.log("Hi");
+  console.log("chartData", chartData);
 
   // Color palette for pie segments
   const COLORS = ['#2563eb', '#059669', '#e11d48', '#93c5fd', '#bfdbfe', '#dbeafe', '#eff6ff', '#1e40af', '#1d4ed8', '#2563eb'];
 
   useEffect(() => {
     async function fetchData() {
+      console.log("trying to fetch");
       try {
         const response = await axios.get("/department/teclab/dashboard/engineer-data");
         // console.log("response = ", response);
-        // console.log("response.data = ", response.data);
+        console.log("response.data = ", response.data);
         // Convert object to array and assert type
         const data: ChartData[] = Object.entries(response.data).map(([engineer, projects]) => ({
           engineer,
@@ -51,11 +55,11 @@ function Engineer_1() {
               dataKey="projects"
               nameKey="engineer"
             >
-              {chartData.map((entry, index) => (
+              {chartData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value, name, props) => [`${value} projects`, props.payload.engineer]} />
+            <Tooltip formatter={(value, _, props) => [`${value} projects`, props.payload.engineer]} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>

@@ -1,4 +1,4 @@
-const {fontFamily} = require("tailwindcss/defaultTheme")
+const { fontFamily } = require("tailwindcss/defaultTheme")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
     container: {
       center: true,
       padding: "2rem",
-      screens: {"2xl": "1400px",},
+      screens: { "2xl": "1400px", },
     },
     extend: {
       borderColor: {
@@ -101,12 +101,12 @@ module.exports = {
         },
         keyframes: {
           "accordion-down": {
-            from: {height: 0},
-            to: {height: "var(--radix-accordion-content-height)"},
+            from: { height: 0 },
+            to: { height: "var(--radix-accordion-content-height)" },
           },
           "accordion-up": {
-            from: {height: "var(--radix-accordion-content-height)"},
-            to: {height: 0},
+            from: { height: "var(--radix-accordion-content-height)" },
+            to: { height: 0 },
           },
         },
         animation: {

@@ -63,7 +63,7 @@ function County_2() {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="engineer"
-              label={{ value: "Engineer", position: "insideBottom", dy: 20 }}
+              label={{ value: "County", position: "insideBottom", dy: 20 }}
             />
             <YAxis
               yAxisId="left"

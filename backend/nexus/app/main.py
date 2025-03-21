@@ -12,7 +12,8 @@ from app.database.setup_data.eagle_data import eagle_data_coll_initial_data, dep
 from app.router.users.users import router as users_router
 from app.router.security.auth import router as auth_router
 from app.router.eagle.eagle import router as eagle_router
-from app.router.public import router as public_router
+from app.router.public.public import router as public_router
+from app.router.admin.admin import router as admin_router
 from app.router.department.teclab.teclab import router as teclab_router
 from app.router.department.teclab.dashboard import router as teclab_dashboard_router
 from app.router.department.teclab.epc import router as teclab_epc_router
@@ -20,6 +21,7 @@ from app.router.department.teclab.cor import router as teclab_cor_router
 from app.router.department.teclab.fosc import router as teclab_fosc_router
 from app.router.testing.test1 import router as testing_router
 from app.router.projects.projects import router as projects_router
+
 from app.sockets.sockets import sio_app
 
 # Include Routers into FASTAPI app
@@ -34,6 +36,8 @@ async def lifespan(app: FastAPI):
     app.include_router(teclab_dashboard_router)
     app.include_router(teclab_epc_router)
     app.include_router(teclab_cor_router)
+
+    app.include_router(admin_router)
 
     # app.include_router(teclab_fosc_router)
     app.include_router(teclab_fosc_router)

@@ -9,6 +9,8 @@ type ChartData = {
 };
 
 function County_1() {
+  console.log("hello therE?");
+  console.log("hello therE?");
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const axios = useAxiosPrivate();
 
