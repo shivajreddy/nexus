@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.database.schemas.department_data import EPCData, CORData, FOSCData
 
@@ -43,9 +43,9 @@ class ContractInfo(BaseModel):
 
 
 class TecLabProjectData(BaseModel):
-    epc_data: 'EPCData'
-    cor_data: 'CORData'
-    fosc_data: 'FOSCData'
+    epc_data: 'EPCData' = Field(default_factory=EPCData)
+    cor_data: 'CORData' = Field(default_factory=CORData)
+    fosc_data: 'FOSCData' = Field(default_factory=FOSCData)
 
 
 class SalesProjectData(BaseModel):

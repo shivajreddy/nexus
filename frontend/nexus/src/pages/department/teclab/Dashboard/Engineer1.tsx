@@ -5,67 +5,67 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { log } from "console";
 
 type ChartData = {
-  engineer: string;
-  projects: number;
+    engineer: string;
+    projects: number;
 };
 
 function Engineer_1() {
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const axios = useAxiosPrivate();
-  console.log("Hi");
-  console.log("chartData", chartData);
+    const [chartData, setChartData] = useState<ChartData[]>([]);
+    const axios = useAxiosPrivate();
+    // console.log("Hi");
+    // console.log("chartData", chartData);
 
-  // Color palette for pie segments
-  const COLORS = ['#2563eb', '#059669', '#e11d48', '#93c5fd', '#bfdbfe', '#dbeafe', '#eff6ff', '#1e40af', '#1d4ed8', '#2563eb'];
+    // Color palette for pie segments
+    const COLORS = ['#2563eb', '#059669', '#e11d48', '#93c5fd', '#bfdbfe', '#dbeafe', '#eff6ff', '#1e40af', '#1d4ed8', '#2563eb'];
 
-  useEffect(() => {
-    async function fetchData() {
-      console.log("trying to fetch");
-      try {
-        const response = await axios.get("/department/teclab/dashboard/engineer-data");
-        // console.log("response = ", response);
-        console.log("response.data = ", response.data);
-        // Convert object to array and assert type
-        const data: ChartData[] = Object.entries(response.data).map(([engineer, projects]) => ({
-          engineer,
-          projects: projects as number, // Type assertion
-        }));
-        setChartData(data);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
-    }
-    fetchData();
-  }, []);
+    useEffect(() => {
+        async function fetchData() {
+            // console.log("trying to fetch");
+            try {
+                const response = await axios.get("/department/teclab/dashboard/engineer-data");
+                // console.log("response = ", response);
+                // console.log("response.data = ", response.data);
+                // Convert object to array and assert type
+                const data: ChartData[] = Object.entries(response.data).map(([engineer, projects]) => ({
+                    engineer,
+                    projects: projects as number, // Type assertion
+                }));
+                setChartData(data);
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
+        }
+        fetchData();
+    }, []);
 
-  return (
-    <Card className="w-[650px] h-[520px] m-2 p-2">
-      <CardHeader className="text-center">Projects Handled by Engineers</CardHeader>
-      <CardContent className="flex flex-col items-center">
-        <ResponsiveContainer width="100%" height={400}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              labelLine={true}
-              label={({ engineer, percent }) => `${engineer} (${(percent * 100).toFixed(0)}%)`}
-              outerRadius={150}
-              fill="#8884d8"
-              dataKey="projects"
-              nameKey="engineer"
-            >
-              {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip formatter={(value, _, props) => [`${value} projects`, props.payload.engineer]} />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-  );
+    return (
+        <Card className="w-[650px] h-[520px] m-2 p-2">
+            <CardHeader className="text-center">Projects Handled by Engineers</CardHeader>
+            <CardContent className="flex flex-col items-center">
+                <ResponsiveContainer width="100%" height={400}>
+                    <PieChart>
+                        <Pie
+                            data={chartData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={true}
+                            label={({ engineer, percent }) => `${engineer} (${(percent * 100).toFixed(0)}%)`}
+                            outerRadius={150}
+                            fill="#8884d8"
+                            dataKey="projects"
+                            nameKey="engineer"
+                        >
+                            {chartData.map((_, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Tooltip formatter={(value, _, props) => [`${value} projects`, props.payload.engineer]} />
+                        <Legend />
+                    </PieChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
+    );
 }
 
 export default Engineer_1;

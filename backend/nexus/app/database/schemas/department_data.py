@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 """
 All schema for `department-data` collection
@@ -155,8 +155,8 @@ class UpdateFOSCData(BaseModel):
 class CORData(BaseModel):
     product: str = ''
     elevation: str = ''
-    locations: Optional[List[str]] = []
-    categories: Optional[List[str]] = []
+    locations: Optional[List[str]] = Field(default_factory=list)
+    categories: Optional[List[str]] = Field(default_factory=list)
     custom_notes: Optional[str] = ''
 
 
@@ -167,10 +167,10 @@ class UpdateCORData(BaseModel):
 
 
 class QueryCOR(BaseModel):
-    products: List[str] = []
-    elevations: List[str] = []
-    locations: List[str] = []
-    categories: List[str] = []
+    products: List[str] = Field(default_factory=list)
+    elevations: List[str] = Field(default_factory=list)
+    locations: List[str] = Field(default_factory=list)
+    categories: List[str] = Field(default_factory=list)
 
 
 # :: SALES ::

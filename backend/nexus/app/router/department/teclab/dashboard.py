@@ -1,11 +1,12 @@
 from typing import List
-from datetime import datetime
+from datetime import datetime, timedelta
 from pydantic import BaseModel
 
 from fastapi import APIRouter, Depends
 
 from app.database.database import projects_coll 
 from app.database.schemas.department_data import EPCData
+from app.database.schemas.project import Project
 from app.security.oauth2 import get_current_user_data
 
 """
@@ -30,17 +31,27 @@ def get_current_month_ticker_data():
 
     current_year = datetime.today().year
     current_month = datetime.today().month
-    print("current_year", current_year)
-    print("current_month", current_month)
+    
+    # Get current and previous month correctly
+    current_date = datetime.today()
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month = last_day_of_previous_month.month
+    previous_month_year = last_day_of_previous_month.year
+    
+    current_month_name = current_date.strftime("%B")
+    previous_month_name = last_day_of_previous_month.strftime("%B")
+    current_year_name = str(current_year)
 
-    filtered_docs = []  # docs that have contract_date of current_year
+    filtered_projects: List[Project] = []  # docs that have contract_date of current_year
     filtered_p_teclab_epc_data: List[EPCData] = []
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
-        project = {k: v for (k, v) in doc.items() if k != "_id"}
+        project_raw = {k: v for (k, v) in doc.items() if k != "_id"}
+        project: Project = Project(**project_raw)
 
-        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+        p_teclab_epc_data: EPCData = EPCData(**project_raw["teclab_data"]["epc_data"])
 
         # Filter for lots from current_year and onwards i.e., skip anything before current_year
         if not p_teclab_epc_data.contract_date:
@@ -48,193 +59,313 @@ def get_current_month_ticker_data():
         if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < current_year:
             continue
 
-        filtered_docs.append(project)
+        filtered_projects.append(project)
+        # if project.teclab_data.epc_data.drafting_assigned_on and project.teclab_data.epc_data.drafting_finished:
+        #     days_taken_to_draft = (project.teclab_data.epc_data.drafting_finished - project.teclab_data.epc_data.drafting_assigned_on).days
+        #     if days_taken_to_draft <= 0:
+        #         print("ERROR: cant be -ve days", project.project_info)
         filtered_p_teclab_epc_data.append(p_teclab_epc_data)
 
     total_projects_current_year = len(filtered_p_teclab_epc_data)
     total_projects_current_month = len([p for p in filtered_p_teclab_epc_data if p.contract_date.month == current_month])
-    total_projects_previous_month = len([p for p in filtered_p_teclab_epc_data if p.contract_date.month == current_month - 1])
+    total_projects_previous_month = len([p for p in filtered_p_teclab_epc_data if p.contract_date.month == previous_month and p.contract_date.year == previous_month_year])
 
-    print("total_projects_current_year", total_projects_current_year)
-    print("total_projects_current_month", total_projects_current_month)
-    print("total_projects_previous_month", total_projects_previous_month)
+    # Helper function to calculate min, max, avg for a specific time period
+    def calculate_stats(data_values, projects, filter_func):
+        filtered_values = [value for project, value in zip(projects, data_values) if filter_func(project)]
+        if not filtered_values:
+            return 0, 0, 0, 0
+        return min(filtered_values), max(filtered_values), sum(filtered_values) // len(filtered_values), len(filtered_values)
 
-    # Drafting
+    # Drafting calculations
+    drafting_projects = []
     drafting_values = []
-    for p in filtered_p_teclab_epc_data:
-        if not p.drafting_assigned_on or not p.drafting_finished: continue
-        days_taken_to_draft = (p.drafting_finished - p.drafting_assigned_on).days
+    for p in filtered_projects:
+        if not p.teclab_data.epc_data.drafting_assigned_on or not p.teclab_data.epc_data.drafting_finished:
+            continue
+        days_taken_to_draft = (p.teclab_data.epc_data.drafting_finished - p.teclab_data.epc_data.drafting_assigned_on).days
+        if days_taken_to_draft < 0:
+            print("ERROR:Drafting:days_taken_to_draft cant be <= 0 days")
+        drafting_projects.append(p)
         drafting_values.append(days_taken_to_draft)
-    drafting_min = min(drafting_values)
-    drafting_max = max(drafting_values)
-    drafting_avg = sum(drafting_values) // len(drafting_values)
+    print("drafting values:::", drafting_values)
 
-    drafting_min_previous_month = 0
-    drafting_min_current_month = 0
-    drafting_min_current_year = 0
+    # Calculate for different time periods
+    drafting_min_current_year, drafting_max_current_year, drafting_avg_current_year, drafting_count_current_year = calculate_stats(
+        drafting_values,    # drafting values from the filtered projects
+        drafting_projects,  # we pass the filtered projects that are used to grab the drafting values
+        lambda p: p.teclab_data.epc_data.drafting_finished.year == current_year
+    )
+    
+    drafting_min_current_month, drafting_max_current_month, drafting_avg_current_month, drafting_count_current_month = calculate_stats(
+        drafting_values, 
+        drafting_projects,
+        lambda p: p.teclab_data.epc_data.drafting_finished.year == current_year and p.teclab_data.epc_data.drafting_finished.month == current_month
+    )
+    
+    drafting_min_previous_month, drafting_max_previous_month, drafting_avg_previous_month, drafting_count_previous_month = calculate_stats(
+        drafting_values, 
+        drafting_projects,
+        lambda p: p.teclab_data.epc_data.drafting_finished.year == current_year and p.teclab_data.epc_data.drafting_finished.month == previous_month
+    )
 
-    drafting_max_previous_month = 0
-    drafting_max_current_month = 0
-    drafting_max_current_year = 0
-
-    drafting_avg_previous_month = 0
-    drafting_avg_current_month = 0
-    drafting_avg_current_year = 0
-
-    # Engineering
+    # Engineering calculations
     engineering_values = []
-    for p in filtered_p_teclab_epc_data:
-        if not p.engineering_sent or not p.engineering_received: continue
-        days_taken_to_engineer = (p.engineering_received - p.engineering_sent).days
+    engineering_projects = []
+
+    for p in filtered_projects:
+        if not p.teclab_data.epc_data.engineering_sent or not p.teclab_data.epc_data.engineering_received:
+            continue
+        days_taken_to_engineer = (p.teclab_data.epc_data.engineering_received - p.teclab_data.epc_data.engineering_sent).days
+        engineering_projects.append(p)
         engineering_values.append(days_taken_to_engineer)
-    engineering_min = min(engineering_values)
-    engineering_max = max(engineering_values)
-    engineering_avg = sum(engineering_values) // len(engineering_values)
 
-    engineering_min_previous_month = 0
-    engineering_min_current_month = 0
-    engineering_min_current_year = 0
+    # Calculate for different time periods
+    engineering_min_current_year, engineering_max_current_year, engineering_avg_current_year, engineering_count_current_year = calculate_stats(
+        engineering_values, 
+        engineering_projects,
+        lambda p: p.teclab_data.epc_data.engineering_received.year == current_year
+    )
+    
+    engineering_min_current_month, engineering_max_current_month, engineering_avg_current_month, engineering_count_current_month = calculate_stats(
+        engineering_values, 
+        engineering_projects,
+        lambda p: p.teclab_data.epc_data.engineering_received.year == current_year and p.teclab_data.epc_data.engineering_received.month == current_month
+    )
+    
+    engineering_min_previous_month, engineering_max_previous_month, engineering_avg_previous_month, engineering_count_previous_month = calculate_stats(
+        engineering_values, 
+        engineering_projects,
+        lambda p: p.teclab_data.epc_data.engineering_received.year == current_year and p.teclab_data.epc_data.engineering_received.month == previous_month
+    )
 
-    engineering_max_previous_month = 0
-    engineering_max_current_month = 0
-    engineering_max_current_year = 0
+    # Plat calculations
+    plat_values = []
+    plat_projects = []
+    for p in filtered_projects:
+        if not p.teclab_data.epc_data.plat_sent or not p.teclab_data.epc_data.plat_received: 
+            continue
+        days_taken_for_plat = (p.teclab_data.epc_data.plat_received - p.teclab_data.epc_data.plat_sent).days
+        plat_projects.append(p)
+        plat_values.append(days_taken_for_plat)
+    
+    # Calculate for different time periods
+    plat_min_current_year, plat_max_current_year, plat_avg_current_year, plat_count_current_year = calculate_stats(
+        plat_values, 
+        plat_projects,
+        lambda p: p.teclab_data.epc_data.plat_received.year == current_year
+    )
+    
+    plat_min_current_month, plat_max_current_month, plat_avg_current_month, plat_count_current_month = calculate_stats(
+        plat_values, 
+        plat_projects,
+        lambda p: p.teclab_data.epc_data.plat_received.year == current_year and p.teclab_data.epc_data.plat_received.month == current_month
+    )
+    
+    plat_min_previous_month, plat_max_previous_month, plat_avg_previous_month, plat_count_previous_month = calculate_stats(
+        plat_values, 
+        plat_projects,
+        lambda p: p.teclab_data.epc_data.plat_received.year == current_year and p.teclab_data.epc_data.plat_received.month == previous_month
+    )
 
-    engineering_avg_previous_month = 0
-    engineering_avg_current_month = 0
-    engineering_avg_current_year = 0
+    # Permitting calculations
+    permitting_values = []
+    permitting_projects = []
+    for p in filtered_projects:
+        if not p.teclab_data.epc_data.permitting_submitted or not p.teclab_data.epc_data.permitting_received: 
+            continue
+        days_taken_for_permitting = (p.teclab_data.epc_data.permitting_received - p.teclab_data.epc_data.permitting_submitted).days
+        permitting_projects.append(p)
+        permitting_values.append(days_taken_for_permitting)
+    
+    # Calculate for different time periods
+    permitting_min_current_year, permitting_max_current_year, permitting_avg_current_year, permitting_count_current_year = calculate_stats(
+        permitting_values, 
+        permitting_projects,
+        lambda p: p.teclab_data.epc_data.permitting_received.year == current_year
+    )
+    
+    permitting_min_current_month, permitting_max_current_month, permitting_avg_current_month, permitting_count_current_month = calculate_stats(
+        permitting_values, 
+        permitting_projects,
+        lambda p: p.teclab_data.epc_data.permitting_received.year == current_year and p.teclab_data.epc_data.permitting_received.month == current_month
+    )
+    
+    permitting_min_previous_month, permitting_max_previous_month, permitting_avg_previous_month, permitting_count_previous_month = calculate_stats(
+        permitting_values, 
+        permitting_projects,
+        lambda p: p.teclab_data.epc_data.permitting_received.year == current_year and p.teclab_data.epc_data.permitting_received.month == previous_month
+    )
 
-    # Plat
-    plat_min_previous_month = 0
-    plat_min_current_month = 0
-    plat_min_current_year = 0
-
-    plat_max_previous_month = 0
-    plat_max_current_month = 0
-    plat_max_current_year = 0
-
-    plat_avg_previous_month = 0
-    plat_avg_current_month = 0
-    plat_avg_current_year = 0
-
-    # Permitting
-    permitting_min_previous_month = 0
-    permitting_min_current_month = 0
-    permitting_min_current_year = 0
-
-    permitting_max_previous_month = 0
-    permitting_max_current_month = 0
-    permitting_max_current_year = 0
-
-    permitting_avg_previous_month = 0
-    permitting_avg_current_month = 0
-    permitting_avg_current_year = 0
-
-    # BBP Posted
-    bbp_posted_min_previous_month = 0
-    bbp_posted_min_current_month = 0
-    bbp_posted_min_current_year = 0
-
-    bbp_posted_max_previous_month = 0
-    bbp_posted_max_current_month = 0
-    bbp_posted_max_current_year = 0
-
-    bbp_posted_avg_previous_month = 0
-    bbp_posted_avg_current_month = 0
-    bbp_posted_avg_current_year = 0
+    # BBP Posted calculations
+    bbp_posted_values = []
+    bbp_posted_projects = []
+    for p in filtered_projects:
+        if not p.teclab_data.epc_data.contract_date or not p.teclab_data.epc_data.bbp_posted or not p.teclab_data.epc_data.permitting_received: 
+            continue
+        days_taken_for_bbp_posted = (p.teclab_data.epc_data.bbp_posted - p.teclab_data.epc_data.permitting_received).days
+        bbp_posted_projects.append(p)
+        bbp_posted_values.append(days_taken_for_bbp_posted)
+    
+    # Calculate for different time periods
+    bbp_posted_min_current_year, bbp_posted_max_current_year, bbp_posted_avg_current_year, bbp_posted_count_current_year = calculate_stats(
+        bbp_posted_values, 
+        bbp_posted_projects,
+        lambda p: p.teclab_data.epc_data.bbp_posted.year == current_year
+    )
+    
+    bbp_posted_min_current_month, bbp_posted_max_current_month, bbp_posted_avg_current_month, bbp_posted_count_current_month = calculate_stats(
+        bbp_posted_values, 
+        bbp_posted_projects,
+        lambda p: p.teclab_data.epc_data.bbp_posted.year == current_year and p.teclab_data.epc_data.bbp_posted.month == current_month
+    )
+    
+    bbp_posted_min_previous_month, bbp_posted_max_previous_month, bbp_posted_avg_previous_month, bbp_posted_count_previous_month = calculate_stats(
+        bbp_posted_values, 
+        bbp_posted_projects,
+        lambda p: p.teclab_data.epc_data.bbp_posted.year == current_year and p.teclab_data.epc_data.bbp_posted.month == previous_month
+    )
 
     res = {
     "CURRENT MONTH": {
+        "title" : current_month_name,
         "total": total_projects_current_month,
         "breakdown": {
             "Drafting": {
+                "USER_MIN": 1,
+                "USER_MAX": 20,
                 "MIN": drafting_min_current_month,
                 "MAX": drafting_max_current_month,
                 "VAL": drafting_avg_current_month,
+                "COUNT":drafting_count_current_month 
             },
             "Engineering": {
+                "USER_MIN": 1,
+                "USER_MAX": 8,
                 "MIN": engineering_min_current_month,
                 "MAX": engineering_max_current_month,
                 "VAL": engineering_avg_current_month,
+                "COUNT":engineering_count_current_month 
             },
             "Plat": {
+                "USER_MIN": 1,
+                "USER_MAX": 8,
                 "MIN": plat_min_current_month,
                 "MAX": plat_max_current_month,
                 "VAL": plat_avg_current_month,
+                "COUNT" :plat_count_current_month 
             },
             "Permitting": {
+                "USER_MIN": 14,
+                "USER_MAX": 28,
                 "MIN": permitting_min_current_month,
                 "MAX": permitting_max_current_month,
                 "VAL": permitting_avg_current_month,
+                "COUNT": permitting_count_current_month,
             },
             "BBP Posted": {
+                "USER_MIN": 1,
+                "USER_MAX": 5,
                 "MIN": bbp_posted_min_current_month,
                 "MAX": bbp_posted_max_current_month,
                 "VAL": bbp_posted_avg_current_month,
+                "COUNT": bbp_posted_count_current_month,
             },
         },
     },
     "PREVIOUS MONTH": {
+        "title" : previous_month_name,
         "total": total_projects_previous_month,
         "breakdown": {
             "Drafting": {
+                "USER_MIN": 1,
+                "USER_MAX": 20,
                 "MIN": drafting_min_previous_month,
                 "MAX": drafting_max_previous_month,
                 "VAL": drafting_avg_previous_month,
+                "COUNT": drafting_count_previous_month,
             },
             "Engineering": {
+                "USER_MIN": 1,
+                "USER_MAX": 8,
                 "MIN": engineering_min_previous_month,
                 "MAX": engineering_max_previous_month,
                 "VAL": engineering_avg_previous_month,
+                "COUNT": engineering_count_previous_month,
             },
             "Plat": {
+                "USER_MIN": 1,
+                "USER_MAX": 8,
                 "MIN": plat_min_previous_month,
                 "MAX": plat_max_previous_month,
                 "VAL": plat_avg_previous_month,
+                "COUNT": plat_count_previous_month,
             },
             "Permitting": {
+                "USER_MIN": 14,
+                "USER_MAX": 28,
                 "MIN": permitting_min_previous_month,
                 "MAX": permitting_max_previous_month,
                 "VAL": permitting_avg_previous_month,
+                "COUNT": permitting_count_previous_month,
             },
             "BBP Posted": {
+                "USER_MIN": 1,
+                "USER_MAX": 5,
                 "MIN": bbp_posted_min_previous_month,
                 "MAX": bbp_posted_max_previous_month,
                 "VAL": bbp_posted_avg_previous_month,
+                "COUNT": bbp_posted_count_previous_month,
             },
         },
     },
     "CURRENT YEAR": {
+        "title": current_year_name,
         "total": total_projects_current_year,
         "breakdown": {
             "Drafting": {
+                "USER_MIN": 1,
+                "USER_MAX": 20,
                 "MIN": drafting_min_current_year,
                 "MAX": drafting_max_current_year,
                 "VAL": drafting_avg_current_year,
+                "COUNT": drafting_count_current_year,
             },
             "Engineering": {
+                "USER_MIN": 1,
+                "USER_MAX": 8,
                 "MIN": engineering_min_current_year,
                 "MAX": engineering_max_current_year,
                 "VAL": engineering_avg_current_year,
+                "COUNT": engineering_count_current_year,
             },
             "Plat": {
+                "USER_MIN": 1,
+                "USER_MAX": 8,
                 "MIN": plat_min_current_year,
                 "MAX": plat_max_current_year,
                 "VAL": plat_avg_current_year,
+                "COUNT": plat_count_current_year,
             },
             "Permitting": {
+                "USER_MIN": 14,
+                "USER_MAX": 28,
                 "MIN": permitting_min_current_year,
                 "MAX": permitting_max_current_year,
                 "VAL": permitting_avg_current_year,
+                "COUNT": permitting_count_current_year,
             },
             "BBP Posted": {
+                "USER_MIN": 1,
+                "USER_MAX": 5,
                 "MIN": bbp_posted_min_current_year,
                 "MAX": bbp_posted_max_current_year,
                 "VAL": bbp_posted_avg_current_year,
+                "COUNT": bbp_posted_count_current_year,
             },
         },
     },
     }
-    print(res)
     return res
 
 class EngineerData(BaseModel):
