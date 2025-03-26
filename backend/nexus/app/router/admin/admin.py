@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends
 from app.database.database import client
 from app.security.oauth2 import HasRequiredRoles
 
+from app.database.database import projects_coll
 
 router = APIRouter(prefix="/admin")
 
@@ -109,4 +110,35 @@ def backup_database():
         "collections_backed_up": cloning_stats
     }
 
-
+@router.get('/fix-boolean-fields', dependencies=[Depends(HasRequiredRoles(required_roles=[999]))])
+def fix_boolean_fields():
+    print("AT fix_boolean_fields")
+    """
+    Iterate through all documents in 'projects_coll' and ensure all boolean fields
+    are either True or False. If any boolean field is None, set it to False.
+    """
+    boolean_fields = [
+        'foundation_scan_status', 'foundation_report_status', 'foundation_uploaded', 'foundation_needed',
+        'slab_scan_status', 'slab_report_status', 'slab_uploaded', 'slab_needed',
+        'frame_scan_status', 'frame_report_status', 'frame_uploaded', 'frame_needed',
+        'mep_scan_status', 'mep_report_status', 'mep_uploaded', 'mep_needed',
+        'misc_scan_status', 'misc_report_status'
+    ]
+    
+    updated_count = 0
+    
+    # Find all documents with None in boolean fields
+    for doc in projects_coll.find():
+        update_fields = {}
+        for field in boolean_fields:
+            if doc["teclab_data"]["fosc_data"].get(field) is None:
+                update_fields[f"teclab_data.fosc_data.{field}"] = False  # Correctly updating nested fields
+        
+        if update_fields:
+            projects_coll.update_one({"_id": doc["_id"]}, {"$set": update_fields})
+            updated_count += 1
+    
+    return {
+        "status": "success",
+        "message": f"Updated {updated_count} documents to ensure boolean fields are True or False."
+    }

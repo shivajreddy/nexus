@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
-import {useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import * as z from "zod"
-import {zodResolver} from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
     Form,
@@ -13,7 +13,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
+import { Input } from "@/components/ui/input"
 
 import {
     Select,
@@ -22,14 +22,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {Button} from "@components/ui/button.tsx";
+import { Button } from "@components/ui/button.tsx";
 
 const formSchema = z.object({
-    community: z.string().min(1, {message: "( Required )"}),
-    section: z.string().min(1, {message: "( Required )"}),
-    lot_number: z.string().min(1, {message: "( Required )"})
+    community: z.string().min(1, { message: "( Required )" }),
+    section: z.string().min(1, { message: "( Required )" }),
+    lot_number: z.string().min(1, { message: "( Required )" })
 })
 
+// Custom sort function to place "NONE" first
+const customSort = (arr) =>
+    arr.sort((a, b) => (a === "NONE" ? -1 : b === "NONE" ? 1 : a.localeCompare(b)));
 
 const CreateProject = () => {
     const axios = useAxiosPrivate();
@@ -39,7 +42,8 @@ const CreateProject = () => {
     useEffect(() => {
         async function getData() {
             const communitiesResponse = await axios.get('/eagle/communities');
-            setExistingCommunities(communitiesResponse.data);
+            // setExistingCommunities(communitiesResponse.data);
+            setExistingCommunities(customSort(communitiesResponse.data));
         }
 
         getData().then(() => {
@@ -82,7 +86,7 @@ const CreateProject = () => {
                     "section": values.section,
                     "lot_number": values.lot_number
                 },
-                {headers: {"Content-Type": "application/json"}}
+                { headers: { "Content-Type": "application/json" } }
             )
             // console.log("response for /projects/new: ", response.data);
             setResult(response.data);
@@ -112,22 +116,22 @@ const CreateProject = () => {
                         <FormField
                             control={form.control}
                             name="community"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="flex items-center select-none">
                                         Community
-                                        <FormMessage className="px-2"/>
+                                        <FormMessage className="px-2" />
                                     </FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl className="min-w-[20em]">
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Choose a community"/>
+                                                <SelectValue placeholder="Choose a community" />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
                                             <SelectGroup className="max-h-40 overflow-y-scroll">
                                                 {existingCommunities.map(community => <SelectItem key={community}
-                                                                                                  value={community}>{community}</SelectItem>)}
+                                                    value={community}>{community}</SelectItem>)}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
@@ -138,10 +142,10 @@ const CreateProject = () => {
                         <FormField
                             control={form.control}
                             name="section"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="flex items-center select-none">Section
-                                        <FormMessage className="px-2"/>
+                                        <FormMessage className="px-2" />
                                     </FormLabel>
                                     <FormControl>
                                         <Input placeholder="" {...field} />
@@ -152,12 +156,12 @@ const CreateProject = () => {
                         <FormField
                             control={form.control}
                             name="lot_number"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="flex items-center select-none">
                                         Lot Number
                                         <p className="px-2 text-default-fg1">(Note: 1 and 01 are not same)</p>
-                                        <FormMessage className="px-2"/>
+                                        <FormMessage className="px-2" />
                                     </FormLabel>
                                     <FormControl>
                                         <Input placeholder="" {...field} />
@@ -167,47 +171,47 @@ const CreateProject = () => {
                         />
                     </div>
                     {status === 'initial' &&
-                      <Button type="submit" variant="primary">
-                        Create
-                      </Button>
+                        <Button type="submit" variant="primary">
+                            Create
+                        </Button>
                     }
                     {status === 'loading' &&
-                      <button disabled
-                              type="submit"
-                              className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
-                        Please wait
-                      </button>
+                        <button disabled
+                            type="submit"
+                            className="cursor-not-allowed flex items-center p-2 rounded-md bg-default-fg1 text-default-bg2">
+                            Please wait
+                        </button>
                     }
                     {status === 'failed' &&
-                      <Button type="submit" variant="primary">
-                        Failed to fetch
-                      </Button>
+                        <Button type="submit" variant="primary">
+                            Failed to fetch
+                        </Button>
                     }
                 </form>
             </Form>
 
             {result &&
-              <div className="border-2 border-green-500 my-2 py-2 rounded-md bg-default-bg1">
-                <div className="flex px-4">
-                  <p className="font-semibold text-green-500">SUCCESS: &nbsp;</p>
-                  <p className="h-max px-2 border rounded-lg">
-                      {result.new_project.project_info.project_id}
-                  </p>
-                  <p>&nbsp; is created</p>
+                <div className="border-2 border-green-500 my-2 py-2 rounded-md bg-default-bg1">
+                    <div className="flex px-4">
+                        <p className="font-semibold text-green-500">SUCCESS: &nbsp;</p>
+                        <p className="h-max px-2 border rounded-lg">
+                            {result.new_project.project_info.project_id}
+                        </p>
+                        <p>&nbsp; is created</p>
+                    </div>
                 </div>
-              </div>
             }
 
             {errorMsg &&
-              <div className="border-2 border-red-500 my-2 py-2 rounded-md bg-default-bg1">
-                <div className="flex px-4">
-                  <p className="font-semibold text-destructive">ERROR: &nbsp;</p>
-                  <p className="h-max px-2 border rounded-lg">
-                      {form.getValues().community}-{form.getValues().section}-{form.getValues().lot_number}
-                  </p>
-                  <p>&nbsp; already exists</p>
+                <div className="border-2 border-red-500 my-2 py-2 rounded-md bg-default-bg1">
+                    <div className="flex px-4">
+                        <p className="font-semibold text-destructive">ERROR: &nbsp;</p>
+                        <p className="h-max px-2 border rounded-lg">
+                            {form.getValues().community}-{form.getValues().section}-{form.getValues().lot_number}
+                        </p>
+                        <p>&nbsp; already exists</p>
+                    </div>
                 </div>
-              </div>
             }
 
         </div>

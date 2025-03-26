@@ -39,7 +39,7 @@ function Engineer_1() {
     }, []);
 
     return (
-        <Card className="w-[650px] h-[520px] m-2 p-2">
+        <Card className="w-[650px] h-[520px] m-2 p-2 flex-shrink-0">
             <CardHeader className="text-center">Projects Handled by Engineers</CardHeader>
             <CardContent className="flex flex-col items-center">
                 <ResponsiveContainer width="100%" height={400}>

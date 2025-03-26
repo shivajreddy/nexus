@@ -49,6 +49,8 @@ def get_current_month_ticker_data():
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
         project_raw = {k: v for (k, v) in doc.items() if k != "_id"}
+        # print("project_raw:epc:", project_raw["teclab_data"]["epc_data"])
+        # print("project_raw:fosc:", project_raw["teclab_data"]["fosc_data"])
         project: Project = Project(**project_raw)
 
         p_teclab_epc_data: EPCData = EPCData(**project_raw["teclab_data"]["epc_data"])
@@ -88,7 +90,7 @@ def get_current_month_ticker_data():
             print("ERROR:Drafting:days_taken_to_draft cant be <= 0 days")
         drafting_projects.append(p)
         drafting_values.append(days_taken_to_draft)
-    print("drafting values:::", drafting_values)
+    # print("drafting values:::", drafting_values)
 
     # Calculate for different time periods
     drafting_min_current_year, drafting_max_current_year, drafting_avg_current_year, drafting_count_current_year = calculate_stats(
@@ -241,7 +243,7 @@ def get_current_month_ticker_data():
             },
             "Engineering": {
                 "USER_MIN": 1,
-                "USER_MAX": 8,
+                "USER_MAX": 15,
                 "MIN": engineering_min_current_month,
                 "MAX": engineering_max_current_month,
                 "VAL": engineering_avg_current_month,
@@ -249,7 +251,7 @@ def get_current_month_ticker_data():
             },
             "Plat": {
                 "USER_MIN": 1,
-                "USER_MAX": 8,
+                "USER_MAX": 15,
                 "MIN": plat_min_current_month,
                 "MAX": plat_max_current_month,
                 "VAL": plat_avg_current_month,
@@ -287,7 +289,7 @@ def get_current_month_ticker_data():
             },
             "Engineering": {
                 "USER_MIN": 1,
-                "USER_MAX": 8,
+                "USER_MAX": 15,
                 "MIN": engineering_min_previous_month,
                 "MAX": engineering_max_previous_month,
                 "VAL": engineering_avg_previous_month,
@@ -295,7 +297,7 @@ def get_current_month_ticker_data():
             },
             "Plat": {
                 "USER_MIN": 1,
-                "USER_MAX": 8,
+                "USER_MAX": 15,
                 "MIN": plat_min_previous_month,
                 "MAX": plat_max_previous_month,
                 "VAL": plat_avg_previous_month,
@@ -333,7 +335,7 @@ def get_current_month_ticker_data():
             },
             "Engineering": {
                 "USER_MIN": 1,
-                "USER_MAX": 8,
+                "USER_MAX": 15,
                 "MIN": engineering_min_current_year,
                 "MAX": engineering_max_current_year,
                 "VAL": engineering_avg_current_year,
@@ -341,7 +343,7 @@ def get_current_month_ticker_data():
             },
             "Plat": {
                 "USER_MIN": 1,
-                "USER_MAX": 8,
+                "USER_MAX": 15,
                 "MIN": plat_min_current_year,
                 "MAX": plat_max_current_year,
                 "VAL": plat_avg_current_year,

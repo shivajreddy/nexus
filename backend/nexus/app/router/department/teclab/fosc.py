@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.database.database import projects_coll
-from app.database.schemas.department_data import UpdateFOSCData
+from app.database.schemas.department_data import FOSCData, UpdateFOSCData
 from app.database.schemas.user import User
 from app.email.utils import send_email_with_given_message_and_attachment
 from app.router.utils.find_project import find_project
@@ -44,8 +44,47 @@ def get_live_lots():
                     "section_number": doc["project_info"]["section"],
                     "lot_number": doc["project_info"]["lot_number"]
                 }
-                final_object.update(project["teclab_data"]["fosc_data"])
+
+                # NOTE: the boolean fields on docs must have a boolean value, not None, the following fixes it
+                # TODO: make sure that the new/update api endpoints ensure that its a boolean
+                def transform_data(data: dict) -> dict:
+                    # Replace None with False for boolean fields
+                    boolean_fields = [
+                        'foundation_scan_status', 'foundation_report_status', 'foundation_uploaded',
+                        'foundation_needed', 'slab_scan_status', 'slab_report_status', 'slab_uploaded',
+                        'slab_needed', 'frame_scan_status', 'frame_report_status', 'frame_uploaded',
+                        'frame_needed', 'mep_scan_status', 'mep_report_status', 'mep_uploaded', 'mep_needed',
+                        'misc_scan_status', 'misc_report_status'
+                    ]
+                    for field in boolean_fields:
+                        if data.get(field) is None:
+                            data[field] = False
+                    return data
+                def update_documents_with_defaults():
+                    # Define the boolean fields you want to check
+                    boolean_fields = [
+                        'foundation_needed', 'foundation_scan_status', 'foundation_report_status', 'foundation_uploaded',
+                        'slab_scan_status', 'slab_report_status', 'slab_uploaded', 'slab_needed',
+                        'frame_scan_status', 'frame_report_status', 'frame_uploaded', 'frame_needed',
+                        'mep_scan_status', 'mep_report_status', 'mep_uploaded', 'mep_needed',
+                        'misc_scan_status', 'misc_report_status'
+                    ]
+
+                    for field in boolean_fields:
+                        # Update documents where the field is None and set it to False
+                        projects_coll.update_many(
+                            {field: None},  # Check for None value
+                            {"$set": {field: False}}  # Set it to False
+                        )
+                # update_documents_with_defaults()
+
+                # Assuming `raw_data` is the data you receive (e.g., from the API)
+                transformed_data = transform_data(project["teclab_data"]["fosc_data"])
+                fosc_data = FOSCData(**transformed_data)
+                final_object.update(fosc_data)
+
                 result.append(final_object)
+        print(result)
         return result
     except Exception as e:
         print("error: ", e)
@@ -682,3 +721,5 @@ def update_db():
     return result
 
 # """
+
+

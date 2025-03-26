@@ -95,44 +95,44 @@ class FOSCData(BaseModel):
     assigned_director: Optional[str] = None
 
     # Foundation
-    foundation_scan_status: Optional[bool] = None
+    foundation_scan_status: bool = False
     foundation_scan_date: Optional[datetime] = None
-    foundation_report_status: Optional[bool] = None
+    foundation_report_status: bool = False
     foundation_reporter: Optional[str] = None
     foundation_report_date: Optional[datetime] = None
-    foundation_uploaded: Optional[bool] = None
-    foundation_needed: Optional[bool] = True
+    foundation_uploaded:bool = False 
+    foundation_needed: bool = True
 
     # Slab
-    slab_scan_status: Optional[bool] = None
+    slab_scan_status: bool = False 
     slab_scan_date: Optional[datetime] = None
-    slab_report_status: Optional[bool] = None
+    slab_report_status: bool = False 
     slab_reporter: Optional[str] = None
     slab_report_date: Optional[datetime] = None
-    slab_uploaded: Optional[bool] = None
-    slab_needed: Optional[bool] = True
+    slab_uploaded: bool = False  
+    slab_needed: bool = True
 
     # Frame
-    frame_scan_status: Optional[bool] = None
+    frame_scan_status: bool = False  
     frame_scan_date: Optional[datetime] = None
-    frame_report_status: Optional[bool] = None
+    frame_report_status: bool = False  
     frame_reporter: Optional[str] = None
     frame_report_date: Optional[datetime] = None
-    frame_uploaded: Optional[bool] = None
-    frame_needed: Optional[bool] = True
+    frame_uploaded: bool = False  
+    frame_needed: bool = True
 
     # MEP
-    mep_scan_status: Optional[bool] = None
+    mep_scan_status: bool = False  
     mep_scan_date: Optional[datetime] = None
-    mep_report_status: Optional[bool] = None
+    mep_report_status: bool = False  
     mep_reporter: Optional[str] = None
     mep_report_date: Optional[datetime] = None
-    mep_uploaded: Optional[bool] = None
-    mep_needed: Optional[bool] = True
+    mep_uploaded: bool = False
+    mep_needed: bool = True
 
     # Misc (warranty, extra)
-    misc_scan_status: Optional[bool] = None
-    misc_report_status: Optional[bool] = None
+    misc_scan_status: bool = False  
+    misc_report_status: bool = False  
 
     # Notes
     notes: Optional[str] = None

@@ -1,8 +1,8 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
-import {HiPencilAlt} from "react-icons/hi";
-import {Button} from "@components/ui/button.tsx";
-import {MdDelete} from "react-icons/md";
+import { HiPencilAlt } from "react-icons/hi";
+import { Button } from "@components/ui/button.tsx";
+import { MdDelete } from "react-icons/md";
 
 import {
     Command,
@@ -46,6 +46,14 @@ const EditFormData = () => {
                 all_plat_engineers: platEngineersResponse.data,
                 all_counties: countiesResponse.data
             })
+
+            // console.log("all_communities:", communitiesResponse.data);
+            // console.log("all_products:", productsResponse.data);
+            // console.log("all_elevations:", elevationsResponse.data);
+            // console.log("all_drafters:", draftersResponse.data);
+            // console.log("all_engineers:", engineersResponse.data);
+            // console.log("all_plat_engineers:", platEngineersResponse.data);
+            // console.log("all_counties:", countiesResponse.data);
         }
 
         getData().then(() => {
@@ -69,14 +77,14 @@ const EditFormData = () => {
         }
     };
 
-    const Item = ({name}) => (
+    const Item = ({ name }) => (
         <CommandItem>
             <Button variant="outline" onClick={() => handleEdit(name)}>
-                <HiPencilAlt/>
+                <HiPencilAlt />
             </Button>
             <span>{name}</span>
             <Button variant="outline" onClick={() => handleDelete(name)}>
-                <MdDelete/>
+                <MdDelete />
             </Button>
         </CommandItem>
     );
@@ -84,14 +92,14 @@ const EditFormData = () => {
     return (
         <div>
             <Command className="rounded-lg border shadow-md h-140">
-                <CommandInput placeholder="Search..."/>
+                <CommandInput placeholder="Search..." />
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     {allFormData.map((eachItem: any) => {
-                            return (
-                                <Item name={eachItem} key={eachItem}/>
-                            )
-                        }
+                        return (
+                            <Item name={eachItem} key={eachItem} />
+                        )
+                    }
                     )}
                 </CommandList>
             </Command>

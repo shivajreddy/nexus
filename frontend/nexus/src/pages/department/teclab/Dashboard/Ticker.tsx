@@ -54,9 +54,9 @@ function Ticker() {
     // console.log("TESTING:", previous_month_metrics?.breakdown.Drafting.MIN);
     const renderMetrics = (metrics: Metrics | null) => (
         <>
-            <div className="flex justify-center items-center">
-                <p className="px-8">{metrics?.title ?? "-"}</p>
-                <p>Projects: {metrics?.total ?? "N/A"}</p>
+            <div className="flex flex-col justify-center items-center">
+                <p className="px-8 uppercase">{metrics?.title ?? "-"}</p>
+                <p className="text-sm pl-2 uppercase text-gray-500">Contracted Projects: {metrics?.total ?? "N/A"}</p>
             </div>
             <div className="flex">
                 {loading ? (

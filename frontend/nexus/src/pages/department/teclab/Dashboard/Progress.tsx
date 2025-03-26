@@ -65,8 +65,8 @@ export function ProgressDemo({ title, count, user_min, user_max, min, max, val }
         <>
             <div className="flex flex-col w-full m-2">
                 <p className="text-center font-medium flex flex-col mb-2">
-                    <span className="uppercase">{title}</span>
-                    <span className="text-xs pl-2 uppercase text-gray-500"> Total Projects:{count} </span>
+                    <span className="uppercase text-xs">{title}</span>
+                    <span className="text-xs pl-2 uppercase text-gray-500">Projects:{count} </span>
                 </p>
                 <div className="flex items-center justify-between  text-xs pb-1 px-2">
                     <div className="flex flex-col">

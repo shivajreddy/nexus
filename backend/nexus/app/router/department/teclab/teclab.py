@@ -171,6 +171,7 @@ def delete_elevation(elevation: Elevation):
 @router.get('/drafters', dependencies=[Depends(get_current_user_data)])
 def get_all_drafters_names():
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if not teclab_doc: return []
     all_teams = teclab_doc["data"]["teams"]
     # drafting_team = None
     for team in all_teams:
@@ -183,6 +184,7 @@ def get_all_drafters_names():
 @router.get('/homesiting-drafters', dependencies=[Depends(get_current_user_data)])
 def get_all_homesiting_drafters_names():
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if not teclab_doc: return []
     all_teams = teclab_doc["data"]["teams"]
     for team in all_teams:
         # print(team["team_name"])
@@ -193,10 +195,13 @@ def get_all_homesiting_drafters_names():
 # :: Field Ops members ::
 @router.get('/fieldops-members', dependencies=[Depends(get_current_user_data)])
 def get_all_field_ops_members_names():
-    former_members = ["R.Spence", "T.Butterworth", "B.Chancellor", "A.Ward", "Archi-TEC-tonic"]
+    # former_members = ["R.Spence", "T.Butterworth", "B.Chancellor", "A.Ward", "Archi-TEC-tonic"]
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if not teclab_doc: return []
     all_teams = teclab_doc["data"]["teams"]
     for team in all_teams:
         print(team["team_name"])
         if team["team_name"] == "Field Ops":
-            return team["team_members"] + former_members
+            # return team["team_members"] + former_members
+            return team["team_members"]
+
