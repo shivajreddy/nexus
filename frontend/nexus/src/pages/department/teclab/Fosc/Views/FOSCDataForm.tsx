@@ -63,22 +63,25 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
     function updateTECLabDataForProject(e: React.MouseEvent<HTMLButtonElement>, project_uid: string) {
         e.preventDefault();
         // console.log("😄 updateTECLabDataForProject=", e);
-        console.log("😄 project_uid=", project_uid);
-        console.log("😄 =selectedProjectsTECLabFOSCData", selectedProjectsTECLabFOSCData);
+        // console.log("😄 project_uid=", project_uid);
+        // console.log("😄 =selectedProjectsTECLabFOSCData", selectedProjectsTECLabFOSCData);
         const makeServerRequest = async () => {
             setUpdateTECLabDataStatus('loading');
             try {
                 await axios.post('/department/teclab/fosc/edit',
                     {
                         "project_uid": project_uid,
-                        "fosc_data": selectedProjectsTECLabFOSCData
+                        "fosc_data": selectedProjectsTECLabFOSCData,
+                        "homesiting_requested_on": selectedProjectsTECLabFOSCData.homesiting_requested_on,
+                        "homesiting_completed_on": selectedProjectsTECLabFOSCData.homesiting_completed_on,
+                        "homesiting_completed_by": selectedProjectsTECLabFOSCData.homesiting_completed_by,
                     },
                     { headers: { "Content-Type": "application/json" } }
                 )
                 setUpdateTECLabDataStatus('success');
 
             } catch (e) {
-                console.error("Error sending post request", e);
+                // console.error("Error sending post request", e);
                 setUpdateTECLabDataStatus('failed')
             }
         }
@@ -130,9 +133,9 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     lot_number: lotData.project_info.lot_number,
 
                     // home-siting-info
-                    homesiting_completed_by: lotData.homesiting_completed_by,
-                    homesiting_completed_on: lotData.homesiting_completed_on ? new Date(lotData.homesiting_completed_on) : undefined,
-                    homesiting_requested_on: lotData.homesiting_requested_on ? new Date(lotData.homesiting_requested_on) : undefined,
+                    homesiting_requested_on: lotData.epc_data.homesiting_requested_on ? new Date(lotData.homesiting_requested_on) : undefined,
+                    homesiting_completed_on: lotData.epc_data.homesiting_completed_on ? new Date(lotData.homesiting_completed_on) : undefined,
+                    homesiting_completed_by: lotData.epc_data.homesiting_completed_by,
 
                     // status
                     lot_status_started: lotData.fosc_data.lot_status_started,

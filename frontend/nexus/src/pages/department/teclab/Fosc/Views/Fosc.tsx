@@ -149,7 +149,7 @@ function Fosc() {
             }
         ];
 
-        if (hasRoles(userRoles, [221])) {
+        if (hasRoles(userRoles, [221, 223, 291, 299, 999])) {
             return [...viewerColDef, ...editorColDef];
         }
         return viewerColDef
@@ -202,7 +202,7 @@ function Fosc() {
                         }
                     </div>
                     <div className="flex mx-10">
-                        {hasRoles(userRoles, [221]) &&
+                        {hasRoles(userRoles, [221, 223, 291, 299, 999]) &&
                             <div className="flex justify-center items-center bg-default-bg1">
                                 <Button
                                     className="min-w-[10em]"

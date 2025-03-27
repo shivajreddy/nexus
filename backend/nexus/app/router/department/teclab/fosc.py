@@ -202,6 +202,8 @@ def get_fosc_data_with_project_uid(project_uid: str):
 
     result_project = {
         "project_info": target_project["project_info"],
+        # sending epc_data also, so that frontend can use home-siting info here
+        "epc_data": target_project["teclab_data"]["epc_data"],  
         "fosc_data": target_project["teclab_data"]["fosc_data"]
     }
     return result_project
@@ -226,10 +228,23 @@ def update_teclab_data_for_project(new_data: UpdateFOSCData):
     if new_data.fosc_data.assigned_director != existing_project["teclab_data"]["fosc_data"]["assigned_director"]:
         update_community_directors(new_data.fosc_data.assigned_director, existing_project["project_info"]["community"])
 
-    # Update the project in the database
+    # Update the project's fosc-data in the database
     projects_coll.update_one(
         {"project_info.project_uid": new_data.project_uid},
-        {"$set": {"teclab_data.fosc_data": new_data.fosc_data.model_dump()}}
+        {"$set": {"teclab_data.fosc_data": new_data.fosc_data.model_dump()}},
+    )
+    # Update the project's homesiting-data in the database
+    projects_coll.update_one(
+        {"project_info.project_uid": new_data.project_uid},
+        {"$set": {"teclab_data.epc_data.homesiting_requested_on": new_data.homesiting_requested_on}},
+    )
+    projects_coll.update_one(
+        {"project_info.project_uid": new_data.project_uid},
+        {"$set": {"teclab_data.epc_data.homesiting_completed_on": new_data.homesiting_completed_on}},
+    )
+    projects_coll.update_one(
+        {"project_info.project_uid": new_data.project_uid},
+        {"$set": {"teclab_data.epc_data.homesiting_completed_by": new_data.homesiting_completed_by}},
     )
 
     return {"message": f"Project {new_data.project_uid} updated successfully"}

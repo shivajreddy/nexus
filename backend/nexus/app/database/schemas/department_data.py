@@ -151,6 +151,9 @@ class UpdateTECLabData(BaseModel):
 class UpdateFOSCData(BaseModel):
     project_uid: str
     fosc_data: FOSCData
+    homesiting_completed_by: Optional[str] = None
+    homesiting_completed_on: Optional[str] = None
+    homesiting_requested_on: Optional[str] = None
 
 class CORData(BaseModel):
     product: str = ''
