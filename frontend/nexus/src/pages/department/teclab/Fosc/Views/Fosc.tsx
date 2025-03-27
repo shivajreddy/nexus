@@ -100,7 +100,7 @@ function Fosc() {
                     notes: item.notes
 
                 }));
-                console.log("transformed 😇 data=", transformedData);
+                // console.log("transformed 😇 data=", transformedData);
                 setAllFOSCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {

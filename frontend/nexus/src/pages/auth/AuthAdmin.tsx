@@ -4,21 +4,19 @@ import { useAppSelector } from "@/redux/hooks";
 import { Outlet } from "react-router-dom";
 
 
-// :: Allowed roles
-const ALLOWED_ROLES = [101]
+const ALLOWED_ROLES = [999]
 
 
-function AuthTecLab() {
+function AuthAdmin() {
 
     // // + get auth state
     const currentUser = useAppSelector(selectCurrentUser)
-
-    if (currentUser?.security?.roles.some(role => ALLOWED_ROLES.includes(role))) {
-        return <Outlet />
-    } else {
+    if (!(currentUser?.security?.roles.some(role => ALLOWED_ROLES.includes(role)))) {
         return <UnAuthorized />
+    } else {
+        return <Outlet />
     }
 }
 
 
-export default AuthTecLab
+export default AuthAdmin

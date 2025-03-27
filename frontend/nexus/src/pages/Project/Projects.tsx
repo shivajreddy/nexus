@@ -1,6 +1,6 @@
 import MainLayout from "@templates/MainLayout.tsx";
 import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import CreateProject from "@pages/Project/CreateProject.tsx";
 
 interface Iprops {
@@ -34,11 +34,12 @@ const Projects = (props: Iprops) => {
 
         props.setChosenProject(targetProject);
     }
+
     return (
         <MainLayout>
             <div id="projects-container"
                 // className="h-[calc(100vh-100px)] bg-default-bg1 rounded-2xl border"
-                 className="bg-default-bg1 rounded-md border"
+                className="bg-default-bg1 rounded-md border"
             >
                 <p className="font-semibold text-3xl p-2 pt-6 text-center">PROJECTS</p>
 
@@ -67,7 +68,7 @@ const Projects = (props: Iprops) => {
                             </div>
                         </div>
                     }
-                    <CreateProject/>
+                    <CreateProject />
                 </div>
 
             </div>

@@ -441,7 +441,7 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                             <CardContent>
                                 {/* ! TODO: provide the onChange handler for the Textarea content cuz i am giving the value to begin with*/}
                                 <Textarea placeholder="Your notes here..."
-                                    value={selectedProjectsTECLabEPCData.notes}
+                                    value={selectedProjectsTECLabEPCData.notes ?? ""}
                                     onChange={newNotes => handleStateChange('notes', newNotes.target.value)}
                                 />
                             </CardContent>

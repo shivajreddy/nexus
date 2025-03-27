@@ -26,7 +26,10 @@
         - 220 - FOSC viewer
         - 221 - FOSC editor
         - 223 - FOSC super user -> get emails, change form data
-9** - MASTER KEY 
-    999 - DEVELOPER -> access to everything
+    29x - Team Lead & Department head
+        - 291 - Drafting Head
+        - 299 - Department(TECLAB) Head
+9** - ADMIN KEY 
+    999 - ADMIN -> access to everything
 
 ```

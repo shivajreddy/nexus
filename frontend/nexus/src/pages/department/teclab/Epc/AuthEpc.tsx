@@ -5,20 +5,21 @@ import { Outlet } from "react-router-dom";
 
 
 // :: Allowed roles
-const ALLOWED_ROLES = [101]
+const ALLOWED_ROLES = [210, 211, 213, 291, 299, 999]
 
 
-function AuthTecLab() {
+function AuthEpc() {
 
-    // // + get auth state
+    // Get auth state
     const currentUser = useAppSelector(selectCurrentUser)
+    // console.log("currentUser:", currentUser);
 
-    if (currentUser?.security?.roles.some(role => ALLOWED_ROLES.includes(role))) {
-        return <Outlet />
-    } else {
+    if (!(currentUser?.security?.roles.some(role => ALLOWED_ROLES.includes(role)))) {
         return <UnAuthorized />
+    } else {
+        return <Outlet />
     }
 }
 
 
-export default AuthTecLab
+export default AuthEpc

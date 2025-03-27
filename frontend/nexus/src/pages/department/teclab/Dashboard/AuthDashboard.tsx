@@ -5,10 +5,10 @@ import { Outlet } from "react-router-dom";
 
 
 // :: Allowed roles
-const ALLOWED_ROLES = [101]
+const ALLOWED_ROLES = [299, 999]
 
 
-function AuthTecLab() {
+function AuthDashboard() {
 
     // // + get auth state
     const currentUser = useAppSelector(selectCurrentUser)
@@ -21,4 +21,4 @@ function AuthTecLab() {
 }
 
 
-export default AuthTecLab
+export default AuthDashboard

@@ -1,8 +1,8 @@
 import MainLayout from "@templates/MainLayout.tsx";
-import {TiArrowBack} from "react-icons/ti";
-import {useNavigate} from "react-router-dom";
-import {Button} from "@components/ui/button.tsx";
-import {useState} from "react";
+import { TiArrowBack } from "react-icons/ti";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@components/ui/button.tsx";
+import { useState } from "react";
 // import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
 import FOSCDataForm from "@pages/department/teclab/Fosc/Views/FOSCDataForm.tsx";
 // import {ScrollArea} from "@components/ui/scroll-area.tsx";
@@ -37,8 +37,8 @@ function SearchAndUpdateFOSCData() {
                         {/* TODO: this should be role specific*/}
                         <div className="flex justify-center items-center">
                             <Button variant="default" className="w-40 flex justify-center items-center"
-                                    onClick={() => navigate('/fosc')}>
-                                <p className="pr-2"><TiArrowBack/></p>
+                                onClick={() => navigate('/fosc')}>
+                                <p className="pr-2"><TiArrowBack /></p>
                                 Back to FOSC
                             </Button>
                         </div>
@@ -56,12 +56,12 @@ function SearchAndUpdateFOSCData() {
                 </div>
 
                 {chosenProject &&
-                  <FOSCDataForm className="ml-4 pt-2"
-                                  statusFOSCDataFetch={statusFOSCDataFetch}
-                                  setStatusFOSCDataFetch={setStatusFOSCDataFetch}
-                                  project_id={chosenProject.project_id}
-                                  project_uid={chosenProject.project_uid}
-                  />
+                    <FOSCDataForm className="ml-4 pt-2"
+                        statusFOSCDataFetch={statusFOSCDataFetch}
+                        setStatusFOSCDataFetch={setStatusFOSCDataFetch}
+                        project_id={chosenProject.project_id}
+                        project_uid={chosenProject.project_uid}
+                    />
                 }
 
             </div>
