@@ -149,7 +149,7 @@ function Fosc() {
             }
         ];
 
-        if (hasRoles(userRoles, [220])) {
+        if (hasRoles(userRoles, [221])) {
             return [...viewerColDef, ...editorColDef];
         }
         return viewerColDef
