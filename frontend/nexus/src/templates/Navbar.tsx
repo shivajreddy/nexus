@@ -21,7 +21,7 @@ function Navbar() {
         link: string,
         icon: ReactElement,
         isBeta: boolean,
-        roles: [number],
+        roles: number[],
     }
 
     // + Fetch the items based on user roles
@@ -32,7 +32,7 @@ function Navbar() {
             link: "/projects",
             icon: <BsHouses size="1.5em" />,
             isBeta: true,
-            roles: [203],
+            roles: [213, 299, 999],
         },
         {
             name: "PipeLine",
@@ -47,7 +47,7 @@ function Navbar() {
             link: "/epc",
             icon: <FaRegCircle size={"1.5em"} />,
             isBeta: true,
-            roles: [101],
+            roles: [210],
         },
         {
             name: "FOSC",
@@ -68,7 +68,7 @@ function Navbar() {
             link: "/dashboard",
             icon: <BsGraphUp size={"1.5em"} />,
             isBeta: true,
-            roles: [999],
+            roles: [299, 999],
         },
     ]
 

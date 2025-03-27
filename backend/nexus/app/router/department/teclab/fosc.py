@@ -22,9 +22,10 @@ TECLAB/FOSC endpoint
 
 router = APIRouter(prefix="/department/teclab/fosc")
 
-@router.get('/')
-def get():
-    print("inside fosc")
+# @router.get('/')
+# def get():
+#     print("inside fosc")
+#     return "inside fosc"
 
 
 # """
@@ -84,10 +85,10 @@ def get_live_lots():
                 final_object.update(fosc_data)
 
                 result.append(final_object)
-        print(result)
+        # print(result)
         return result
     except Exception as e:
-        print("error: ", e)
+        # print("error: ", e)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 # """
@@ -160,7 +161,7 @@ def get_current_lots():
 
         return result
     except Exception as e:
-        print("error: ", e)
+        # print("error: ", e)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 # """
@@ -354,7 +355,7 @@ def get_all_communities():
 # Formats the dates to remove the time
 def format_date(date_string):
     if date_string:
-        print(date_string)
+        # print(date_string)
         if isinstance(date_string, datetime):
             # print("shifter")
             return date_string.strftime("%m/%d/%Y")
@@ -403,7 +404,7 @@ def generate_send_csv_summary(current_user_data: Annotated[User, Depends(get_cur
     # create the csv file
     today_date = datetime.now().strftime("%m-%d-%Y")
     csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsSummaryTracker.csv")
-    print("filename=", csv_filename)
+    # print("filename=", csv_filename)
     with open(csv_filename, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([
@@ -436,7 +437,7 @@ def generate_send_csv_live(current_user_data: Annotated[User, Depends(get_curren
     # create the csv file
     today_date = datetime.now().strftime("%m-%d-%Y")
     csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsLiveTracker.csv")
-    print("filename=", csv_filename)
+    # print("filename=", csv_filename)
     with open(csv_filename, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([
@@ -487,7 +488,7 @@ def generate_send_csv_all(current_user_data: Annotated[User, Depends(get_current
     # create the csv file
     today_date = datetime.now().strftime("%m-%d-%Y")
     csv_filename = os.path.join("./app/files/fosc", f"{today_date}-FieldOpsAllTracker.csv")
-    print("filename=", csv_filename)
+    # print("filename=", csv_filename)
     with open(csv_filename, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([
@@ -552,7 +553,7 @@ def update_community_directors(new_data: str | None, community: str):
                     {"$set": {"teclab_data.fosc_data.assigned_director": new_data}}
                 )
     except Exception as e:
-        print("error: ", e)
+        # print("error: ", e)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
@@ -606,7 +607,7 @@ def update_project_fosc_data(new_data: list, header: list):
                 {"$set": {update_type: update}}
             )
 
-        print(">", this_project["project_info"]["project_id"])
+        # print(">", this_project["project_info"]["project_id"])
 
         for count, i in enumerate(new_data):
             if i.strip():
@@ -619,7 +620,8 @@ def update_project_fosc_data(new_data: list, header: list):
 
                 if update_type:
                     if i.strip() == test or i.strip()[0].upper() + i.strip()[1:].lower() == test:
-                        print(update_type.rsplit(".", 1)[-1], "Not Changed")
+                        update_type.rsplit(".", 1)[-1]
+                        # print("Not Changed")
                     elif i.upper() == "TRUE":
                         update_field(update_type, True)
                     elif i.upper() == "FALSE":
@@ -629,8 +631,8 @@ def update_project_fosc_data(new_data: list, header: list):
 
 
     except Exception as e:
-        print("error: ", e)
-        print("lot: ", new_data)
+        # print("error: ", e)
+        # print("lot: ", new_data)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
@@ -643,13 +645,13 @@ def csv_upload():
         header = next(csv_reader)
 
         if header[1] == "Director":
-            print("Director csv")
+            # print("Director csv")
             for row in csv_reader:
                 update_community_directors(row[1], row[0])
 
             return "Updated all Directors to given CSV file."
         elif header[1] == "Section":
-            print("All Lots csv")
+            # print("All Lots csv")
             del header[:3]
             for row in csv_reader:
                 update_project_fosc_data(row, header)
