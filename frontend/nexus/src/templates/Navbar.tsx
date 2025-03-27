@@ -54,7 +54,7 @@ function Navbar() {
             link: "/fosc",
             icon: <FaExpand size={"1.5em"} />,
             isBeta: true,
-            roles: [220, 213, 299, 999],
+            roles: [220, 221, 223, 299, 999],
         },
         {
             name: "CORD",
