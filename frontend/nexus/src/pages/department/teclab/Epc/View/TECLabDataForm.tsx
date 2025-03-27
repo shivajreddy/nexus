@@ -63,8 +63,8 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
     function updateTECLabDataForProject(e: React.MouseEvent<HTMLButtonElement>, project_uid: string) {
         e.preventDefault();
         // console.log("😄 updateTECLabDataForProject=", e);
-        console.log("😄 project_uid=", project_uid);
-        console.log("😄 =selectedProjectsTECLabEPCData", selectedProjectsTECLabEPCData);
+        // console.log("😄 project_uid=", project_uid);
+        // console.log("😄 =selectedProjectsTECLabEPCData", selectedProjectsTECLabEPCData);
         const makeServerRequest = async () => {
             setUpdateTECLabDataStatus('loading');
             try {
@@ -148,8 +148,8 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                     lot_status_released: lotData.epc_data.lot_status_released,
 
                     homesiting_requested_on: lotData.epc_data.homesiting_requested_on ? new Date(lotData.epc_data.homesiting_requested_on) : undefined,
-                    homesiting_completed_by: lotData.epc_data.homesiting_completed_by,
                     homesiting_completed_on: lotData.epc_data.homesiting_completed_on ? new Date(lotData.epc_data.homesiting_completed_on) : undefined,
+                    homesiting_completed_by: lotData.epc_data.homesiting_completed_by,
 
                     project_id: lotData.project_info.project_id,
                     project_uid: lotData.project_info.project_uid,

@@ -133,8 +133,8 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     lot_number: lotData.project_info.lot_number,
 
                     // home-siting-info
-                    homesiting_requested_on: lotData.epc_data.homesiting_requested_on ? new Date(lotData.homesiting_requested_on) : undefined,
-                    homesiting_completed_on: lotData.epc_data.homesiting_completed_on ? new Date(lotData.homesiting_completed_on) : undefined,
+                    homesiting_requested_on: lotData.epc_data.homesiting_requested_on ? new Date(lotData.epc_data.homesiting_requested_on) : undefined,
+                    homesiting_completed_on: lotData.epc_data.homesiting_completed_on ? new Date(lotData.epc_data.homesiting_completed_on) : undefined,
                     homesiting_completed_by: lotData.epc_data.homesiting_completed_by,
 
                     // status
@@ -188,7 +188,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     // Notes
                     notes: lotData.fosc_data.notes
                 };
-                // console.log("transformedData=", transformedData);
+                console.log("transformedData=", transformedData);
                 // Set the data to the lot-state
                 setSelectedProjectsTECLabFOSCData(transformedData);
                 setStatusFOSCDataFetch("success");

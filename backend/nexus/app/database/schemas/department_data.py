@@ -74,9 +74,9 @@ class EPCData(BaseModel):
     permitting_received: Optional[datetime] = None
 
     # HomeSiting
+    homesiting_requested_on: Optional[datetime] = None
+    homesiting_completed_on: Optional[datetime] = None
     homesiting_completed_by: Optional[str] = None
-    homesiting_completed_on: Optional[str] = None
-    homesiting_requested_on: Optional[str] = None
 
     # Build By Plans
     bbp_posted: Optional[datetime] = None
@@ -151,9 +151,9 @@ class UpdateTECLabData(BaseModel):
 class UpdateFOSCData(BaseModel):
     project_uid: str
     fosc_data: FOSCData
+    homesiting_requested_on: Optional[datetime] = None
+    homesiting_completed_on: Optional[datetime] = None
     homesiting_completed_by: Optional[str] = None
-    homesiting_completed_on: Optional[str] = None
-    homesiting_requested_on: Optional[str] = None
 
 class CORData(BaseModel):
     product: str = ''
