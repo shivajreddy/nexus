@@ -21,5 +21,6 @@ def connect_mongodb():
     try:
         client.admin.command("ping")
         print("Database Connection: ✅")
+        print(f"Database Name: {database_name}")
     except Exception as e:
-        print("Database Connection: ❌", e)
+        print("Database Connection FAILED: ❌", e)
