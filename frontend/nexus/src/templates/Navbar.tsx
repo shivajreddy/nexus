@@ -47,14 +47,14 @@ function Navbar() {
             link: "/epc",
             icon: <FaRegCircle size={"1.5em"} />,
             isBeta: true,
-            roles: [210],
+            roles: [210, 213, 299, 999],
         },
         {
             name: "FOSC",
             link: "/fosc",
             icon: <FaExpand size={"1.5em"} />,
             isBeta: true,
-            roles: [220],
+            roles: [220, 213, 299, 999],
         },
         {
             name: "CORD",
