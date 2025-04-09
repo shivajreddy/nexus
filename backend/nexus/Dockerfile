@@ -12,5 +12,5 @@ EXPOSE 8000
 
 # start the uvicorn app
 # CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-CMD ["fastapi", "dev", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "--host", "0.0.0.0", "--port", "8000"]
 
