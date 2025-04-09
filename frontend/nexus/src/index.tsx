@@ -45,7 +45,7 @@ import FOSCSummary from "@pages/department/teclab/Fosc/Views/FOSCSummary.tsx";
 import FOSCCurrent from "@pages/department/teclab/Fosc/Views/FOSCCurrent.tsx";
 import FOSCAll from "@pages/department/teclab/Fosc/Views/FOSCAll.tsx";
 import AddFOSCProject from "@pages/department/teclab/Fosc/Views/AddFOSCProject.tsx";
-import DashboardHome from "./pages/department/teclab/Dashboard/DashboardHome";
+import DashboardPage from "./pages/department/teclab/Dashboard/DashboardPage";
 import AuthEpc from "./pages/department/teclab/Epc/AuthEpc";
 import AuthFosc from "./pages/department/teclab/Fosc/AuthFosc";
 import AuthFoscChanges from "./pages/department/teclab/Fosc/AuthFoscChanges";
@@ -79,7 +79,7 @@ const router = createBrowserRouter(
                     </Route>
 
                     <Route path="dashboard" element={<AuthDashboard />}>
-                        <Route index element={<DashboardHome />} />
+                        <Route index element={<DashboardPage />} />
                     </Route>
 
                     <Route path="epc" element={<AuthEpc />}>

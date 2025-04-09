@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Rectangle } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Rectangle, Cell } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 
@@ -7,11 +7,15 @@ type EngineerData = {
     engineer: string;
     avgTime: number;
     totalProjects: number;
+    colorHexCode: string;
 };
 
 function Engineer_2() {
     const [chartData, setChartData] = useState<EngineerData[]>([]);
     const axios = useAxiosPrivate();
+
+    // Color palette for pie segments
+    const COLORS = ['#2364AA', '#5c9ead', '#DFAF01', '#5D576B', '#703880', '#dbeafe', '#eff6ff', '#1e40af', '#1d4ed8', '#2563eb'];
 
     useEffect(() => {
         async function fetchData() {
@@ -34,9 +38,18 @@ function Engineer_2() {
                     return {
                         engineer,
                         avgTime: parseFloat(avgTime.toFixed(1)), // Round to 1 decimal place
-                        totalProjects
+                        totalProjects,
+                        colorHexCode: ""
                     };
                 });
+
+                // Sort by engineer name (alphabetically)
+                processedData.sort((a, b) => a.engineer.localeCompare(b.engineer));
+
+                // Now that they are sorted go over the sorted processedData and set the colorHexCode
+                processedData.map((_, idx) => (
+                    processedData[idx].colorHexCode = COLORS[idx % COLORS.length]
+                ))
 
                 setChartData(processedData);
             } catch (error) {
@@ -51,6 +64,36 @@ function Engineer_2() {
             <CardHeader className="text-center">Engineer Performance Metrics</CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
+
+                    <BarChart data={chartData} width={600} height={400}>
+                        <XAxis dataKey="engineer" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        {/* <Bar dataKey="avgTime" name="Average Time" fill={} /> */}
+                        <Bar dataKey="avgTime" name="Average Time" label={{ fill: 'white' }}>
+                            {chartData.map((entry, index) => (
+                                <Cell key={`bar-cell-${index}`} fill={entry.colorHexCode} />
+                            ))}
+                        </Bar>
+                        {/* <Bar */}
+                        {/*     dataKey="totalProjects" */}
+                        {/*     name="Total Projects" */}
+                        {/*     fill="#EEE5E9" */}
+                        {/* /> */}
+                    </BarChart>
+
+
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
+    );
+}
+
+export default Engineer_2;
+
+
+/*
                     <BarChart
                         data={chartData}
                         margin={{
@@ -95,10 +138,4 @@ function Engineer_2() {
                         // activeBar={<Rectangle fill="gold" stroke="green" />}
                         />
                     </BarChart>
-                </ResponsiveContainer>
-            </CardContent>
-        </Card>
-    );
-}
-
-export default Engineer_2;
+*/

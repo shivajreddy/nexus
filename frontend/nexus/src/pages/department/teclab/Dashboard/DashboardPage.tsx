@@ -1,12 +1,12 @@
 import MainLayout from "@/templates/MainLayout"
 import "./dashboard.css"
 import Ticker from "./Ticker"
-import CarouselOrientation from "./Test"
+import DashboardCarousel from "./DashboardCarousel"
 import { useAppSelector } from "@/redux/hooks";
 import { selectCurrentUser } from "@/features/auth/authSlice";
 import UnAuthorized from "@/pages/common/UnAuthorized"
 
-function DashboardHome() {
+function DashboardPage() {
 
     // Get auth state & Authenticate based on the allowed roles
     const currentUser = useAppSelector(selectCurrentUser)
@@ -21,7 +21,7 @@ function DashboardHome() {
 
                 <Ticker />
 
-                <CarouselOrientation />
+                <DashboardCarousel />
 
                 {/* <div className="p-5"> */}
                 {/*     <div className="bg-default-bg1 rounded-lg p-4 m-4"> */}
@@ -38,4 +38,4 @@ function DashboardHome() {
     }
 }
 
-export default DashboardHome
+export default DashboardPage
