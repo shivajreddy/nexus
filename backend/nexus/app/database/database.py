@@ -18,9 +18,16 @@ projects_coll = db["projects"]
 
 
 def connect_mongodb():
+    print("::::::::::::::::::::::::::::::::::::::::::::::")
+    print("TRYING TO CONNECT TO MONGODB")
+    print("::::::::::::::::::::::::::::::::::::::::::::::")
     try:
         client.admin.command("ping")
+        print("::::::::::::::::::::::::::::::::::::::::::::::")
         print("Database Connection: ✅")
         print(f"Database Name: {database_name}")
+        print("::::::::::::::::::::::::::::::::::::::::::::::")
     except Exception as e:
+        print("::::::::::::::::::::::::::::::::::::::::::::::")
         print("Database Connection FAILED: ❌", e)
+        print("::::::::::::::::::::::::::::::::::::::::::::::")
