@@ -1,4 +1,5 @@
 from typing import List
+from collections import defaultdict
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 
@@ -370,6 +371,48 @@ def get_current_month_ticker_data():
     }
     return res
 
+
+"""
+ENDPOINT for ALL Charts
+RESPONSE SHAPE:
+{
+    "Engineering" : {
+        "PREVIOUS-MONTH": {
+            "name" : "march",
+            "data" : {}
+        },
+        "CURRENT-MONTH": {
+            "name" : "april",
+            "data" : {}
+        },
+        "CURRENT-MONTH": {
+            "name" : "2025",
+            "data" : {}
+        },
+    },
+
+    "Permitting" : {
+    },
+}
+"""
+@router.get("/all-chart-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
+def get_all_chart_data():
+    all_docs = list(projects_coll.find())
+
+    # Chart 1: Products
+    # part 1: Total volume of each-product-type in current year
+    # part 2: Avg cyle Time in current month
+    # part 3: Avg cyle Time in previous month
+    # part 4: Avg cyle Time in current year
+
+    # Chart 2: Engineers
+    # part 1: Total volume of each-engineer in current year
+    # part 2: Avg cyle Time in current month
+    # part 3: Avg cyle Time in previous month
+    # part 4: Avg cyle Time in current year
+
+    return {"result" : "all your chart data here"}
+
 class EngineerData(BaseModel):
     engineer: str   # name of the engineer
     projects: int   # no. of projects handled by this engineer, for a given time frame
@@ -377,7 +420,14 @@ class EngineerData(BaseModel):
 @router.get("/engineer-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
 def engineeer_data():
     all_docs = list(projects_coll.find())
-    engineers_map = {}
+    # engineers_map = {}
+    result = defaultdict(lambda: defaultdict(int))
+    """
+    engineers_map = {
+        "HBS" : {"Savannah" : 2,"Fulton" : 1 }
+        "Kempsville" : {"corvallis" : 3,"Savannah" : 2 }
+    }
+    """
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
         project = {k: v for (k, v) in doc.items() if k != "_id"}
@@ -385,18 +435,35 @@ def engineeer_data():
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
         # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date:
-            continue
-        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
             continue
 
+        # ENGINNER filed is empty
         if p_teclab_epc_data.engineering_engineer == None:
             print("WAIT: ", project["project_info"]["project_id"])
-        if p_teclab_epc_data.engineering_engineer not in engineers_map:
-            engineers_map[p_teclab_epc_data.engineering_engineer] = 0
-        engineers_map[p_teclab_epc_data.engineering_engineer] += 1
 
-    return engineers_map
+        engineer_name = p_teclab_epc_data.engineering_engineer
+        product_name = p_teclab_epc_data.product_name
+        result[engineer_name][product_name] += 1
+
+        # if engineer_name not in engineers_map:
+        #     engineers_map[engineers_map] = [product_name]
+        #
+        # if p_teclab_epc_data.engineering_engineer not in engineers_map:
+        #     engineers_map[p_teclab_epc_data.engineering_engineer] = 0
+        # engineers_map[p_teclab_epc_data.engineering_engineer] += 1
+    # return engineers_map
+
+    def to_dict(d):
+        if isinstance(d, defaultdict):
+            d = {k: to_dict(v) for k, v in d.items()}
+        elif isinstance(d, dict):
+            d = {k: to_dict(v) for k, v in d.items()}
+        return d
+
+    final_result = to_dict(result)
+
+    return final_result
 
 
 """
