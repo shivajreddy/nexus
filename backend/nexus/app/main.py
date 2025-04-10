@@ -68,6 +68,7 @@ origins = [
     "http://localhost:3000",
     "http://nexus.tecofva.com",
     "http://34.139.78.157",
+    "https://nexus.shiva.computer",
     "http://nexus.shiva.computer",
 ]
 
