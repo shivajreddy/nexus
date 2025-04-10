@@ -17,17 +17,30 @@ department_data_coll = db["department_data"]
 projects_coll = db["projects"]
 
 
+import logging
+logging.basicConfig(
+    level=logging.INFO,  # Adjust the log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+
 def connect_mongodb():
+
     print("::::::::::::::::::::::::::::::::::::::::::::::")
+    logger.info("TRYING TO CONNECT TO MONGODB")
     print("TRYING TO CONNECT TO MONGODB")
     print("::::::::::::::::::::::::::::::::::::::::::::::")
     try:
         client.admin.command("ping")
-        print("::::::::::::::::::::::::::::::::::::::::::::::")
-        print("Database Connection: ✅")
-        print(f"Database Name: {database_name}")
-        print("::::::::::::::::::::::::::::::::::::::::::::::")
+        # print("::::::::::::::::::::::::::::::::::::::::::::::")
+        # print("Database Connection: ✅")
+        logger.info("Database Connection: ✅")
+        # print(f"Database Name: {database_name}")
+        logger.info(f"Database Name: {database_name}")
+        # print("::::::::::::::::::::::::::::::::::::::::::::::")
     except Exception as e:
-        print("::::::::::::::::::::::::::::::::::::::::::::::")
-        print("Database Connection FAILED: ❌", e)
-        print("::::::::::::::::::::::::::::::::::::::::::::::")
+        # print("::::::::::::::::::::::::::::::::::::::::::::::")
+        # print("Database Connection FAILED: ❌", e)
+        logger.error("Database Connection FAILED: ❌", e)
+        # print("::::::::::::::::::::::::::::::::::::::::::::::")
