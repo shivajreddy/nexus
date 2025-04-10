@@ -65,6 +65,7 @@ app.mount("/ws", sio_app)
 
 # Front-end origins that should be allowed
 origins = [
+    "http://localhost",
     "http://localhost:3000",
     "http://nexus.tecofva.com",
     "http://34.139.78.157",
