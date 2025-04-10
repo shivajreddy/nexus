@@ -67,6 +67,7 @@ app.mount("/ws", sio_app)
 origins = [
     "http://localhost:3000",
     "http://nexus.tecofva.com",
+    "http://nexus.shiva.computer",
 ]
 
 app.add_middleware(
