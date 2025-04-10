@@ -69,7 +69,9 @@ origins = [
     "http://nexus.tecofva.com",
     "http://34.139.78.157",
     "https://nexus.shiva.computer",
+    "https://nexus.shiva.computer:8000",
     "http://nexus.shiva.computer",
+    "http://nexus.shiva.computer:8000",
 ]
 
 app.add_middleware(
