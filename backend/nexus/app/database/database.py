@@ -27,20 +27,14 @@ logger = logging.getLogger(__name__)
 
 def connect_mongodb():
 
-    print("::::::::::::::::::::::::::::::::::::::::::::::")
-    logger.info("TRYING TO CONNECT TO MONGODB")
     print("TRYING TO CONNECT TO MONGODB")
-    print("::::::::::::::::::::::::::::::::::::::::::::::")
+    logger.info("TRYING TO CONNECT TO MONGODB")
     try:
         client.admin.command("ping")
-        # print("::::::::::::::::::::::::::::::::::::::::::::::")
-        # print("Database Connection: ✅")
+        print("Database Connection: ✅")
         logger.info("Database Connection: ✅")
-        # print(f"Database Name: {database_name}")
+        print(f"Database Name: {database_name}")
         logger.info(f"Database Name: {database_name}")
-        # print("::::::::::::::::::::::::::::::::::::::::::::::")
     except Exception as e:
-        # print("::::::::::::::::::::::::::::::::::::::::::::::")
-        # print("Database Connection FAILED: ❌", e)
+        print("Database Connection FAILED: ❌", e)
         logger.error("Database Connection FAILED: ❌", e)
-        # print("::::::::::::::::::::::::::::::::::::::::::::::")
