@@ -1,14 +1,23 @@
+# Use Node.js 18 with Alpine for lightweight image
 FROM node:18-alpine
 
 WORKDIR /app/frontend
 
+# Copy the application code
 COPY . .
 
-# install all the dependencies
+# Install dependencies
 RUN npm install
 
-EXPOSE 3000
+# Build the app for production
+RUN npm run build
 
-# start vite react app
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Install a static file server to serve the built React app
+RUN npm install -g serve
+
+# Expose port 80 (the port that will be accessible for frontend traffic)
+EXPOSE 80
+
+# Serve the static files built by Vite
+CMD ["serve", "-s", "dist", "-l", "80"]
 
