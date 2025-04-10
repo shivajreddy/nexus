@@ -10,14 +10,14 @@ COPY . .
 RUN npm install
 
 # Build the app for production
-RUN npm run build
+RUN npm run dev
 
-# Install a static file server to serve the built React app
-RUN npm install -g serve
-
-# Expose port 80 (the port that will be accessible for frontend traffic)
-EXPOSE 80
-
-# Serve the static files built by Vite
-CMD ["serve", "-s", "dist", "-l", "80"]
-
+# # Install a static file server to serve the built React app
+# RUN npm install -g serve
+#
+# # Expose port 80 (the port that will be accessible for frontend traffic)
+# EXPOSE 80
+#
+# # Serve the static files built by Vite
+# CMD ["serve", "-s", "dist", "-l", "80"]
+#

@@ -54,8 +54,13 @@ import AuthEpcChanges from "./pages/department/teclab/Epc/AuthEpcChanges";
 import AuthDashboard from "./pages/department/teclab/Dashboard/AuthDashboard";
 import AuthProjects from "./pages/Project/AuthProjects";
 
+import React, { useState } from "react";
+
 // # Router configuration
 const router = createBrowserRouter(
+
+
+
     createRoutesFromElements(
         <Route errorElement={<UiErrorPage />}>
 
@@ -73,7 +78,8 @@ const router = createBrowserRouter(
                     {/*<Route path="epc" element={<EpcTest1/>}/>*/}
 
                     <Route path="projects" element={<AuthProjects />}>
-                        <Route index element={<Projects />} />
+                        <Route index element={<Projects />}
+                        />
                         {/* <Route path="search" element={<FindProject />} /> */}
                         {/* <Route path="new" element={} /> */}
                     </Route>
