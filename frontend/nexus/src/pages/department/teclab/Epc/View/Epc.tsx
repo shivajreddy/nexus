@@ -188,7 +188,7 @@ function Epc() {
                     </div>
 
                     <div className="flex mx-10">
-                        {hasRoles(userRoles, [211, 999]) &&
+                        {hasRoles(userRoles, [211, 213, 299, 999]) &&
                             <div className="flex justify-center items-center bg-default-bg1">
                                 <Button onClick={() => navigate('edit')} className="min-w-[10em]">
                                     <p className="pr-2"><MdModeEditOutline /></p>
@@ -196,7 +196,7 @@ function Epc() {
                                 </Button>
                             </div>
                         }
-                        {hasRoles(userRoles, [213, 999]) &&
+                        {hasRoles(userRoles, [213, 299, 999]) &&
                             <div className="flex justify-center items-center bg-default-bg1 mx-4">
                                 <Button onClick={() => axios.get(BASE_URL + '/department/teclab/epc/epc-backlog-tracker')}
                                     className="min-w-[10em]">
