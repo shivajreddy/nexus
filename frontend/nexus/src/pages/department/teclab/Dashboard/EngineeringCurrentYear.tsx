@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bar, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, Legend, BarChart } from "recharts";
+import { BarChart, Bar, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, Legend, Label } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useEnsureColors, useColor } from "./ColorContext";
 
@@ -12,21 +12,20 @@ type EngineerData = {
     engineer: string;
     avgTime: number;
     totalProjects: number;
-    colorHexCode: string;
 };
 
 
-function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
-
+function EngineeringCurrentYear({ responseData }: { responseData: any }) {
     const [chartData, setChartData] = useState<ChartData[]>([]);
-    const [subChard2Data, setSubChart2Data] = useState<EngineerData[]>([]);
+    const [subChart2Data, setSubChart2Data] = useState<EngineerData[]>([]);
+
     useEffect(() => {
         if (
             responseData &&
-            responseData.CURRENT_MONTH &&
-            responseData.CURRENT_MONTH.PIECHARTDATA
+            responseData.CURRENT_YEAR &&
+            responseData.CURRENT_YEAR.PIECHARTDATA
         ) {
-            const engineeringData = responseData.CURRENT_MONTH.PIECHARTDATA;
+            const engineeringData = responseData.CURRENT_YEAR.PIECHARTDATA;
 
             const departmentData: ChartData[] = Object.entries(engineeringData).map(
                 ([department, engineers]) => {
@@ -48,10 +47,10 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
 
         if (
             responseData &&
-            responseData.CURRENT_MONTH &&
-            responseData.CURRENT_MONTH.BARCHARTDATA
+            responseData.CURRENT_YEAR &&
+            responseData.CURRENT_YEAR.BARCHARTDATA
         ) {
-            const data = responseData.CURRENT_MONTH.BARCHARTDATA;
+            const data = responseData.CURRENT_YEAR.BARCHARTDATA;
 
             const processedData: EngineerData[] = Object.entries(data).map(([engineer, timesArray]) => {
                 const times = timesArray as number[];
@@ -75,8 +74,8 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
 
     if (
         !responseData ||
-        !responseData.CURRENT_MONTH ||
-        !responseData.CURRENT_MONTH.PIECHARTDATA
+        !responseData.CURRENT_YEAR ||
+        !responseData.CURRENT_YEAR.PIECHARTDATA
     ) {
         return (
             <Card className="w-max mx-4">
@@ -90,7 +89,7 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
     return (
         <Card className="w-max mx-4">
             <CardHeader className="text-center text-xl p-2 text-white bg-slate-600 rounded-t-md">
-                {responseData.CURRENT_MONTH.VALUE}
+                {responseData.CURRENT_YEAR.VALUE}
             </CardHeader>
             <CardContent className="flex items-center justify-center">
                 {/* Pie Chart */}
@@ -124,12 +123,12 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
                 {/* Bar Chart */}
                 <div className="flex-col">
                     <p className="text-center p-2">Average Cycle Times</p>
-                    <BarChart className="m-0 p-0" data={subChard2Data} width={400} height={400}>
+                    <BarChart className="m-0 p-0" data={subChart2Data} width={400} height={400}>
                         <XAxis dataKey="engineer" />
                         <YAxis />
                         <Tooltip />
                         <Bar dataKey="avgTime" name="Average Time" label={{ fill: "white" }}>
-                            {subChard2Data.map((entry) => (
+                            {subChart2Data.map((entry) => (
                                 <Cell key={`bar-cell-${entry.engineer}`} fill={useColor(entry.engineer)} />
                             ))}
                         </Bar>
@@ -141,6 +140,5 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
     );
 }
 
-
-export default EngineeringCurrentMonth;
+export default EngineeringCurrentYear;
 

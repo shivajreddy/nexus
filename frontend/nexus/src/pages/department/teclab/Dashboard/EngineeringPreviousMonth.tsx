@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Bar, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, Legend, BarChart, Text, Label } from "recharts";
+import { BarChart, Bar, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, Legend, Label } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { useEnsureColors, useColor } from "./ColorContext";
 
 type ChartData = {
     engineer: string;
@@ -12,127 +12,128 @@ type EngineerData = {
     engineer: string;
     avgTime: number;
     totalProjects: number;
-    colorHexCode: string;
 };
 
-function EngineeringPreviousMonth() {
-    // Color palette for pie segments
-    const COLORS = ['#2364AA', '#5c9ead', '#DFAF01', '#5D576B', '#703880', '#dbeafe', '#eff6ff', '#1e40af', '#1d4ed8', '#2563eb'];
 
-    const [subChard1Data, setSubChart1Data] = useState<ChartData[]>([]);
-    const axios = useAxiosPrivate();
-    // console.log("subChard1Data", subChard1Data);
+function EngineeringPreviousMonth({ responseData }: { responseData: any }) {
+    const [chartData, setChartData] = useState<ChartData[]>([]);
+    const [subChart2Data, setSubChart2Data] = useState<EngineerData[]>([]);
+
     useEffect(() => {
-        async function fetchData() {
-            // console.log("trying to fetch");
-            try {
-                const response = await axios.get("/department/teclab/dashboard/engineer-data");
-                // console.log("response = ", response);
-                // console.log("response.data = ", response.data);
-                // Convert object to array and assert type
-                const data: ChartData[] = Object.entries(response.data).map(([engineer, projects]) => ({
-                    engineer,
-                    projects: projects as number, // Type assertion
-                }));
-                // Sort by engineer name (alphabetically)
-                data.sort((a, b) => a.engineer.localeCompare(b.engineer));
-                setSubChart1Data(data);
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-            }
-        }
-        fetchData();
-    }, []);
+        if (
+            responseData &&
+            responseData.PREVIOUS_MONTH &&
+            responseData.PREVIOUS_MONTH.PIECHARTDATA
+        ) {
+            const engineeringData = responseData.PREVIOUS_MONTH.PIECHARTDATA;
 
-    const [subChard2Data, setSubChart2Data] = useState<EngineerData[]>([]);
-    // console.log("subChard2Data", subChard2Data);
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await axios.get("/department/teclab/dashboard/engineer-data-2");
-                // console.log("response = ", response);
-                // console.log("response.data = ", response.data);
-
-                // Process the data to calculate average time and total projects
-                const processedData: EngineerData[] = Object.entries(response.data).map(([engineer, timesArray]) => {
-                    // Cast timesArray to number array
-                    const times = timesArray as number[];
-
-                    // Calculate average time (sum of all times divided by number of times)
-                    const avgTime = times.reduce((sum, time) => sum + time, 0) / times.length;
-
-                    // Count total projects (length of the array)
-                    const totalProjects = times.length;
+            const departmentData: ChartData[] = Object.entries(engineeringData).map(
+                ([department, engineers]) => {
+                    const totalProjects = Object.values(engineers as Record<string, number>).reduce(
+                        (sum, count) => sum + count,
+                        0
+                    );
 
                     return {
-                        engineer,
-                        avgTime: parseFloat(avgTime.toFixed(1)), // Round to 1 decimal place
-                        totalProjects,
-                        colorHexCode: ""
+                        engineer: department,
+                        projects: totalProjects,
                     };
-                });
+                }
+            );
 
-                // Sort by engineer name (alphabetically)
-                processedData.sort((a, b) => a.engineer.localeCompare(b.engineer));
-
-                // Now that they are sorted go over the sorted processedData and set the colorHexCode
-                processedData.map((_, idx) => (
-                    processedData[idx].colorHexCode = COLORS[idx % COLORS.length]
-                ))
-
-                setSubChart2Data(processedData);
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-            }
+            departmentData.sort((a, b) => a.engineer.localeCompare(b.engineer));
+            setChartData(departmentData);
         }
-        fetchData();
-    }, []);
+
+        if (
+            responseData &&
+            responseData.PREVIOUS_MONTH &&
+            responseData.PREVIOUS_MONTH.BARCHARTDATA
+        ) {
+            const data = responseData.PREVIOUS_MONTH.BARCHARTDATA;
+
+            const processedData: EngineerData[] = Object.entries(data).map(([engineer, timesArray]) => {
+                const times = timesArray as number[];
+                const avgTime = times.reduce((sum, time) => sum + time, 0) / times.length;
+                const totalProjects = times.length;
+
+                return {
+                    engineer,
+                    avgTime: parseFloat(avgTime.toFixed(1)),
+                    totalProjects,
+                };
+            });
+
+            processedData.sort((a, b) => a.engineer.localeCompare(b.engineer));
+            setSubChart2Data(processedData);
+        }
+    }, [responseData]);
+
+    const engineerNames = chartData.map((entry) => entry.engineer);
+    useEnsureColors(engineerNames);
+
+    if (
+        !responseData ||
+        !responseData.PREVIOUS_MONTH ||
+        !responseData.PREVIOUS_MONTH.PIECHARTDATA
+    ) {
+        return (
+            <Card className="w-max mx-4">
+                <CardContent className="flex items-center justify-center">
+                    <p>Loading data...</p>
+                </CardContent>
+            </Card>
+        );
+    }
 
     return (
         <Card className="w-max mx-4">
-            <CardHeader className="text-center text-xl p-2">Engineering  *Previous Month*</CardHeader>
+            <CardHeader className="text-center text-xl p-2 text-white bg-slate-600 rounded-t-md">
+                {responseData.PREVIOUS_MONTH.VALUE}
+            </CardHeader>
             <CardContent className="flex items-center justify-center">
+                {/* Pie Chart */}
+                <div className="flex-col">
+                    <p className="text-center p-2">Total Projects Breakdown</p>
+                    <PieChart width={600} height={400} className="p-0 m-0">
+                        <Pie
+                            data={chartData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ engineer, projects, percent }) =>
+                                `${engineer}:${projects} (${(percent * 100).toFixed(0)}%)`
+                            }
+                            outerRadius={110}
+                            innerRadius={60}
+                            fill="#8884d8"
+                            dataKey="projects"
+                            nameKey="engineer"
+                            legendType="square"
+                        >
+                            {chartData.map((entry) => (
+                                <Cell key={`cell-${entry.engineer}`} fill={useColor(entry.engineer)} />
+                            ))}
+                        </Pie>
+                        <Tooltip formatter={(value, _, props) => [`${value} projects`, props.payload.engineer]} />
+                        <Legend />
+                    </PieChart>
+                </div>
 
-                {/* Sub-Chart 1 */}
-                <PieChart width={600} height={400} className="p-0 m-0">
-                    <Pie
-                        data={subChard1Data}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        // label={({ engineer, value, percent }) =>
-                        //     `${value} projects (${(percent * 100).toFixed(0)}%)`
-                        // }
-                        label={({ engineer, percent }) => `${engineer}-${(percent * 100).toFixed(0)}%`}
-                        outerRadius={150}
-                        innerRadius={100}
-                        fill="#8884d8"
-                        dataKey="projects"
-                        nameKey="engineer"
-                        legendType="square"
-                    >
-                        {subChard1Data.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip formatter={(value, _, props) => [`${value} projects`, props.payload.engineer]} />
-                    <Legend />
-                    {/* <Label value="hi" /> */}
-                </PieChart>
-
-                {/* Sub-Chart 2 */}
-                <BarChart className="m-0 p-0" data={subChard2Data} width={400} height={400}>
-                    <XAxis dataKey="engineer" />
-                    <YAxis />
-                    {/* <Tooltip /> */}
-                    {/* <Legend /> */}
-                    {/* <Bar dataKey="avgTime" name="Average Time" fill={} /> */}
-                    <Bar dataKey="avgTime" name="Average Time" label={{ fill: 'white' }}>
-                        {subChard2Data.map((entry, index) => (
-                            <Cell key={`bar-cell-${index}`} fill={entry.colorHexCode} />
-                        ))}
-                    </Bar>
-                </BarChart>
+                {/* Bar Chart */}
+                <div className="flex-col">
+                    <p className="text-center p-2">Average Cycle Times</p>
+                    <BarChart className="m-0 p-0" data={subChart2Data} width={400} height={400}>
+                        <XAxis dataKey="engineer" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="avgTime" name="Average Time" label={{ fill: "white" }}>
+                            {subChart2Data.map((entry) => (
+                                <Cell key={`bar-cell-${entry.engineer}`} fill={useColor(entry.engineer)} />
+                            ))}
+                        </Bar>
+                    </BarChart>
+                </div>
 
             </CardContent>
         </Card>

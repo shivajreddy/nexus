@@ -22,10 +22,10 @@ TECLAB/EPC endpoint
 router = APIRouter(prefix="/department/teclab/epc")
 
 
-# """
 # Filter out all finished and released lots
 @router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
 def get_live_lots():
+    # print("HERE @ /department/teclab/epc/live")
     try:
         result = []
         for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
@@ -45,8 +45,6 @@ def get_live_lots():
         # print("error: ", e)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
-
-# """
 
 @router.get('/update-db')
 def update_db():

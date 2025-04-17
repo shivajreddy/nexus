@@ -1,82 +1,62 @@
 import { useState, useEffect } from "react";
-import { Bar, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, Legend, BarChart } from "recharts";
+import { BarChart, Bar, PieChart, Pie, Cell, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useEnsureColors, useColor } from "./ColorContext";
 
-type ChartData = {
+type PieChartServerData = Record<string, number>;
+
+type BarChartServerData = Record<string, number[]>;
+
+type PermittingPieChartData = {
     engineer: string;
     projects: number;
 };
 
-type EngineerData = {
+type PermittingBarChartData = {
     engineer: string;
     avgTime: number;
-    totalProjects: number;
-    colorHexCode: string;
 };
 
 
-function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
+// function PermittingCurrentYear({ responseData }: { responseData: any }) {
+function PermittingCurrentYear({ responseData }: { responseData: { CURRENT_YEAR?: { PIECHARTDATA?: PieChartServerData, BARCHARTDATA?: BarChartServerData, VALUE?: string } } }) {
+    const [pieChartData, setPieChartData] = useState<PermittingPieChartData[]>([]);
+    const [barChartData, setBarChartData] = useState<PermittingBarChartData[]>([]);
 
-    const [chartData, setChartData] = useState<ChartData[]>([]);
-    const [subChard2Data, setSubChart2Data] = useState<EngineerData[]>([]);
+    // console.log("pieChartData", pieChartData);
+    // console.log("barChartData", barChartData);
+
     useEffect(() => {
-        if (
-            responseData &&
-            responseData.CURRENT_MONTH &&
-            responseData.CURRENT_MONTH.PIECHARTDATA
-        ) {
-            const engineeringData = responseData.CURRENT_MONTH.PIECHARTDATA;
+        if (responseData?.CURRENT_YEAR && responseData.CURRENT_YEAR?.PIECHARTDATA && responseData.CURRENT_YEAR?.BARCHARTDATA) {
+            const pieRaw: PieChartServerData = responseData.CURRENT_YEAR.PIECHARTDATA;
+            const barRaw: BarChartServerData = responseData.CURRENT_YEAR.BARCHARTDATA;
 
-            const departmentData: ChartData[] = Object.entries(engineeringData).map(
-                ([department, engineers]) => {
-                    const totalProjects = Object.values(engineers as Record<string, number>).reduce(
-                        (sum, count) => sum + count,
-                        0
-                    );
-
-                    return {
-                        engineer: department,
-                        projects: totalProjects,
-                    };
-                }
-            );
-
-            departmentData.sort((a, b) => a.engineer.localeCompare(b.engineer));
-            setChartData(departmentData);
-        }
-
-        if (
-            responseData &&
-            responseData.CURRENT_MONTH &&
-            responseData.CURRENT_MONTH.BARCHARTDATA
-        ) {
-            const data = responseData.CURRENT_MONTH.BARCHARTDATA;
-
-            const processedData: EngineerData[] = Object.entries(data).map(([engineer, timesArray]) => {
-                const times = timesArray as number[];
-                const avgTime = times.reduce((sum, time) => sum + time, 0) / times.length;
-                const totalProjects = times.length;
-
-                return {
+            if (pieRaw) {
+                const pieArray: PermittingPieChartData[] = Object.entries(pieRaw).map(([engineer, projects]) => ({
                     engineer,
-                    avgTime: parseFloat(avgTime.toFixed(1)),
-                    totalProjects,
-                };
-            });
+                    projects
+                }));
+                setPieChartData(pieArray);
+            }
 
-            processedData.sort((a, b) => a.engineer.localeCompare(b.engineer));
-            setSubChart2Data(processedData);
+            if (barRaw) {
+                const barArray: PermittingBarChartData[] = Object.entries(barRaw).map(([engineer, times]) => {
+                    const total = times.reduce((sum, t) => sum + t, 0);
+                    const avgTime = times.length ? total / times.length : 0;
+                    return { engineer, avgTime: parseFloat(avgTime.toFixed(2)) };
+                });
+                setBarChartData(barArray);
+            }
         }
     }, [responseData]);
 
-    const engineerNames = chartData.map((entry) => entry.engineer);
+    const engineerNames = pieChartData.map((entry) => entry.engineer);
     useEnsureColors(engineerNames);
 
     if (
         !responseData ||
-        !responseData.CURRENT_MONTH ||
-        !responseData.CURRENT_MONTH.PIECHARTDATA
+        !responseData.CURRENT_YEAR ||
+        !responseData.CURRENT_YEAR.PIECHARTDATA
     ) {
         return (
             <Card className="w-max mx-4">
@@ -90,7 +70,7 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
     return (
         <Card className="w-max mx-4">
             <CardHeader className="text-center text-xl p-2 text-white bg-slate-600 rounded-t-md">
-                {responseData.CURRENT_MONTH.VALUE}
+                {responseData.CURRENT_YEAR.VALUE}
             </CardHeader>
             <CardContent className="flex items-center justify-center">
                 {/* Pie Chart */}
@@ -98,7 +78,7 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
                     <p className="text-center p-2">Total Projects Breakdown</p>
                     <PieChart width={600} height={400} className="p-0 m-0">
                         <Pie
-                            data={chartData}
+                            data={pieChartData}
                             cx="50%"
                             cy="50%"
                             labelLine={false}
@@ -112,7 +92,7 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
                             nameKey="engineer"
                             legendType="square"
                         >
-                            {chartData.map((entry) => (
+                            {pieChartData.map((entry) => (
                                 <Cell key={`cell-${entry.engineer}`} fill={useColor(entry.engineer)} />
                             ))}
                         </Pie>
@@ -124,12 +104,12 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
                 {/* Bar Chart */}
                 <div className="flex-col">
                     <p className="text-center p-2">Average Cycle Times</p>
-                    <BarChart className="m-0 p-0" data={subChard2Data} width={400} height={400}>
+                    <BarChart className="m-0 p-0" data={barChartData} width={400} height={400}>
                         <XAxis dataKey="engineer" />
                         <YAxis />
                         <Tooltip />
                         <Bar dataKey="avgTime" name="Average Time" label={{ fill: "white" }}>
-                            {subChard2Data.map((entry) => (
+                            {barChartData.map((entry) => (
                                 <Cell key={`bar-cell-${entry.engineer}`} fill={useColor(entry.engineer)} />
                             ))}
                         </Bar>
@@ -141,6 +121,5 @@ function EngineeringCurrentMonth({ responseData }: { responseData: any }) {
     );
 }
 
-
-export default EngineeringCurrentMonth;
+export default PermittingCurrentYear;
 

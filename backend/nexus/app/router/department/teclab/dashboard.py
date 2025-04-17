@@ -1,6 +1,7 @@
-from typing import List
+from typing import Dict, List
 from collections import defaultdict
 from datetime import datetime, timedelta
+import calendar
 from pydantic import BaseModel
 
 from fastapi import APIRouter, Depends
@@ -417,17 +418,52 @@ class EngineerData(BaseModel):
     engineer: str   # name of the engineer
     projects: int   # no. of projects handled by this engineer, for a given time frame
 
-@router.get("/engineer-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
-def engineeer_data():
-    all_docs = list(projects_coll.find())
-    # engineers_map = {}
-    result = defaultdict(lambda: defaultdict(int))
+
+class CardDataScheme(BaseModel):
+    VALUE: str
+    PIECHARTDATA: Dict
+    BARCHARTDATA: Dict
+
+class SectionDataScheme(BaseModel):
+    PREVIOUS_MONTH: CardDataScheme
+    CURRENT_MONTH: CardDataScheme
+    CURRENT_YEAR: CardDataScheme
+
+# Helper fn to flatten the nested defaultdict
+def to_dict(d):
+    if isinstance(d, defaultdict):
+        d = {k: to_dict(v) for k, v in d.items()}
+    elif isinstance(d, dict):
+        d = {k: to_dict(v) for k, v in d.items()}
+    return d
+
+
+def get_engineering_dashboard_data(all_docs) -> SectionDataScheme:
+    result = SectionDataScheme(
+        PREVIOUS_MONTH = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_MONTH  = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_YEAR = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        )
+    )
+
     """
-    engineers_map = {
-        "HBS" : {"Savannah" : 2,"Fulton" : 1 }
-        "Kempsville" : {"corvallis" : 3,"Savannah" : 2 }
-    }
+    Current-Year
     """
+    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
+    result.CURRENT_YEAR.BARCHARTDATA = {}
+
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
         project = {k: v for (k, v) in doc.items() if k != "_id"}
@@ -438,32 +474,540 @@ def engineeer_data():
         if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
             continue
 
-        # ENGINNER filed is empty
+        # Engineer's Name  field is empty
         if p_teclab_epc_data.engineering_engineer == None:
-            print("WAIT: ", project["project_info"]["project_id"])
+            print("ERROR::engineer_name is empty::", project["project_info"]["project_id"])
+            # continue
 
         engineer_name = p_teclab_epc_data.engineering_engineer
         product_name = p_teclab_epc_data.product_name
-        result[engineer_name][product_name] += 1
+        result.CURRENT_YEAR.PIECHARTDATA[engineer_name][product_name] += 1
 
-        # if engineer_name not in engineers_map:
-        #     engineers_map[engineers_map] = [product_name]
-        #
-        # if p_teclab_epc_data.engineering_engineer not in engineers_map:
-        #     engineers_map[p_teclab_epc_data.engineering_engineer] = 0
-        # engineers_map[p_teclab_epc_data.engineering_engineer] += 1
-    # return engineers_map
+        if p_teclab_epc_data.engineering_sent and p_teclab_epc_data.engineering_received:
+            delta_time = p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+            delta_days = delta_time.days
+            if p_teclab_epc_data.engineering_engineer not in result.CURRENT_YEAR.BARCHARTDATA:
+                result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.engineering_engineer] = [delta_days]
+            result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.engineering_engineer].append(delta_days)
 
-    def to_dict(d):
-        if isinstance(d, defaultdict):
-            d = {k: to_dict(v) for k, v in d.items()}
-        elif isinstance(d, dict):
-            d = {k: to_dict(v) for k, v in d.items()}
-        return d
+    result.CURRENT_YEAR.PIECHARTDATA = to_dict(result.CURRENT_YEAR.PIECHARTDATA)
 
-    final_result = to_dict(result)
+    """
+    Previous-Month
+    """
+    previous_month_number = datetime.today().month - 1
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month_number]
+    result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
+    result.PREVIOUS_MONTH.BARCHARTDATA = {}
 
-    return final_result
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # TODO: these filters are supposed to be for this sections time range
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+        # if p_teclab_epc_data.engineering_received:
+            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
+            # print("previous_month_number", previous_month_number)
+            # print("id", project["project_info"]["project_id"])
+        if not p_teclab_epc_data.engineering_received or p_teclab_epc_data.engineering_received.month != previous_month_number:
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Engineer's Name  field is empty
+        if p_teclab_epc_data.engineering_engineer == None:
+            print("ERROR::engineer_name is empty::", project["project_info"]["project_id"])
+            # continue
+
+        engineer_name = p_teclab_epc_data.engineering_engineer
+        product_name = p_teclab_epc_data.product_name
+        result.PREVIOUS_MONTH.PIECHARTDATA[engineer_name][product_name] += 1
+
+        if p_teclab_epc_data.engineering_sent and p_teclab_epc_data.engineering_received:
+            delta_time = p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+            delta_days = delta_time.days
+            if p_teclab_epc_data.engineering_engineer not in result.PREVIOUS_MONTH.BARCHARTDATA:
+                result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer] = [delta_days]
+            result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer].append(delta_days)
+
+    result.PREVIOUS_MONTH.PIECHARTDATA = to_dict(result.PREVIOUS_MONTH.PIECHARTDATA)
+
+    """
+    Current-Month
+    """
+    result.CURRENT_MONTH.VALUE = calendar.month_name[datetime.today().month]
+    result.CURRENT_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
+    result.CURRENT_MONTH.BARCHARTDATA = {}
+
+    current_month_number = datetime.today().month
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # TODO: these filters are supposed to be for this sections time range
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+        # if p_teclab_epc_data.engineering_received:
+        #     print("CURRENT_MONTH is it ?::::::::::", p_teclab_epc_data.engineering_received.month)
+        #     print("current_month_number", current_month_number)
+        #     print("id", project["project_info"]["project_id"])
+        if not p_teclab_epc_data.engineering_received or p_teclab_epc_data.engineering_received.month != current_month_number:
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Engineer's Name  field is empty
+        if p_teclab_epc_data.engineering_engineer == None:
+            print("ERROR::engineer_name is empty::", project["project_info"]["project_id"])
+            # continue
+
+        engineer_name = p_teclab_epc_data.engineering_engineer
+        product_name = p_teclab_epc_data.product_name
+        result.CURRENT_MONTH.PIECHARTDATA[engineer_name][product_name] += 1
+
+        if p_teclab_epc_data.engineering_sent and p_teclab_epc_data.engineering_received:
+            delta_time = p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+            delta_days = delta_time.days
+            if p_teclab_epc_data.engineering_engineer not in result.CURRENT_MONTH.BARCHARTDATA:
+                result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer] = [delta_days]
+            result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer].append(delta_days)
+
+    result.CURRENT_MONTH.PIECHARTDATA = to_dict(result.CURRENT_MONTH.PIECHARTDATA)
+
+    return result
+
+def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
+    result = SectionDataScheme(
+        PREVIOUS_MONTH = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_MONTH  = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_YEAR = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        )
+    )
+
+    """
+    Current-Year
+    """
+    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
+    result.CURRENT_YEAR.BARCHARTDATA = {}
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+
+        # Plat-Engineer's Name  field is empty
+        if p_teclab_epc_data.plat_engineer == None:
+            print("ERROR::plat_engineer is empty::", project["project_info"]["project_id"])
+            # continue
+
+        plat_engineer_name = p_teclab_epc_data.plat_engineer
+        product_name = p_teclab_epc_data.product_name
+        result.CURRENT_YEAR.PIECHARTDATA[plat_engineer_name][product_name] += 1
+
+        if p_teclab_epc_data.plat_sent and p_teclab_epc_data.plat_received:
+            delta_time = p_teclab_epc_data.plat_received - p_teclab_epc_data.plat_sent
+            delta_days = delta_time.days
+            if p_teclab_epc_data.plat_engineer not in result.CURRENT_YEAR.BARCHARTDATA:
+                result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [delta_days]
+            result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(delta_days)
+
+    result.CURRENT_YEAR.PIECHARTDATA = to_dict(result.CURRENT_YEAR.PIECHARTDATA)
+
+    """
+    Previous-Month
+    """
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[datetime.today().month - 1]
+    result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
+    result.PREVIOUS_MONTH.BARCHARTDATA = {}
+
+    previous_month_number = datetime.today().month - 1
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # TODO: these filters are supposed to be for this sections time range
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+        # if p_teclab_epc_data.engineering_received:
+            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
+            # print("previous_month_number", previous_month_number)
+            # print("id", project["project_info"]["project_id"])
+        if not p_teclab_epc_data.plat_received or p_teclab_epc_data.plat_received.month != previous_month_number:
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Plat-Engineer's Name  field is empty
+        if p_teclab_epc_data.plat_engineer == None:
+            print("ERROR::plat_engineer_name is empty::", project["project_info"]["project_id"])
+            # continue
+
+        plat_engineer_name = p_teclab_epc_data.plat_engineer
+        product_name = p_teclab_epc_data.product_name
+        result.PREVIOUS_MONTH.PIECHARTDATA[plat_engineer_name][product_name] += 1
+
+        if p_teclab_epc_data.plat_sent and p_teclab_epc_data.plat_received:
+            delta_time = p_teclab_epc_data.plat_received - p_teclab_epc_data.plat_sent
+            delta_days = delta_time.days
+            if p_teclab_epc_data.plat_engineer not in result.PREVIOUS_MONTH.BARCHARTDATA:
+                result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [delta_days]
+            result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(delta_days)
+
+    result.PREVIOUS_MONTH.PIECHARTDATA = to_dict(result.PREVIOUS_MONTH.PIECHARTDATA)
+
+    """
+    Current-Month
+    """
+    result.CURRENT_MONTH.VALUE = calendar.month_name[datetime.today().month]
+    result.CURRENT_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
+    result.CURRENT_MONTH.BARCHARTDATA = {}
+
+    current_month_number = datetime.today().month
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # TODO: these filters are supposed to be for this sections time range
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+        # if p_teclab_epc_data.engineering_received:
+        #     print("CURRENT_MONTH is it ?::::::::::", p_teclab_epc_data.engineering_received.month)
+        #     print("current_month_number", current_month_number)
+        #     print("id", project["project_info"]["project_id"])
+        if not p_teclab_epc_data.plat_received or p_teclab_epc_data.plat_received.month != current_month_number:
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Engineer's Name  field is empty
+        if p_teclab_epc_data.plat_engineer == None:
+            print("ERROR::plat_engineer_name is empty::", project["project_info"]["project_id"])
+            # continue
+
+        plat_engineer_name = p_teclab_epc_data.plat_engineer
+        product_name = p_teclab_epc_data.product_name
+        result.CURRENT_MONTH.PIECHARTDATA[plat_engineer_name][product_name] += 1
+
+        if p_teclab_epc_data.plat_sent and p_teclab_epc_data.plat_received:
+            delta_time = p_teclab_epc_data.plat_received - p_teclab_epc_data.plat_sent
+            delta_days = delta_time.days
+            if p_teclab_epc_data.plat_engineer not in result.CURRENT_MONTH.BARCHARTDATA:
+                result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [delta_days]
+            result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(delta_days)
+
+    result.CURRENT_MONTH.PIECHARTDATA = to_dict(result.CURRENT_MONTH.PIECHARTDATA)
+
+    return result
+
+
+
+def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
+    result = SectionDataScheme(
+        PREVIOUS_MONTH = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_MONTH  = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_YEAR = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        )
+    )
+
+    """
+    Current-Year
+    """
+    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.PIECHARTDATA = defaultdict(int)
+    result.CURRENT_YEAR.BARCHARTDATA = defaultdict(lambda: [])
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+
+        # Drafters's Name  field is empty
+        if p_teclab_epc_data.drafting_drafter == None:
+            print("ERROR::drafting_drafter is empty::", project["project_info"]["project_id"])
+            # continue
+
+        # drafter_name = p_teclab_epc_data.drafting_drafter
+        # result.CURRENT_YEAR.PIECHARTDATA[drafter_name][product_name] += 1
+        product_name = p_teclab_epc_data.product_name
+        result.CURRENT_YEAR.PIECHARTDATA[product_name] += 1
+
+        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.engineering_sent:
+            delta_time = p_teclab_epc_data.engineering_sent - p_teclab_epc_data.drafting_assigned_on
+            delta_days = delta_time.days
+            result.CURRENT_YEAR.BARCHARTDATA[product_name].append(delta_days)
+
+    """
+    Previous-Month
+    """
+    previous_month_number = datetime.today().month - 1
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month_number]
+    result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(int)
+    result.PREVIOUS_MONTH.BARCHARTDATA = defaultdict(lambda: [])
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # TODO: these filters are supposed to be for this sections time range
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+        # if p_teclab_epc_data.engineering_received:
+            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
+            # print("previous_month_number", previous_month_number)
+            # print("id", project["project_info"]["project_id"])
+        if not p_teclab_epc_data.engineering_sent or p_teclab_epc_data.engineering_sent.month != previous_month_number:
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Plat-Engineer's Name  field is empty
+        if p_teclab_epc_data.product_name == None:
+            print("ERROR::product_name is empty::", project["project_info"]["project_id"])
+            # continue
+
+        product_name = p_teclab_epc_data.product_name
+        # product_name = p_teclab_epc_data.product_name
+        result.PREVIOUS_MONTH.PIECHARTDATA[product_name] += 1
+
+        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.engineering_sent:
+            delta_time = p_teclab_epc_data.engineering_sent - p_teclab_epc_data.drafting_assigned_on
+            delta_days = delta_time.days
+            result.PREVIOUS_MONTH.BARCHARTDATA[product_name].append(delta_days)
+
+    """
+    Current-Month
+    """
+    current_year = datetime.today().year
+    current_month_number  = datetime.today().month
+    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month_number]
+    result.CURRENT_MONTH.PIECHARTDATA = defaultdict(int)
+    result.CURRENT_MONTH.BARCHARTDATA = defaultdict(lambda: [])
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # Contract must be in current year
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < current_year:
+            continue
+        if not p_teclab_epc_data.drafting_assigned_on or p_teclab_epc_data.drafting_assigned_on.month != current_month_number:
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Plat-Engineer's Name  field is empty
+        if p_teclab_epc_data.drafting_drafter == None:
+            print("ERROR::drafting_drafter is empty::", project["project_info"]["project_id"])
+            # continue
+
+        product_name = p_teclab_epc_data.product_name
+        # product_name = p_teclab_epc_data.product_name
+        result.CURRENT_MONTH.PIECHARTDATA[product_name] += 1
+
+        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.drafting_finished:
+            delta_time = p_teclab_epc_data.drafting_finished - p_teclab_epc_data.drafting_assigned_on
+            delta_days = delta_time.days
+            result.CURRENT_MONTH.BARCHARTDATA[product_name].append(delta_days)
+
+
+    return result
+
+def get_permitting_dashboard_data(all_docs) -> SectionDataScheme:
+    result = SectionDataScheme(
+        PREVIOUS_MONTH = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_MONTH  = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        ),
+        CURRENT_YEAR = CardDataScheme(
+            VALUE="",
+            PIECHARTDATA = {},
+            BARCHARTDATA = {},
+        )
+    )
+
+    """
+    Current-Year
+    """
+    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.PIECHARTDATA = defaultdict(int)
+    result.CURRENT_YEAR.BARCHARTDATA = defaultdict(lambda: [])
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+
+        # Drafters's Name  field is empty
+        if p_teclab_epc_data.drafting_drafter == None:
+            print("ERROR::drafting_drafter is empty::", project["project_info"]["project_id"])
+            # continue
+
+        # drafter_name = p_teclab_epc_data.drafting_drafter
+        # result.CURRENT_YEAR.PIECHARTDATA[drafter_name][product_name] += 1
+        county_name = p_teclab_epc_data.permitting_county_name
+        result.CURRENT_YEAR.PIECHARTDATA[county_name] += 1
+
+        if p_teclab_epc_data.permitting_submitted and p_teclab_epc_data.permitting_received:
+            delta_time = p_teclab_epc_data.permitting_received - p_teclab_epc_data.permitting_submitted
+            delta_days = delta_time.days
+            result.CURRENT_YEAR.BARCHARTDATA[county_name].append(delta_days)
+
+    """
+    Previous-Month
+    """
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[datetime.today().month - 1]
+    result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(int)
+    result.PREVIOUS_MONTH.BARCHARTDATA = defaultdict(lambda: [])
+
+    previous_month_number = datetime.today().month - 1
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # TODO: these filters are supposed to be for this sections time range
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+        # if p_teclab_epc_data.engineering_received:
+            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
+            # print("previous_month_number", previous_month_number)
+            # print("id", project["project_info"]["project_id"])
+        if not p_teclab_epc_data.permitting_received or p_teclab_epc_data.permitting_received.month != previous_month_number:
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Plat-Engineer's Name  field is empty
+        if p_teclab_epc_data.permitting_county_name == None:
+            print("ERROR::permitting_county_name is empty::", project["project_info"]["project_id"])
+            # continue
+
+        permitting_county_name = p_teclab_epc_data.permitting_county_name
+        # product_name = p_teclab_epc_data.product_name
+        result.PREVIOUS_MONTH.PIECHARTDATA[permitting_county_name] += 1
+
+        if p_teclab_epc_data.permitting_submitted and p_teclab_epc_data.permitting_received:
+            delta_time = p_teclab_epc_data.permitting_received - p_teclab_epc_data.permitting_submitted
+            delta_days = delta_time.days
+            result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.permitting_county_name].append(delta_days)
+
+    """
+    Current-Month
+    """
+    current_month_number  = datetime.today().month
+    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month_number ]
+    result.CURRENT_MONTH.PIECHARTDATA = defaultdict(int)
+    result.CURRENT_MONTH.BARCHARTDATA = defaultdict(lambda: [])
+
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project = {k: v for (k, v) in doc.items() if k != "_id"}
+
+        p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
+
+        # TODO: these filters are supposed to be for this sections time range
+        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+            continue
+        # if p_teclab_epc_data.engineering_received:
+            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
+            # print("current_month_number ", current_month_number )
+            # print("id", project["project_info"]["project_id"])
+        if not p_teclab_epc_data.permitting_received or p_teclab_epc_data.permitting_received.month != current_month_number :
+            continue
+
+        # print("HERE::::::::::::::::::")
+        # Plat-Engineer's Name  field is empty
+        if p_teclab_epc_data.permitting_county_name == None:
+            print("ERROR::permitting_county_name is empty::", project["project_info"]["project_id"])
+            # continue
+
+        permitting_county_name = p_teclab_epc_data.permitting_county_name
+        # product_name = p_teclab_epc_data.product_name
+        result.CURRENT_MONTH.PIECHARTDATA[permitting_county_name] += 1
+
+        if p_teclab_epc_data.permitting_submitted and p_teclab_epc_data.permitting_received:
+            delta_time = p_teclab_epc_data.permitting_received - p_teclab_epc_data.permitting_submitted
+            delta_days = delta_time.days
+            result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.permitting_county_name].append(delta_days)
+
+    return result
+
+# @router.get("/engineer-dashboard-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
+@router.get("/engineer-dashboard-data", response_model=List[SectionDataScheme], dependencies=[Depends(get_current_user_data)])
+def engineeer_data():
+
+    all_docs = list(projects_coll.find())
+
+    drafting_dashboard_data = get_drafting_dashboard_data(all_docs)
+    engineering_dashboard_data = get_engineering_dashboard_data(all_docs)
+    plat_dashboard_data = get_plat_dashboard_data(all_docs)
+    permitting_dashboard_data = get_permitting_dashboard_data(all_docs)
+    return [drafting_dashboard_data, engineering_dashboard_data, plat_dashboard_data, permitting_dashboard_data]
 
 
 """
