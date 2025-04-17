@@ -10,7 +10,7 @@ function DashboardPage() {
 
     // Get auth state & Authenticate based on the allowed roles
     const currentUser = useAppSelector(selectCurrentUser)
-    const ALLOWED_ROLES = [220, 221, 223, 291, 299, 999]
+    const ALLOWED_ROLES = [220, 221, 223, 291, 299, 600, 999]
 
     if (!(currentUser?.security?.roles.some(role => ALLOWED_ROLES.includes(role)))) {
         return <UnAuthorized />

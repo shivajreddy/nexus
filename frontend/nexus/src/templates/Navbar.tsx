@@ -68,7 +68,7 @@ function Navbar() {
             link: "/dashboard",
             icon: <BsGraphUp size={"1.5em"} />,
             isBeta: true,
-            roles: [299, 999],
+            roles: [299, 600, 999],
         },
     ]
 

@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 
 
 // :: Allowed roles
-const ALLOWED_ROLES = [299, 999]
+const ALLOWED_ROLES = [299, 600, 999]
 
 
 function AuthDashboard() {

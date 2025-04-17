@@ -30,6 +30,8 @@
         - 291 - Drafting Head
         - 292 - Home Siting & FOSC Head
         - 299 - Department(TECLAB) Head
+
+600 - View Dashboard
 9** - ADMIN KEY 
     999 - ADMIN -> access to everything
 
