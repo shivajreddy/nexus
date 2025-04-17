@@ -47,7 +47,7 @@ function Navbar() {
             link: "/epc",
             icon: <FaRegCircle size={"1.5em"} />,
             isBeta: true,
-            roles: [210, 213, 299, 999],
+            roles: [210, 211, 213, 299, 999],
         },
         {
             name: "FOSC",

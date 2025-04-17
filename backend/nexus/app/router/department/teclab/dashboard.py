@@ -778,8 +778,8 @@ def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
         product_name = p_teclab_epc_data.product_name
         result.CURRENT_YEAR.PIECHARTDATA[product_name] += 1
 
-        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.engineering_sent:
-            delta_time = p_teclab_epc_data.engineering_sent - p_teclab_epc_data.drafting_assigned_on
+        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.drafting_finished:
+            delta_time = p_teclab_epc_data.drafting_finished - p_teclab_epc_data.drafting_assigned_on
             delta_days = delta_time.days
             if delta_days < 0:
                 print("ERROR::delta_days is -ve", project["project_info"]["project_id"])
