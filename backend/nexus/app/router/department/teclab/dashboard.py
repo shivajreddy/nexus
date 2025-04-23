@@ -731,7 +731,6 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
     return result
 
 
-
 def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
     result = SectionDataScheme(
         PREVIOUS_MONTH = CardDataScheme(
