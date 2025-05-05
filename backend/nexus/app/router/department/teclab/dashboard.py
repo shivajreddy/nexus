@@ -205,7 +205,7 @@ def get_current_month_ticker_data():
     bbp_posted_values = []
     bbp_posted_projects = []
     for p in filtered_projects:
-        if not p.teclab_data.epc_data.contract_date or not p.teclab_data.epc_data.bbp_posted or not p.teclab_data.epc_data.permitting_received: 
+        if not p.teclab_data.epc_data.contract_date or not p.teclab_data.epc_data.bbp_posted or not p.teclab_data.epc_data.permitting_received:
             continue
         days_taken_for_bbp_posted = (p.teclab_data.epc_data.bbp_posted - p.teclab_data.epc_data.permitting_received).days
         bbp_posted_projects.append(p)

@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str
     SENDER_EMAIL: str
 
+    # IHMS Api
+    CLIENT_ID: str
+    CLIENT_SECRET: str
+
     class Config:
         env_file: str
 

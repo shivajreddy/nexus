@@ -224,7 +224,7 @@ function Fosc() {
                         {/*     </Button> */}
                         {/*   </div> */}
                         {/* } */}
-                        {hasRoles(userRoles, [223]) &&
+                        {hasRoles(userRoles, [223, 299, 999]) &&
                             <FoscMenu />
                         }
                     </div>

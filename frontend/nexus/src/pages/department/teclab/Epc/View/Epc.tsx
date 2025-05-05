@@ -198,7 +198,7 @@ function Epc() {
                         }
                         {hasRoles(userRoles, [213, 299, 999]) &&
                             <div className="flex justify-center items-center bg-default-bg1 mx-4">
-                                <Button onClick={() => axios.get(BASE_URL + '/department/teclab/epc/epc-backlog-tracker')}
+                                <Button onClick={() => axios.get('/department/teclab/epc/epc-backlog-tracker')}
                                     className="min-w-[10em]">
                                     <p className="pr-2"><MdEmail /></p>
                                     Email Me Backlog
