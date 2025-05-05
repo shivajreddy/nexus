@@ -75,7 +75,7 @@ export TERM=xterm-256color
 - 3. `sudo docker-compose -f docker-compose-prod.yml up --build -d`   d is to run in detached mode.
 - 4. when you keep building up, the storage keeps increasing due to past images/containers/volumes. so delete them using:
     `sudo docker system prune -a`
-- 5. use this `docker-compose -f docker-compose-prod.yml logs -f` to look at the logs
+- 5. use this `docker-compose -f docker-compose-prod.yml logs --tail=0 -f` to look at the logs
 
 ### Running it locally
 - 1. clone this repo
