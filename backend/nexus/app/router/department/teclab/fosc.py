@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional
 
 import csv
@@ -34,7 +35,7 @@ router = APIRouter(prefix="/department/teclab/fosc")
 # Filter out all finished and released lots
 @router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
 def get_live_lots():
-    # print("inside fosc/live")
+    print("inside fosc/live")
     try:
         result = []
         for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
@@ -217,7 +218,7 @@ def get_fosc_data_with_project_uid(project_uid: str):
 # Updating project data
 @router.post('/edit', dependencies=[Depends(get_current_user_data)])
 def update_teclab_data_for_project(new_data: UpdateFOSCData):
-    # print("given new_data", new_data)
+    print("given new_data", new_data)
     # Check if the project exists
     existing_project = projects_coll.find_one({"project_info.project_uid": new_data.project_uid})
 
@@ -248,6 +249,25 @@ def update_teclab_data_for_project(new_data: UpdateFOSCData):
         {"project_info.project_uid": new_data.project_uid},
         {"$set": {"teclab_data.epc_data.homesiting_completed_by": new_data.homesiting_completed_by}},
     )
+    projects_coll.update_one(
+        {"project_info.project_uid": new_data.project_uid},
+        {"$set": {"teclab_data.epc_data.homesiting_feedback_received_date": new_data.homesiting_feedback_received_date}},
+    )
+
+    # Update the VarianceBOC field
+    if new_data.fosc_data.as_built_BOC and new_data.fosc_data.proposed_BOC:
+        variance_boc_value = (Decimal(new_data.fosc_data.as_built_BOC) - Decimal(new_data.fosc_data.proposed_BOC)) * 12
+        new_data.fosc_data.variance_BOC = str(variance_boc_value)
+        projects_coll.update_one(
+            {"project_info.project_uid": new_data.project_uid},
+            {"$set": {"teclab_data.fosc_data.variance_BOC": new_data.fosc_data.variance_BOC}},
+        )
+    else:
+        projects_coll.update_one(
+            {"project_info.project_uid": new_data.project_uid},
+            {"$set": {"teclab_data.fosc_data.variance_BOC": "0"}},
+        )
+
 
     return {"message": f"Project {new_data.project_uid} updated successfully"}
 

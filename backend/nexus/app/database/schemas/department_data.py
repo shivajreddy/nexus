@@ -77,6 +77,7 @@ class EPCData(BaseModel):
     homesiting_requested_on: Optional[datetime] = None
     homesiting_completed_on: Optional[datetime] = None
     homesiting_completed_by: Optional[str] = None
+    homesiting_feedback_received_date: Optional[datetime] = None
 
     # Build By Plans
     bbp_posted: Optional[datetime] = None
@@ -130,9 +131,15 @@ class FOSCData(BaseModel):
     mep_uploaded: bool = False
     mep_needed: bool = True
 
+    misc_report_status: bool = False  
     # Misc (warranty, extra)
     misc_scan_status: bool = False  
-    misc_report_status: bool = False  
+
+    # BOC related
+    proposed_BOC: Optional[str] = None
+    as_built_BOC: Optional[str] = None
+    variance_BOC: Optional[str] = None
+    field_feedback_notes: Optional[str] = None
 
     # Notes
     notes: Optional[str] = None
@@ -154,6 +161,7 @@ class UpdateFOSCData(BaseModel):
     homesiting_requested_on: Optional[datetime] = None
     homesiting_completed_on: Optional[datetime] = None
     homesiting_completed_by: Optional[str] = None
+    homesiting_feedback_received_date: Optional[datetime] = None
 
 class CORData(BaseModel):
     product: str = ''
