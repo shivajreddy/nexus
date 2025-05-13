@@ -102,7 +102,8 @@ def query_projects(target_project: TargetProject):
                 "project_id": project["project_info"]["project_id"],
                 "project_uid": project["project_info"]["project_uid"]
             })
-        return result
+        return sorted(result, key=lambda x: x["project_id"])
+        # return result
 
     # only community is selected
     if target_project.community and not target_project.section and not target_project.lot_number:
@@ -114,7 +115,8 @@ def query_projects(target_project: TargetProject):
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
                 })
-        return result
+        return sorted(result, key=lambda x: x["project_id"])
+        # return result
 
     # only section is selected
     if not target_project.community and target_project.section and not target_project.lot_number:
@@ -126,7 +128,8 @@ def query_projects(target_project: TargetProject):
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
                 })
-        return result
+        return sorted(result, key=lambda x: x["project_id"])
+        # return result
 
     # only lot_number is selected
     if not target_project.community and not target_project.section and target_project.lot_number:
@@ -138,7 +141,8 @@ def query_projects(target_project: TargetProject):
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
                 })
-        return result
+        return sorted(result, key=lambda x: x["project_id"])
+        # return result
 
     # community and section is selected
     if target_project.community and target_project.section and not target_project.lot_number:
@@ -153,7 +157,8 @@ def query_projects(target_project: TargetProject):
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
                 })
-        return result
+        return sorted(result, key=lambda x: x["project_id"])
+        # return result
 
     # community and lot_number is selected
     if target_project.community and target_project.lot_number and not target_project.section:
@@ -168,7 +173,8 @@ def query_projects(target_project: TargetProject):
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
                 })
-        return result
+        return sorted(result, key=lambda x: x["project_id"])
+        # return result
 
     # all are selected
     if target_project.community and target_project.section and target_project.lot_number:
@@ -184,9 +190,11 @@ def query_projects(target_project: TargetProject):
                     "project_id": project["project_info"]["project_id"],
                     "project_uid": project["project_info"]["project_uid"]
                 })
-        return result
+        return sorted(result, key=lambda x: x["project_id"])
+        # return result
 
-    return result
+    return sorted(result, key=lambda x: x["project_id"])
+    # return result
 
 
 @router.get("/find")
