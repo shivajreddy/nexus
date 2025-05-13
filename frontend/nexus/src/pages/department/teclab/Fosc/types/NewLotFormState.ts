@@ -61,13 +61,20 @@ type TECLabFOSCData = {
     misc_scan_status?: boolean;
     misc_report_status?: boolean;
 
+    // BOC related
+    proposed_BOC?: string;
+    as_built_BOC?: string;
+    variance_BOC?: string;
+    field_feedback_notes?: string;
+
     // Notes
     notes?: string;
 
     // home-siting-info
-    homesiting_completed_by?: string;
-    homesiting_completed_on?: Date;
     homesiting_requested_on?: Date;
+    homesiting_completed_on?: Date;
+    homesiting_completed_by?: string;
+    homesiting_feedback_received_date?: Date;
 }
 
 export {

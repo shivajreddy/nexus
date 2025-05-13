@@ -49,7 +49,14 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
         "A.Ghannam", "W.Wallace", "P.Shaw", "S.Lambert", "C.Montgomery", "J.Bruce", "R.Adenauer",
         "R.Kelley", "F.Cole", "J.Fleming", "D.Stosser", "M.Mugler"]
 
-    const [formData, setFormData] = useState({
+    type IFormData = {
+        all_communities: string[];
+        all_field_ops_members: string[];
+        all_directors: string[];
+        all_pms: string[];
+    };
+
+    const [formData, setFormData] = useState<IFormData>({
         "all_communities": [],
         "all_field_ops_members": [],
         "all_directors": [],
@@ -68,6 +75,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
         const makeServerRequest = async () => {
             setUpdateTECLabDataStatus('loading');
             try {
+                console.log("selectedProjectsTECLabFOSCData", selectedProjectsTECLabFOSCData);
                 await axios.post('/department/teclab/fosc/edit',
                     {
                         "project_uid": project_uid,
@@ -75,6 +83,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                         "homesiting_requested_on": selectedProjectsTECLabFOSCData.homesiting_requested_on,
                         "homesiting_completed_on": selectedProjectsTECLabFOSCData.homesiting_completed_on,
                         "homesiting_completed_by": selectedProjectsTECLabFOSCData.homesiting_completed_by,
+                        "homesiting_feedback_received_date": selectedProjectsTECLabFOSCData.homesiting_feedback_received_date,
                     },
                     { headers: { "Content-Type": "application/json" } }
                 )
@@ -94,7 +103,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
         async function getData() {
             const communitiesResponse = await axios.get('/eagle/communities');
             const fieldOpsMembersResponse = await axios.get('/department/teclab/fieldops-members')
-            console.log("fieldOpsMembersResponse:::::", fieldOpsMembersResponse);
+            // console.log("fieldOpsMembersResponse:::::", fieldOpsMembersResponse);
             // sort them alphabatecially
             const fieldOpsMembers = fieldOpsMembersResponse.data.sort((a, b) => a.localeCompare(b));
             setFormData({
@@ -118,8 +127,8 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                 // console.log("Response for /get/{project_uid}: ", response);
 
                 const lotData = response.data;
-                console.log(":::lotData = ", lotData)
-                console.log("TRYING TO TRANSFORM");
+                // console.log(":::lotData = ", lotData)
+                // console.log("TRYING TO TRANSFORM");
 
                 // Data transformation
                 const transformedData: TECLabFOSCData = {
@@ -136,6 +145,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     homesiting_requested_on: lotData.epc_data.homesiting_requested_on ? new Date(lotData.epc_data.homesiting_requested_on) : undefined,
                     homesiting_completed_on: lotData.epc_data.homesiting_completed_on ? new Date(lotData.epc_data.homesiting_completed_on) : undefined,
                     homesiting_completed_by: lotData.epc_data.homesiting_completed_by,
+                    homesiting_feedback_received_date: lotData.epc_data.homesiting_feedback_received_date ? new Date(lotData.epc_data.homesiting_feedback_received_date) : undefined,
 
                     // status
                     lot_status_started: lotData.fosc_data.lot_status_started,
@@ -152,6 +162,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     foundation_reporter: lotData.fosc_data.foundation_reporter,
                     foundation_report_date: lotData.fosc_data.foundation_report_date ? new Date(lotData.fosc_data.foundation_report_date) : undefined,
                     foundation_uploaded: lotData.fosc_data.foundation_uploaded,
+                    foundation_needed: lotData.fosc_data.foundation_needed,
 
                     // Slab
                     slab_scan_status: lotData.fosc_data.slab_scan_status,
@@ -160,6 +171,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     slab_reporter: lotData.fosc_data.slab_reporter,
                     slab_report_date: lotData.fosc_data.slab_report_date ? new Date(lotData.fosc_data.slab_report_date) : undefined,
                     slab_uploaded: lotData.fosc_data.slab_uploaded,
+                    slab_needed: lotData.fosc_data.slab_needed,
 
                     // Frame
                     frame_scan_status: lotData.fosc_data.frame_scan_status,
@@ -168,6 +180,7 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     frame_reporter: lotData.fosc_data.frame_reporter,
                     frame_report_date: lotData.fosc_data.frame_report_date ? new Date(lotData.fosc_data.frame_report_date) : undefined,
                     frame_uploaded: lotData.fosc_data.frame_uploaded,
+                    frame_needed: lotData.fosc_data.frame_needed,
 
                     // MEP
                     mep_scan_status: lotData.fosc_data.mep_scan_status,
@@ -176,19 +189,22 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                     mep_reporter: lotData.fosc_data.mep_reporter,
                     mep_report_date: lotData.fosc_data.mep_report_date ? new Date(lotData.fosc_data.mep_report_date) : undefined,
                     mep_uploaded: lotData.fosc_data.mep_uploaded,
+                    mep_needed: lotData.fosc_data.mep_needed,
 
                     // Misc (warranty, extra)
                     misc_scan_status: lotData.fosc_data.misc_scan_status,
                     misc_report_status: lotData.fosc_data.misc_report_status,
-                    foundation_needed: lotData.fosc_data.foundation_needed,
-                    slab_needed: lotData.fosc_data.slab_needed,
-                    frame_needed: lotData.fosc_data.frame_needed,
-                    mep_needed: lotData.fosc_data.mep_needed,
+
+                    // BOC related
+                    proposed_BOC: lotData.fosc_data.proposed_BOC ? lotData.fosc_data.proposed_BOC : "",
+                    as_built_BOC: lotData.fosc_data.as_built_BOC ? lotData.fosc_data.as_built_BOC : "",
+                    variance_BOC: lotData.fosc_data.variance_BOC ? lotData.fosc_data.variance_BOC : "",
+                    field_feedback_notes: lotData.fosc_data.field_feedback_notes ? lotData.fosc_data.field_feedback_notes : "",
 
                     // Notes
                     notes: lotData.fosc_data.notes
                 };
-                console.log("transformedData=", transformedData);
+                // console.log("transformedData=", transformedData);
                 // Set the data to the lot-state
                 setSelectedProjectsTECLabFOSCData(transformedData);
                 setStatusFOSCDataFetch("success");
@@ -334,11 +350,16 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                                         value={selectedProjectsTECLabFOSCData.homesiting_completed_on}
                                         onUpdate={newDate => handleStateChange('homesiting_completed_on', newDate)}
                                     />
-                                    <FieldDropDown id="6_drafter"
+                                    <FieldDropDown id="homesiting_completed_by"
                                         name={"Completed By"}
                                         dropdownData={formData.all_field_ops_members}
                                         value={selectedProjectsTECLabFOSCData.homesiting_completed_by}
                                         onUpdate={newValue => handleStateChange('homesiting_completed_by', newValue)}
+                                    />
+                                    <FieldDate id="homesiting_feedback_received_date"
+                                        name="Feedback Received On"
+                                        value={selectedProjectsTECLabFOSCData.homesiting_feedback_received_date}
+                                        onUpdate={newDate => handleStateChange('homesiting_feedback_received_date', newDate)}
                                     />
                                 </CardContent>
                             </Card>
@@ -438,6 +459,43 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
                                     />
                                 </CardContent>
                             </Card>
+
+                            {/* BOC */}
+                            <Card className="m-4">
+                                <CardHeader>
+                                    <CardTitle>BOC</CardTitle>
+                                    <CardDescription>Back Of Curb details</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <FieldText id="proposed_BOC"
+                                        name="Proposed BOC"
+                                        value={selectedProjectsTECLabFOSCData.proposed_BOC}
+                                        onUpdate={nexText => handleStateChange('proposed_BOC', nexText.target.value)}
+                                    />
+                                    <p className="text-xs text-gray-500">(In Decimanl Feet)</p>
+                                    <FieldText id="as_built_BOC"
+                                        name="AsBuilt BOC"
+                                        value={selectedProjectsTECLabFOSCData.as_built_BOC}
+                                        onUpdate={newText => handleStateChange('as_built_BOC', newText.target.value)}
+                                    />
+                                    <p className="text-xs text-gray-500">(In Decimanl Feet)</p>
+                                    <FieldText id="variance_BOC"
+                                        disabled
+                                        name="Variance BOC"
+                                        value={selectedProjectsTECLabFOSCData.variance_BOC}
+                                        onUpdate={newText => handleStateChange('variance_BOC', newText.target.value)}
+                                    />
+                                    <p className="text-xs text-gray-500">(In Decimanl Inches)</p>
+
+                                    <p className="text-lg font-medium pt-4">Field Feedback Notes</p>
+                                    <Textarea placeholder="Your notes here..."
+                                        value={selectedProjectsTECLabFOSCData.field_feedback_notes ?? ""}
+                                        onChange={newNotes => handleStateChange('field_feedback_notes', newNotes.target.value)}
+                                    />
+                                </CardContent>
+                            </Card>
+
+
                         </div>
 
                         <div className="min-w-[27%]">
