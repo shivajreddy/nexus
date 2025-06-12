@@ -80,6 +80,15 @@ const foscColumnDefinitions: ColGroupDef[] = [
         marryChildren: true
     },
     {
+        headerName: 'BOC',
+        children: [
+            { headerName: 'Proposed', field: 'proposed_BOC' },
+            { headerName: 'AsBuilt', field: 'as_built_BOC' },
+            { headerName: 'Variance', field: 'variance_BOC' },
+        ],
+        marryChildren: true
+    },
+    {
         headerName: 'Notes',
         children: [
             { field: 'notes', headerName: 'notes', width: 300 }

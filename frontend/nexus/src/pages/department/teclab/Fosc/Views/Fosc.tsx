@@ -48,6 +48,7 @@ function Fosc() {
                 // console.log("😆 response.data=", response.data);
                 // setLotData(response.data);
                 const backendData = response.data;
+                // console.log("backendData::::", backendData);
                 // Data transformation
                 const transformedData = backendData.map((item: any) => ({
 
@@ -97,10 +98,14 @@ function Fosc() {
                     misc_scan_status: item.misc_scan_status,
                     misc_report_status: item.misc_report_status,
 
+                    proposed_BOC: item.proposed_BOC ? item.proposed_BOC : "",
+                    as_built_BOC: item.as_built_BOC ? item.as_built_BOC : "",
+                    variance_BOC: item.variance_BOC ? item.variance_BOC : "",
+
                     notes: item.notes
 
                 }));
-                // console.log("transformed 😇 data=", transformedData);
+                console.log("transformed 😇 data=", transformedData);
                 setAllFOSCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {

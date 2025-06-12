@@ -438,3 +438,59 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
         # f"pm_waiting_eng_or_plat: + {len(pm_waiting_eng_or_plat)}": pm_waiting_eng_or_plat,
         # f"pm_waiting_to_send_permit: + {len(pm_waiting_to_send_permit)}": pm_waiting_to_send_permit
     }
+
+# CUSTOM ROUTE: FOR BERTON EMAIL
+@router.get('/epc-backlog-tracker-custom-berton')
+def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+    # query the data
+    filtered_lots, result_data = query_tracker_data()
+
+    # create the csv file
+    today_date = datetime.now().strftime("%d-%m-%y")
+    csv_filename = os.path.join("./app/files/epc", f"{today_date}-EagleBacklogTrackerBerton.csv")
+    print("filename=", csv_filename)
+    with open(csv_filename, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow([
+            "Community",
+            "Contract-Waiting_Drafting",
+            "Contract-Waiting_Eng_or_Plat",
+            "Contract-Waiting_Permit",
+            "Permit&Hold-Waiting_Drafting",
+            "Permit&Hold-Waiting_Eng_or_Plat",
+            "Permit&Hold-Waiting_Permit",
+            "Community Totals"
+        ])
+        for k, v in result_data.items():
+            csv_writer.writerow([k] + v)
+
+    # create email with attachment
+    message = MIMEMultipart()
+    message['Subject'] = 'Eagle Backlog Tracker'
+    message['From'] = 'nexus@tecofva.com'
+    # message['To'] = 'sreddy@tecofva.com'
+    message['To'] = current_user_data.username
+    message.attach(MIMEText('EPC Backlog Tracker as of today', 'plain'))
+
+    # attach the csv file to message
+    with open(csv_filename, 'r') as file:
+        attachment = MIMEText(file.read())
+        attachment.add_header('Content-Disposition', 'attachment', filename=(today_date + "-EagleBacklogTracker.csv"))
+        message.attach(attachment)
+
+    send_email_with_given_message_and_attachment(
+        current_user_data.username,
+        # "sreddy@tecofva.com",
+        message
+    )
+
+    return {
+        "total": len(filtered_lots),
+        "email_data": result_data,
+        # f"contract_waiting_drafting: + {len(contract_waiting_drafting)}": contract_waiting_drafting,
+        # f"contract_waiting_eng_or_plat: + {len(contract_waiting_eng_or_plat)}": contract_waiting_eng_or_plat,
+        # f"contract_waiting_to_send_permit: + {len(contract_waiting_to_send_permit)}": contract_waiting_to_send_permit,
+        # f"pm_waiting_drafting: + {len(pm_waiting_drafting)}": pm_waiting_drafting,
+        # f"pm_waiting_eng_or_plat: + {len(pm_waiting_eng_or_plat)}": pm_waiting_eng_or_plat,
+        # f"pm_waiting_to_send_permit: + {len(pm_waiting_to_send_permit)}": pm_waiting_to_send_permit
+    }
