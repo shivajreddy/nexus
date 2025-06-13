@@ -1,6 +1,6 @@
 import MainLayout from "@templates/MainLayout.tsx";
 
-import {AgGridReact} from "ag-grid-react";
+import { AgGridReact } from "ag-grid-react";
 
 import FoscMenu from "./FoscMenu.tsx";
 
@@ -11,16 +11,17 @@ import "@assets/pages/Epc/Epc.css"
 
 
 // import {rowData, columnDefinitions} from "./demoData.ts";
-import {useNavigate} from "react-router-dom";
-import {Button} from "@components/ui/button.tsx";
-import {useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@components/ui/button.tsx";
+import { useEffect, useState } from "react";
 import useAxiosPrivate from "@hooks/useAxiosPrivate.ts";
-import {format} from "date-fns";
-import {PiPencilSimpleFill} from "react-icons/pi";
-import {hasRoles} from "@/features/utils/utils.ts";
-import {useUserRoles} from "@hooks/useUserRoles.ts";
-import {Skeleton} from "@components/ui/skeleton.tsx";
-import {TiArrowBack} from "react-icons/ti";
+import { format } from "date-fns";
+import { PiPencilSimpleFill } from "react-icons/pi";
+import { hasRoles } from "@/features/utils/utils.ts";
+import { useUserRoles } from "@hooks/useUserRoles.ts";
+import { Skeleton } from "@components/ui/skeleton.tsx";
+import { TiArrowBack } from "react-icons/ti";
+// import foscColumnDefinitions from "./foscColumnDefinitions.ts";
 
 
 const defaultColumnSettings = {
@@ -41,80 +42,102 @@ const columnDefinitionsData = [
     {
         headerName: 'Lot Info',
         children: [
-            {headerName: 'Community', field: 'community_name', width: 200},
-            {headerName: 'Section', field: 'section_number'},
-            {headerName: 'Lot-#', field: 'lot_number'},
+            { headerName: 'Community', field: 'community_name', width: 200 },
+            { headerName: 'Section', field: 'section_number' },
+            { headerName: 'Lot-#', field: 'lot_number' },
+            // not needed to show
+            // {headerName: 'Lot Started', field: 'lot_status_started'},
+            // {headerName: 'Lot Finished', field: 'lot_status_finished'},
         ],
+        marryChildren: true
     },
     {
         headerName: 'Supervisors',
         children: [
-            {headerName: 'Project Manager', field: 'assigned_pm', width: 160},
-            {headerName: 'Director', field: 'assigned_director', width: 150},
+            { headerName: 'Project Manager', field: 'assigned_pm', width: 160 },
+            { headerName: 'Director', field: 'assigned_director', width: 150 },
         ],
+        marryChildren: true
     },
     {
         headerName: 'Foundation',
         children: [
-            {headerName: 'Scanned', field: 'foundation_scan_status'},
-            {headerName: 'Date', field: 'foundation_scan_date'},
-            {headerName: 'Reported', field: 'foundation_report_status'},
-            {headerName: 'Reporter', field: 'foundation_reporter'},
-            {headerName: 'Date', field: 'foundation_report_date'},
-            {headerName: 'Uploaded', field: 'foundation_uploaded'},
+            { headerName: 'Scan Status', field: 'foundation_scan_status' },
+            { headerName: 'Scan Date', field: 'foundation_scan_date' },
+            { headerName: 'Reported', field: 'foundation_report_status' },
+            { headerName: 'Reporter', field: 'foundation_reporter' },
+            { headerName: 'Report Date', field: 'foundation_report_date' },
+            { headerName: 'Uploaded', field: 'foundation_uploaded' },
+            { headerName: 'Foundation Needed', field: 'foundation_needed' },
         ],
+        marryChildren: true
     },
     {
         headerName: 'Slab',
         children: [
-            {headerName: 'Scanned', field: 'slab_scan_status'},
-            {headerName: 'Date', field: 'slab_scan_date'},
-            {headerName: 'Reported', field: 'slab_report_status'},
-            {headerName: 'Reporter', field: 'slab_reporter'},
-            {headerName: 'Date', field: 'slab_report_date'},
-            {headerName: 'Uploaded', field: 'slab_uploaded'},
+            { headerName: 'Scanned', field: 'slab_scan_status' },
+            { headerName: 'Date', field: 'slab_scan_date' },
+            { headerName: 'Reported', field: 'slab_report_status' },
+            { headerName: 'Reporter', field: 'slab_reporter' },
+            { headerName: 'Date', field: 'slab_report_date' },
+            { headerName: 'Uploaded', field: 'slab_uploaded' },
         ],
+        marryChildren: true
     },
     {
         headerName: 'Frame',
         children: [
-            {headerName: 'Scanned', field: 'frame_scan_status'},
-            {headerName: 'Date', field: 'frame_scan_date'},
-            {headerName: 'Reported', field: 'frame_report_status'},
-            {headerName: 'Reporter', field: 'frame_reporter'},
-            {headerName: 'Date', field: 'frame_report_date'},
-            {headerName: 'Uploaded', field: 'frame_uploaded'},
+            { headerName: 'Scanned', field: 'frame_scan_status' },
+            { headerName: 'Date', field: 'frame_scan_date' },
+            { headerName: 'Reported', field: 'frame_report_status' },
+            { headerName: 'Reporter', field: 'frame_reporter' },
+            { headerName: 'Date', field: 'frame_report_date' },
+            { headerName: 'Uploaded', field: 'frame_uploaded' },
         ],
+        marryChildren: true
     },
     {
         headerName: 'Mep',
         children: [
-            {headerName: 'Scanned', field: 'mep_scan_status'},
-            {headerName: 'Date', field: 'mep_scan_date'},
-            {headerName: 'Reported', field: 'mep_report_status'},
-            {headerName: 'Reporter', field: 'mep_reporter'},
-            {headerName: 'Date', field: 'mep_report_date'},
-            {headerName: 'Uploaded', field: 'mep_uploaded'},
+            { headerName: 'Scanned', field: 'mep_scan_status' },
+            { headerName: 'Date', field: 'mep_scan_date' },
+            { headerName: 'Reported', field: 'mep_report_status' },
+            { headerName: 'Reporter', field: 'mep_reporter' },
+            { headerName: 'Date', field: 'mep_report_date' },
+            { headerName: 'Uploaded', field: 'mep_uploaded' },
         ],
+        marryChildren: true
     },
     {
         headerName: 'Warranty/Misc',
         children: [
-            {headerName: 'Scanned', field: 'misc_scan_status'},
-            {headerName: 'Reported', field: 'misc_report_status'},
-            {headerName: 'Foundation Needs', field: 'foundation_needed'},
-            {headerName: 'Slab Needs', field: 'slab_needed'},
-            {headerName: 'Frame Needs', field: 'frame_needed'},
-            {headerName: 'MEP Needs', field: 'mep_needed'},
-            {headerName: 'Lot Started', field: 'lot_status_started'},
-            {headerName: 'lot Finished', field: 'lot_status_finished'},
+            { headerName: 'Scanned', field: 'misc_scan_status' },
+            { headerName: 'Reported', field: 'misc_report_status' },
+            { headerName: 'Foundation Needs', field: 'foundation_needed' },
+            { headerName: 'Slab Needs', field: 'slab_needed' },
+            { headerName: 'Frame Needs', field: 'frame_needed' },
+            { headerName: 'MEP Needs', field: 'mep_needed' },
+            { headerName: 'Lot Started', field: 'lot_status_started' },
+            { headerName: 'lot Finished', field: 'lot_status_finished' },
         ],
+        marryChildren: true
+    },
+
+    {
+        headerName: 'BOC',
+        children: [
+            { headerName: 'Proposed', field: 'proposed_BOC' },
+            { headerName: 'AsBuilt', field: 'as_built_BOC' },
+            { headerName: 'Variance', field: 'variance_BOC' },
+        ],
+        marryChildren: true
     },
     {
         headerName: 'Notes',
         children: [
-            {field: 'notes', headerName: 'notes', width: 300}
+            { field: 'notes', headerName: 'notes', width: 300 }
         ],
+        marryChildren: true
     },
 ];
 
@@ -122,6 +145,7 @@ const columnDefinitionsData = [
 const gridOptions = {
     defaultColDef: defaultColumnSettings,
     columnDefs: columnDefinitionsData,
+    // columnDefs: foscColumnDefinitions,
     // Group columns
     groupHeaderHeight: 40,
     // Label columns
@@ -151,6 +175,7 @@ function FOSCAll() {
     const [allFOSCLots, setAllFOSCLots] = useState([]);
 
     const [columnDefinitions, setColumnDefinitions] = useState(columnDefinitionsData)
+    // const [columnDefinitions, setColumnDefinitions] = useState(foscColumnDefinitions)
 
     // + Fetch all EPC lots
     useEffect(() => {
@@ -213,6 +238,10 @@ function FOSCAll() {
                     lot_status_started: item.lot_status_started,
                     lot_status_finished: item.lot_status_finished,
 
+                    proposed_BOC: item.proposed_BOC ? item.proposed_BOC : "",
+                    as_built_BOC: item.as_built_BOC ? item.as_built_BOC : "",
+                    variance_BOC: item.variance_BOC ? item.variance_BOC : "",
+
                     notes: item.notes,
                 }));
                 setAllFOSCLots(transformedData);
@@ -252,9 +281,9 @@ function FOSCAll() {
                                         // href={`edit/${params.data.project_uid}`}
                                         className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
                                         data-id={params.data.id}
-                                        onClick={()=>navigate(`/fosc/edit/${params.data.project_uid}`)}
+                                        onClick={() => navigate(`/fosc/edit/${params.data.project_uid}`)}
                                     >
-                                        <PiPencilSimpleFill/>
+                                        <PiPencilSimpleFill />
                                     </a>
                                 )
                             },
@@ -295,12 +324,12 @@ function FOSCAll() {
                     <div className="flex mx-10">
 
                         <Button variant="outline" className="flex justify-center items-center"
-                                onClick={() => navigate('/fosc')}>
-                            <p className="pr-2"><TiArrowBack/></p>
+                            onClick={() => navigate('/fosc')}>
+                            <p className="pr-2"><TiArrowBack /></p>
                             Back to FOSC
                         </Button>
 
-                        <FoscMenu/>
+                        <FoscMenu />
                     </div>
                 </div>
                 <div className="epc-body">
@@ -311,7 +340,7 @@ function FOSCAll() {
                         >
                             <div className="space-y-4 m-8">
                                 {[...Array(30)].map((_, index) => (
-                                    <Skeleton key={index} className="rounded-full h-4 w-[80vw]"/>
+                                    <Skeleton key={index} className="rounded-full h-4 w-[80vw]" />
                                 ))}
                             </div>
                         </div>
@@ -330,12 +359,13 @@ function FOSCAll() {
                                 // id="nexus-epc-grid-container"
                                 className="ag-theme-alpine ag-theme-nexus"
                                 // className="ag-theme-alpine"
-                                style={{height: '100%'}}
+                                style={{ height: '100%' }}
                             >
                                 <AgGridReact
                                     rowData={allFOSCLots}
                                     gridOptions={gridOptions}
                                     columnDefs={columnDefinitions}
+                                // columnDefs={foscColumnDefinitions}
 
                                 />
                             </div>

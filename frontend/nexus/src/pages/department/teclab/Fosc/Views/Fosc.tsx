@@ -18,9 +18,13 @@ import { format } from "date-fns";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { hasRoles } from "@/features/utils/utils.ts";
 import { useUserRoles } from "@hooks/useUserRoles.ts";
-import { MdDownload, MdModeEditOutline } from "react-icons/md";
+import { MdModeEditOutline } from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 import { ColDef, ColGroupDef, GridOptions } from "ag-grid-community";
+
+import { MdEmail } from "react-icons/md";
+import { BASE_URL } from "@/services/api";
+import { CgMenuGridO } from "react-icons/cg";
 // import {useAppSelector} from "@redux/hooks.ts";
 // import {selectCurrentUser} from "@/features/auth/authSlice.ts";
 
@@ -229,9 +233,23 @@ function Fosc() {
                         {/*     </Button> */}
                         {/*   </div> */}
                         {/* } */}
+
+                        {/*List of all of the lots that exist and their status*/}
                         {hasRoles(userRoles, [223, 299, 999]) &&
-                            <FoscMenu />
+                            <div className="flex justify-center items-center ml-8 bg-default-bg2">
+                                <button
+                                    className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
+                                    onClick={() => navigate('/fosc/all-lots')}
+                                >
+                                    <p className="pr-2"><CgMenuGridO /></p>
+                                    All Lots
+                                </button>
+                            </div>
                         }
+
+
+                        {/* :: For now only dev can see this, make it visible once menu is finished */}
+                        {hasRoles(userRoles, [999]) && <FoscMenu />}
                     </div>
                 </div>
                 <div className="epc-body">
