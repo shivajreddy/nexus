@@ -22,6 +22,7 @@ import { MdEmail, MdModeEditOutline } from "react-icons/md";
 import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 import { BASE_URL } from "@/services/api";
 import { ColDef, ColGroupDef, GridOptions } from "ag-grid-community";
+import { CgMenuGridO } from "react-icons/cg";
 // import { useAppSelector } from "@redux/hooks.ts";
 // import { selectCurrentUser } from "@/features/auth/authSlice.ts";
 
@@ -205,6 +206,20 @@ function Epc() {
                                 </Button>
                             </div>
                         }
+
+
+                        {hasRoles(userRoles, [299, 999]) &&
+                            <div className="flex justify-center items-center ml-8 bg-default-bg2">
+                                <button
+                                    className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
+                                    onClick={() => navigate('/epc/all-lots')}
+                                >
+                                    <p className="pr-2"><CgMenuGridO /></p>
+                                    All Lots
+                                </button>
+                            </div>
+                        }
+
                         {/* :: For now only dev can see this, make it visible once menu is finished */}
                         {hasRoles(userRoles, [999]) && <EpcMenu />}
                     </div>
