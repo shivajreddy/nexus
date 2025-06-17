@@ -108,7 +108,7 @@ function DraftingCurrentMonth({ responseData }: { responseData: { CURRENT_MONTH?
                         <XAxis dataKey="engineer" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="avgTime" name="Average Time" label={{ fill: "white" }}>
+                        <Bar dataKey="avgTime" name="Average Time" label={{ fill: "white" }} maxBarSize={33} >
                             {barChartData.map((entry) => (
                                 <Cell key={`bar-cell-${entry.engineer}`} fill={useColor(entry.engineer)} />
                             ))}
@@ -117,7 +117,7 @@ function DraftingCurrentMonth({ responseData }: { responseData: { CURRENT_MONTH?
                 </div>
 
             </CardContent>
-        </Card>
+        </Card >
     );
 }
 

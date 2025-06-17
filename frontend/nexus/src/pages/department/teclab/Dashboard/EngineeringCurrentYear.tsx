@@ -123,7 +123,7 @@ function EngineeringCurrentYear({ responseData }: { responseData: any }) {
                 {/* Bar Chart */}
                 <div className="flex-col">
                     <p className="text-center p-2">Average Cycle Times</p>
-                    <BarChart className="m-0 p-0" data={subChart2Data} width={400} height={400}>
+                    <BarChart className="m-0 p-0" data={subChart2Data} width={400} height={400} maxBarSize={33}>
                         <XAxis dataKey="engineer" />
                         <YAxis />
                         <Tooltip />

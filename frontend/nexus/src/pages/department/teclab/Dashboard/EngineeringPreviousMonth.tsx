@@ -127,7 +127,7 @@ function EngineeringPreviousMonth({ responseData }: { responseData: any }) {
                         <XAxis dataKey="engineer" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="avgTime" name="Average Time" label={{ fill: "white" }}>
+                        <Bar dataKey="avgTime" name="Average Time" label={{ fill: "white" }} maxBarSize={33}>
                             {subChart2Data.map((entry) => (
                                 <Cell key={`bar-cell-${entry.engineer}`} fill={useColor(entry.engineer)} />
                             ))}

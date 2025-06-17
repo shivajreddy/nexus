@@ -87,9 +87,13 @@ def get_current_month_ticker_data():
     for p in filtered_projects:
         if not p.teclab_data.epc_data.drafting_assigned_on or not p.teclab_data.epc_data.drafting_finished:
             continue
-        days_taken_to_draft = (p.teclab_data.epc_data.drafting_finished - p.teclab_data.epc_data.drafting_assigned_on).days
+        # days_taken_to_draft = (p.teclab_data.epc_data.drafting_finished - p.teclab_data.epc_data.drafting_assigned_on).days
+        delta = p.teclab_data.epc_data.drafting_finished - p.teclab_data.epc_data.drafting_assigned_on
+        days_taken_to_draft = max(0, round(delta.total_seconds() / 86400))
         if days_taken_to_draft < 0:
-            print("ERROR:Drafting:days_taken_to_draft cant be <= 0 days")
+            print(f"ERROR: project_id:{p.project_info.project_id} days_taken_to_draft:{days_taken_to_draft} cant be < 0 days")
+            print(f"finished-date:{p.teclab_data.epc_data.drafting_finished} assigned-date{p.teclab_data.epc_data.drafting_assigned_on}")
+            print(f"differnce: {p.teclab_data.epc_data.drafting_finished - p.teclab_data.epc_data.drafting_assigned_on}")
         drafting_projects.append(p)
         drafting_values.append(days_taken_to_draft)
     # print("drafting values:::", drafting_values)
@@ -207,7 +211,8 @@ def get_current_month_ticker_data():
     for p in filtered_projects:
         if not p.teclab_data.epc_data.contract_date or not p.teclab_data.epc_data.bbp_posted or not p.teclab_data.epc_data.permitting_received:
             continue
-        days_taken_for_bbp_posted = (p.teclab_data.epc_data.bbp_posted - p.teclab_data.epc_data.permitting_received).days
+        delta = p.teclab_data.epc_data.bbp_posted - p.teclab_data.epc_data.permitting_received
+        days_taken_for_bbp_posted = max(0, round(delta.total_seconds() / 86400))
         bbp_posted_projects.append(p)
         bbp_posted_values.append(days_taken_for_bbp_posted)
     
@@ -729,7 +734,6 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
     result.CURRENT_MONTH.PIECHARTDATA = to_dict(result.CURRENT_MONTH.PIECHARTDATA)
 
     return result
-
 
 def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
     result = SectionDataScheme(
