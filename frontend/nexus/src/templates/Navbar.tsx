@@ -5,6 +5,7 @@ import { ReactElement } from "react";
 import { FaExpand, FaRegCircle } from "react-icons/fa";
 
 import { BsCollection, BsGraphUp, BsHouses } from "react-icons/bs";
+import { MdAutoGraph } from "react-icons/md";
 import { PiGraphBold } from "react-icons/pi";
 import { useUserRoles } from "@hooks/useUserRoles.ts";
 import { hasRoles } from "@/features/utils/utils.ts";
@@ -69,6 +70,13 @@ function Navbar() {
             icon: <BsGraphUp size={"1.5em"} />,
             isBeta: true,
             roles: [299, 600, 999],
+        },
+        {
+            name: "Graphs",
+            link: "/graphs",
+            icon: <MdAutoGraph size={"1.5em"} />,
+            isBeta: true,
+            roles: [999],
         },
     ]
 

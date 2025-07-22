@@ -4,6 +4,16 @@ function Graph1() {
     return (
         <div>
             <p>Graph1</p>
+            <div>
+                <>
+                    <p>FILTER CRITERIA</p>
+                </>
+                <>
+                    <p>X-AXIS</p>
+                    <p>Y-AXIS</p>
+                </>
+            </div>
+
         </div>
     )
 }
