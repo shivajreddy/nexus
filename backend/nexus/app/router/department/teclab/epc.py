@@ -244,8 +244,12 @@ def download():
         # if p_epc_data.contract_date is None:
             # continue
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
+        # Filter for lots with "contract_date" from 2025 and onwards i.e., skip anything before 2025
+        # if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
+            # continue
+
+        # Filter for lots with "drafting_assigned_on" from 2024 and onwards i.e., skip anything before 2025
+        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.drafting_assigned_on.year < 2024:
             continue
 
         # # combine the p_epc_data and p_project_info

@@ -91,7 +91,6 @@ const PipeLineView = () => {
                     <Controls />
                 </ReactFlow>
             </div>
-
         </div>
     );
 };
