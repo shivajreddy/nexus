@@ -1,9 +1,8 @@
 
 function Graph1() {
-
     return (
         <div>
-            <p>Graph1</p>
+            <p>GRAPH-1</p>
             <div>
                 <>
                     <p>FILTER CRITERIA</p>
@@ -13,7 +12,6 @@ function Graph1() {
                     <p>Y-AXIS</p>
                 </>
             </div>
-
         </div>
     )
 }
