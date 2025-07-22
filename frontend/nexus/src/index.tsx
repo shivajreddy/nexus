@@ -57,6 +57,8 @@ import AuthProjects from "./pages/Project/AuthProjects";
 import React, { useState } from "react";
 import AuthWarrantyDashboard from "./pages/department/teclab/Dashboard/Warranty/AuthWarrantyDashboard";
 import WarrantyDashboardPage from "./pages/department/teclab/Dashboard/Warranty/WarrantyDashboardPage";
+import AuthGraphs from "./pages/department/teclab/graphs/AuthGraphs";
+import GraphsHomePage from "./pages/department/teclab/graphs/GraphsHomepage";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -89,9 +91,11 @@ const router = createBrowserRouter(
                     <Route path="dashboard" element={<AuthDashboard />}>
                         <Route index element={<DashboardPage />} />
                     </Route>
-
                     <Route path="dashboard2" element={<AuthWarrantyDashboard />}>
                         <Route index element={<WarrantyDashboardPage />} />
+                    </Route>
+                    <Route path="graphs" element={<AuthGraphs />}>
+                        <Route index element={<GraphsHomePage />} />
                     </Route>
 
                     <Route path="epc" element={<AuthEpc />}>
