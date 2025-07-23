@@ -579,8 +579,8 @@ def generate_send_csv_all(current_user_data: Annotated[User, Depends(get_current
 
 # """
 # Updates the director for each community change its changed
-def update_community_directors(new_data: Optional[str], community: str):
 # def update_community_directors(new_data: str | None, community: str):
+def update_community_directors(new_data: Optional[str], community: str):
     try:
         for doc in projects_coll.find({"project_info.community": community}).sort("project_info.meta_info.created_at", -1):
             if not doc["teclab_data"]["fosc_data"]["lot_status_finished"] and\

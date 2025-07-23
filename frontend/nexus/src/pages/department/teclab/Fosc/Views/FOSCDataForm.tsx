@@ -45,9 +45,11 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
     const axios = useAxiosPrivate();
 
     const ALL_DIRECTORS = ["J.Marcinkevich", "T.Burke", "B.Keller", "J.Wood", "M.Mugler"]
+    ALL_DIRECTORS.sort()
     const ALL_PMS = ["P.Monge", "D.Johnson", "T.Burke", "M.Hardy", "P.Riley", "E.Phelps", "L.Saunders",
         "A.Ghannam", "W.Wallace", "P.Shaw", "S.Lambert", "C.Montgomery", "J.Bruce", "R.Adenauer",
-        "R.Kelley", "F.Cole", "J.Fleming", "D.Stosser", "M.Mugler"]
+        "R.Kelley", "F.Cole", "J.Fleming", "D.Stosser", "M.Mugler", "Sam Taylor"]
+    ALL_PMS.sort()
 
     type IFormData = {
         all_communities: string[];
