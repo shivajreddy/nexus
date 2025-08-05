@@ -19,3 +19,4 @@ function Graph1() {
 }
 
 export default Graph1
+

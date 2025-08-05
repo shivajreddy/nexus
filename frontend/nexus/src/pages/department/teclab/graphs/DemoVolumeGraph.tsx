@@ -119,6 +119,11 @@ const chartData = [
     { date: "2024-06-27", desktop: 448, mobile: 490 },
     { date: "2024-06-28", desktop: 149, mobile: 200 },
     { date: "2024-06-29", desktop: 103, mobile: 160 },
+    { date: "2024-06-29", desktop: 103, mobile: 160 },
+    { date: "2024-06-29", desktop: 103, mobile: 160 },
+    { date: "2024-06-29", desktop: 103, mobile: 160 },
+    { date: "2024-06-29", desktop: 103, mobile: 160 },
+    { date: "2024-06-29", desktop: 103, mobile: 160 },
     { date: "2024-06-30", desktop: 446, mobile: 400 },
 ]
 
@@ -136,7 +141,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DemoGraph() {
+export function DemoVolumeGraph() {
     const [timeRange, setTimeRange] = React.useState("90d")
 
     const filteredData = chartData.filter((item) => {
@@ -157,7 +162,7 @@ export function DemoGraph() {
         <Card className="pt-0">
             <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
                 <div className="grid flex-1 gap-1">
-                    <CardTitle>Area Chart - Interactive</CardTitle>
+                    <CardTitle>Demo Volume Chart - Interactive</CardTitle>
                     <CardDescription>
                         Showing total visitors for the last 3 months
                     </CardDescription>

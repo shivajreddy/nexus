@@ -23,6 +23,7 @@ import LoadingSpinner2 from "@components/common/LoadingSpinner2.tsx";
 import { BASE_URL } from "@/services/api";
 import { ColDef, ColGroupDef, GridOptions } from "ag-grid-community";
 import { CgMenuGridO } from "react-icons/cg";
+import { FaPencil } from "react-icons/fa6";
 // import { useAppSelector } from "@redux/hooks.ts";
 // import { selectCurrentUser } from "@/features/auth/authSlice.ts";
 
@@ -46,7 +47,7 @@ function Epc() {
                 const response = await axios.get('/department/teclab/epc/live');
                 // const response = await axios.get('/department/teclab/epc/all');
                 // console.log("response=", response);
-                // console.log("😆 response.data=", response.data);
+                console.log("😆 response.data=", response.data);
                 // setLotData(response.data);
                 const backendData = response.data;
                 // Data transformation
@@ -76,6 +77,7 @@ function Epc() {
                     plat_received: item.plat_received ? format(new Date(item.plat_received), 'MM/dd/yyyy') : null,
                     permit_submitted: item.permitting_submitted ? format(new Date(item.permitting_submitted), 'MM/dd/yyyy') : null,
                     permit_received: item.permitting_received ? format(new Date(item.permitting_received), 'MM/dd/yyyy') : null,
+                    permithold_start: item.permithold_start ? format(new Date(item.permithold_start), 'MM/dd/yyyy') : null,
                     bbp_posted: item.bbp_posted ? format(new Date(item.bbp_posted), 'MM/dd/yyyy') : null,
                     drafter_name: item.drafting_drafter,
                     engineer_name: item.engineering_engineer,
@@ -83,7 +85,7 @@ function Epc() {
                     county: item.permitting_county_name,
                     notes: item.notes,
                 }));
-                // console.log("transformed 😇 data=", transformedData);
+                console.log("transformed 😇 data=", transformedData);
                 setAllEPCLots(transformedData);
                 setFetchLotDataStatus('success');
             } catch (e: any) {
@@ -103,16 +105,18 @@ function Epc() {
 
         const viewerColDef = epcColumnDefinitions;
         const editorColDef: ColGroupDef[] = [
-
             {
-                headerName: "✍🏻",
+                // headerName: "✍🏻",
+                headerName: "E",
                 children: [
                     {
                         field: 'edit',
                         headerName: '',
                         sortable: false,
                         filter: false,
-                        width: 50,
+                        width: 38,
+                        // cellStyle: { 'paddingLeft': 0, 'paddingRight': 0 },
+                        cellStyle: { 'paddingLeft': 2, 'paddingRight': 2 },
                         pinned: "left",
                         cellClass: ["editor-only"],
                         headerTooltip: "Edit Lot",
@@ -121,15 +125,16 @@ function Epc() {
                         cellRenderer: (params: any) => {
                             return (
                                 <a
-                                    // href={`edit/${params.data.project_uid}`}
+                                    href={`epc/edit/${params.data.project_uid}`}
                                     className={"flex justify-center items-center m-0 p-0 cursor-pointer w-8 h-10"}
                                     data-id={params.data.id}
-                                    onClick={() => navigate(`edit/${params.data.project_uid}`)}
+                                // onClick={() => navigate(`edit/${params.data.project_uid}`)}
                                 >
-                                    <PiPencilSimpleFill />
+                                    <FaPencil className="text-blue-600" />
+                                    {/* <FaPencil style={{ color: "#1DB954" }} /> */}
+                                    {/* <PiPencilSimpleFill /> */}
                                 </a>
                             )
-
                         }
                     }
                 ]

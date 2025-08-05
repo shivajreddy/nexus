@@ -150,6 +150,7 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                     homesiting_requested_on: lotData.epc_data.homesiting_requested_on ? new Date(lotData.epc_data.homesiting_requested_on) : undefined,
                     homesiting_completed_on: lotData.epc_data.homesiting_completed_on ? new Date(lotData.epc_data.homesiting_completed_on) : undefined,
                     homesiting_completed_by: lotData.epc_data.homesiting_completed_by,
+                    homesiting_notes: lotData.epc_data.homesiting_notes,
 
                     project_id: lotData.project_info.project_id,
                     project_uid: lotData.project_info.project_uid,
@@ -165,24 +166,29 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                     drafting_drafter: lotData.epc_data.drafting_drafter,
                     drafting_assigned_on: lotData.epc_data.drafting_assigned_on ? new Date(lotData.epc_data.drafting_assigned_on) : undefined,
                     drafting_finished: lotData.epc_data.drafting_finished ? new Date(lotData.epc_data.drafting_finished) : undefined,
+                    drafting_notes: lotData.epc_data.drafting_notes,
 
                     engineering_engineer: lotData.epc_data.engineering_engineer,
                     engineering_sent: lotData.epc_data.engineering_sent ? new Date(lotData.epc_data.engineering_sent) : undefined,
                     engineering_received: lotData.epc_data.engineering_received ? new Date(lotData.epc_data.engineering_received) : undefined,
+                    engineering_notes: lotData.epc_data.engineering_notes,
 
                     plat_engineer: lotData.epc_data.plat_engineer,
                     plat_sent: lotData.epc_data.plat_sent ? new Date(lotData.epc_data.plat_sent) : undefined,
                     plat_received: lotData.epc_data.plat_received ? new Date(lotData.epc_data.plat_received) : undefined,
+                    plat_notes: lotData.epc_data.plat_notes,
 
                     permitting_county_name: lotData.epc_data.permitting_county_name,
                     permitting_submitted: lotData.epc_data.permitting_submitted ? new Date(lotData.epc_data.permitting_submitted) : undefined,
                     permitting_received: lotData.epc_data.permitting_received ? new Date(lotData.epc_data.permitting_received) : undefined,
+                    permitting_notes: lotData.epc_data.permitting_notes,
+                    permithold_start: lotData.epc_data.permithold_start ? new Date(lotData.epc_data.permithold_start) : undefined,
 
                     bbp_posted: lotData.epc_data.bbp_posted ? new Date(lotData.epc_data.bbp_posted) : undefined,
 
                     notes: lotData.epc_data.notes
                 };
-                // console.log("transformedData=", transformedData);
+                console.log("transformedData=", transformedData);
                 // Set the data to the lot-state
                 setSelectedProjectsTECLabEPCData(transformedData);
                 setStatusEPCDataFetch("success");
@@ -249,6 +255,7 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                     value={selectedProjectsTECLabEPCData.contract_date}
                                     onUpdate={(newValue) => handleStateChange('contract_date', newValue)}
                                 />
+                                <div className="w-[50%] my-2 border-b border border-gray-200 mx-auto" />
                                 <FieldDropDown id="1_community"
                                     disabled
                                     name={"Community"}
@@ -268,6 +275,7 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                     value={selectedProjectsTECLabEPCData.lot_number}
                                     onUpdate={(e) => handleStateChange('lot_number', e.target.value)}
                                 />
+                                <div className="w-[50%] my-2 border-b border border-gray-200 mx-auto" />
                                 <FieldDropDown id="1_product"
                                     name={"Product"}
                                     dropdownData={formData.all_products}
@@ -279,6 +287,12 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                     dropdownData={formData.all_elevations}
                                     value={selectedProjectsTECLabEPCData.elevation_name}
                                     onUpdate={(newValue) => handleStateChange('elevation_name', newValue)}
+                                />
+                                <div className="w-[50%] my-2 border-b border border-gray-200 mx-auto" />
+                                <FieldDate id="1_ph_tostart_date"
+                                    name="P.H. Start"
+                                    value={selectedProjectsTECLabEPCData.permithold_start}
+                                    onUpdate={(newValue) => handleStateChange('permithold_start', newValue)}
                                 />
                             </CardContent>
                         </Card>
@@ -307,6 +321,10 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                         value={selectedProjectsTECLabEPCData.drafting_finished}
                                         onUpdate={newDate => handleStateChange('drafting_finished', newDate)}
                                     />
+                                    <Textarea id="2_drafting_notes" placeholder="Drafting specific notes ..."
+                                        value={selectedProjectsTECLabEPCData.drafting_notes ?? ""}
+                                        onChange={newNotes => handleStateChange('drafting_notes', newNotes.target.value)}
+                                    />
                                 </CardContent>
                             </Card>
 
@@ -331,6 +349,10 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                         name="Received On"
                                         value={selectedProjectsTECLabEPCData.engineering_received}
                                         onUpdate={newDate => handleStateChange('engineering_received', newDate)}
+                                    />
+                                    <Textarea id="3_engineering_notes" placeholder="Engineering specific notes ..."
+                                        value={selectedProjectsTECLabEPCData.engineering_notes ?? ""}
+                                        onChange={newNotes => handleStateChange('engineering_notes', newNotes.target.value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -360,6 +382,10 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                         value={selectedProjectsTECLabEPCData.plat_received}
                                         onUpdate={newDate => handleStateChange('plat_received', newDate)}
                                     />
+                                    <Textarea id="4_plat_notes" placeholder="Plat specific notes ..."
+                                        value={selectedProjectsTECLabEPCData.plat_notes ?? ""}
+                                        onChange={newNotes => handleStateChange('plat_notes', newNotes.target.value)}
+                                    />
                                 </CardContent>
                             </Card>
 
@@ -384,6 +410,10 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                         name="Received on"
                                         value={selectedProjectsTECLabEPCData.permitting_received}
                                         onUpdate={newDate => handleStateChange('permitting_received', newDate)}
+                                    />
+                                    <Textarea id="5_permitting_notes" placeholder="Permitting specific notes ..."
+                                        value={selectedProjectsTECLabEPCData.permitting_notes ?? ""}
+                                        onChange={newNotes => handleStateChange('permitting_notes', newNotes.target.value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -411,6 +441,10 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                                     dropdownData={formData.all_homesiting_drafters}
                                     value={selectedProjectsTECLabEPCData.homesiting_completed_by}
                                     onUpdate={newValue => handleStateChange('homesiting_completed_by', newValue)}
+                                />
+                                <Textarea id="6_homesiting_notes" placeholder="Home Siting specific notes ..."
+                                    value={selectedProjectsTECLabEPCData.homesiting_notes ?? ""}
+                                    onChange={newNotes => handleStateChange('homesiting_notes', newNotes.target.value)}
                                 />
                                 {/* <FieldDate id="homesiting_feedback_received_date" */}
                                 {/*     name="Feedback Received On" */}
@@ -445,7 +479,7 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                             </CardHeader>
                             <CardContent>
                                 {/* ! TODO: provide the onChange handler for the Textarea content cuz i am giving the value to begin with*/}
-                                <Textarea placeholder="Your notes here..."
+                                <Textarea placeholder="General notes ..."
                                     value={selectedProjectsTECLabEPCData.notes ?? ""}
                                     onChange={newNotes => handleStateChange('notes', newNotes.target.value)}
                                 />

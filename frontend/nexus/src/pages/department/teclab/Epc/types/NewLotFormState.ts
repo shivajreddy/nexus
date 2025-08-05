@@ -14,6 +14,8 @@ type TECLabEPCData = {
     community?: string;
     section_number?: string;
     lot_number?: string;
+
+    // Contract details
     contract_date?: Date;
     contract_type?: string;
     product_name?: string;
@@ -23,27 +25,33 @@ type TECLabEPCData = {
     drafting_drafter?: string;
     drafting_assigned_on?: Date;
     drafting_finished?: Date;
+    drafting_notes?: string;
 
     // Engineering
     engineering_engineer?: string;
     engineering_sent?: Date;
     engineering_received?: Date;
+    engineering_notes?: string;
 
     // Plat
     plat_engineer?: string;
     plat_sent?: Date;
     plat_received?: Date;
+    plat_notes?: string;
 
     // Permitting
     permitting_county_name?: string;
     permitting_submitted?: Date;
     permitting_received?: Date;
+    permitting_notes?: string;
+    permithold_start?: Date;
 
     // Homesiting
     homesiting_requested_on?: Date;
     homesiting_completed_by?: string;
     homesiting_completed_on?: Date;
     homesiting_feedback_received_date?: Date;
+    homesiting_notes?: string;
 
     // BBP
     bbp_posted?: Date;

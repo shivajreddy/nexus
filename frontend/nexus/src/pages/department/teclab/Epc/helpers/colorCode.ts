@@ -1,20 +1,20 @@
-import {CellClassParams} from "ag-grid-community";
+import { CellClassParams } from "ag-grid-community";
 
 // styles to mark the cells whose task is not finished yet
-const style_1 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #2d711e'};
-const style_2 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #40a02b'};
-const style_3 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #1e66f5'};
-const style_4 = {color: "white",boxShadow: 'inset 0px 0px 20px 1px #df8e1d'};
-const style_5 = {color: "black",boxShadow: 'inset 0px 0px 20px 1px #df5301'};
-const style_6 = {color: "black", boxShadow: 'inset 0px 0px 20px 1px #d20f39'};
+const style_1 = { color: "black", boxShadow: 'inset 0px 0px 20px 1px #2d711e' };
+const style_2 = { color: "black", boxShadow: 'inset 0px 0px 20px 1px #40a02b' };
+const style_3 = { color: "black", boxShadow: 'inset 0px 0px 20px 1px #1e66f5' };
+const style_4 = { color: "white", boxShadow: 'inset 0px 0px 20px 1px #df8e1d' };
+const style_5 = { color: "black", boxShadow: 'inset 0px 0px 20px 1px #df5301' };
+const style_6 = { color: "black", boxShadow: 'inset 0px 0px 20px 1px #d20f39' };
 
 // Complimentary styles to mark the cells that have already finished the task
-const style_1_comp = {color: "#2d711e", fontWeight: 600};
-const style_2_comp = {color: "#40a02b", fontWeight: 600};
-const style_3_comp = {color: "#1e66f5", fontWeight: 600};
-const style_4_comp = {color: "#df8e1d", fontWeight: 600};
-const style_5_comp = {color: "#df5301", fontWeight: 600};
-const style_6_comp = {color: "#d20f39", fontWeight: 600}
+const style_1_comp = { color: "#2d711e", fontWeight: 600 };
+const style_2_comp = { color: "#40a02b", fontWeight: 600 };
+const style_3_comp = { color: "#1e66f5", fontWeight: 600 };
+const style_4_comp = { color: "#df8e1d", fontWeight: 600 };
+const style_5_comp = { color: "#df5301", fontWeight: 600 };
+const style_6_comp = { color: "#d20f39", fontWeight: 600 }
 
 
 /*
@@ -121,7 +121,6 @@ function getStyle(startDate: string, finishDate: string | null, taskDuration: nu
             return style_1;
         }
     }
-
 }
 
 
@@ -146,7 +145,12 @@ function colorCode(params: CellClassParams) {
     }
     if (params.column.getId() === 'bbp_posted') {
         // return getColorScheme(params.data['permit_received'], params.value, 5);
-        return getStyle(params.data['permit_received'], params.value, 5);
+        // return getStyle(params.data['permit_received'], params.value, 5);
+        return getStyle(
+            params.data['permithold_start'] ?? params.data['permit_received'],
+            params.value,
+            5
+        );
     }
 }
 
