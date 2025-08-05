@@ -209,10 +209,24 @@ def get_current_month_ticker_data():
     bbp_posted_values = []
     bbp_posted_projects = []
     for p in filtered_projects:
-        if not p.teclab_data.epc_data.contract_date or not p.teclab_data.epc_data.bbp_posted or not p.teclab_data.epc_data.permitting_received:
+        if not p.teclab_data.epc_data.contract_date:
             continue
-        delta = p.teclab_data.epc_data.bbp_posted - p.teclab_data.epc_data.permitting_received
+        if not p.teclab_data.epc_data.bbp_posted:
+            continue
+        date_that_matters = (p.teclab_data.epc_data.permithold_start if p.teclab_data.epc_data.permithold_start is not None else p.teclab_data.epc_data.permitting_received)
+        if not date_that_matters: 
+            continue
+        # delta = p.teclab_data.epc_data.bbp_posted - p.teclab_data.epc_data.permitting_received
+        delta = p.teclab_data.epc_data.bbp_posted - date_that_matters   # Time taken to post buildbyplans
         days_taken_for_bbp_posted = max(0, round(delta.total_seconds() / 86400))
+        if(days_taken_for_bbp_posted == 78):
+            print("here stoppppp")
+            print(p.project_info)
+            print("delta:", delta)
+            print("p.teclab_data.epc_data.bbp_posted", p.teclab_data.epc_data.bbp_posted)
+            print("p.teclab_data.epc_data.permithold_start", p.teclab_data.epc_data.permithold_start)
+            print("p.teclab_data.epc_data.permitting_received", p.teclab_data.epc_data.permitting_received)
+            print("date_that_matters", date_that_matters)
         bbp_posted_projects.append(p)
         bbp_posted_values.append(days_taken_for_bbp_posted)
     
@@ -234,6 +248,8 @@ def get_current_month_ticker_data():
         bbp_posted_projects,
         lambda p: p.teclab_data.epc_data.bbp_posted.year == current_year and p.teclab_data.epc_data.bbp_posted.month == previous_month
     )
+    print("bbp_posted_min_previous_month", bbp_posted_min_previous_month)
+    print("bbp_posted_max_previous_month", bbp_posted_max_previous_month)
 
     res = {
     "CURRENT MONTH": {
