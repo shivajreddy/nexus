@@ -12,7 +12,7 @@ from app.database.schemas.department_data import EPCData
 from app.security.oauth2 import get_current_user_data
 
 """
-Endpoing: /department/teclab/graphs
+Endpoint: /department/teclab/graphs
 Purpose:
   - API for all graphs
 """

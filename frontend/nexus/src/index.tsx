@@ -54,11 +54,11 @@ import AuthEpcChanges from "./pages/department/teclab/Epc/AuthEpcChanges";
 import AuthDashboard from "./pages/department/teclab/Dashboard/AuthDashboard";
 import AuthProjects from "./pages/Project/AuthProjects";
 
-import React, { useState } from "react";
 import AuthWarrantyDashboard from "./pages/department/teclab/Dashboard/Warranty/AuthWarrantyDashboard";
 import WarrantyDashboardPage from "./pages/department/teclab/Dashboard/Warranty/WarrantyDashboardPage";
 import AuthGraphs from "./pages/department/teclab/graphs/AuthGraphs";
 import GraphsHomePage from "./pages/department/teclab/graphs/GraphsHomepage";
+import { SaveProject } from "./pages/dev/project/SaveProject";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -82,8 +82,7 @@ const router = createBrowserRouter(
                     {/*<Route path="epc" element={<EpcTest1/>}/>*/}
 
                     <Route path="projects" element={<AuthProjects />}>
-                        <Route index element={<Projects />}
-                        />
+                        <Route index element={<Projects />} />
                         {/* <Route path="search" element={<FindProject />} /> */}
                         {/* <Route path="new" element={} /> */}
                     </Route>
@@ -148,6 +147,9 @@ const router = createBrowserRouter(
 
             {/* 404 Page */}
             < Route path="*" element={< PageNotFound />} />
+
+            {/* DEV PAGES : UNDER DEVELOPMENT*/}
+            <Route path="/dev/saveproject/p1" element={<SaveProject />} />
 
         </Route>
     )

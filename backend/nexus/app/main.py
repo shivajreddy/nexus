@@ -21,8 +21,9 @@ from app.router.department.teclab.dashboardWarranty import router as warranty_da
 from app.router.department.teclab.epc import router as teclab_epc_router
 from app.router.department.teclab.cor import router as teclab_cor_router
 from app.router.department.teclab.fosc import router as teclab_fosc_router
-from app.router.testing.test1 import router as testing_router
 from app.router.projects.projects import router as projects_router
+
+from app.router.dev.test1 import router as test1_router
 
 from app.sockets.sockets import sio_app
 
@@ -45,8 +46,9 @@ async def lifespan(app: FastAPI):
 
     # app.include_router(teclab_fosc_router)
     app.include_router(teclab_fosc_router)
-    app.include_router(testing_router)
     app.include_router(projects_router)
+
+    app.include_router(test1_router)
     yield
 
 
