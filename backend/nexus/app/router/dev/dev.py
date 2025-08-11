@@ -1,4 +1,7 @@
+from datetime import datetime
+from typing import Optional
 from fastapi import APIRouter
+from app.database.schemas.department_data import EPCData
 from app.settings.config import settings
 from app.security.oauth2 import get_current_user_data
 
@@ -18,6 +21,58 @@ router = APIRouter(prefix="/dev")
 @router.get("/", response_model=dict)
 def dev():
     return {"TEST" : "OK"}
+
+
+@router.get("/ihms/epcdata", response_model=dict, dependencies=[Depends(get_current_user_data)])
+async def get_epc_fields():
+    community = "RB"
+    section = "S7"
+    lot_number = "28"
+    try:
+        # Make API call to IHMS
+        house_number = await get_house_number(community, section, lot_number)
+        print("::::HOUSE NUMBER::::", house_number)
+        res = await get_house_data(community, house_number)
+        # print(res)
+        epc_data = extract_epc_data(res)
+        return {"EPCDATA": epc_data}
+    except httpx.ConnectError as e:
+        # Handle connection errors
+        raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")
+    except httpx.TimeoutException:
+        # Handle timeout errors
+        raise HTTPException(status_code=504, detail="Request timed out")
+    except Exception as e:
+        # Handle other errors
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+def parse_date(value: str) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%m/%d/%Y")
+    except ValueError:
+        try:
+            return datetime.strptime(value, "%Y-%m-%d")
+        except ValueError:
+            return None
+
+def extract_epc_data(house_data: dict) -> EPCData:
+    return EPCData(
+        contract_date=parse_date(house_data.get("CONTRACT_DATE")),
+        product_name=house_data.get("MODELCODE"),
+        elevation_name=house_data.get("ELEVATIONCODE"),
+        drafting_drafter=house_data.get("DRAFTEDBY"),
+        drafting_notes=house_data.get("NOTES"),
+        engineering_engineer=house_data.get("STRUCTURALCO"),
+        engineering_sent=parse_date(house_data.get("ENGORDEREDDATE")),
+        engineering_received=parse_date(house_data.get("ENGRECVDDATE")),
+        plat_sent=parse_date(house_data.get("PLATORDEREDDATE")),
+        plat_received=parse_date(house_data.get("PLATRECDATE")),
+        permitting_submitted=parse_date(house_data.get("PERMIT_DATE")),
+        permitting_notes=house_data.get("REMARKS"),
+        homesiting_completed_on=parse_date(house_data.get("HOMESITERPRTDATE")),
+    )
 
 @router.get("/ihms/test", response_model=dict, dependencies=[Depends(get_current_user_data)])
 async def test():
@@ -52,6 +107,7 @@ async def get_house_number(community, section, lot_number):
 
     # https://api.ecimarksystems.com/rest/EVA/companies/001/developments/RB/houses
     url = f"{IHMS_api_endpoint}/companies/{IHMS_company_code}/developments/{IHMS_development_code}/houses"
+    # TODO: save the access_token and get a new one only after it expires
     access_token = await get_access_token()
     headers = {
         "Content-Type" : "application/json",
@@ -128,6 +184,7 @@ async def get_house_data(community, house_number):
 GET ACCESSTOKEN FROM IHMS 
 Client-id & Client-Secret are from IHMS Developer account
 """
+# TODO: save the access_token and get a new one only after it expires
 async def get_access_token():
     print("GOING TO GET ACCESSTOKEN FROM IHMS")
     url = "https://api.ecimarksystems.com/accesstoken"
