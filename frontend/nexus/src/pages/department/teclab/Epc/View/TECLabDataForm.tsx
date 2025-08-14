@@ -127,8 +127,7 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
             // console.log("all_field_ops_members:", fieldOpsMembersResponse.data);
         }
 
-        getData().then(() => {
-        });
+        getData();
     }, [])
 
     // + Fetch the chosen project's TEC-lab data
@@ -198,8 +197,7 @@ const TECLabDataForm = ({ project_id, project_uid, statusEPCDataFetch, setStatus
                 console.error(e);
             }
         };
-        fetchSelectedProjectTECLabEPCData().then(() => {
-        })
+        fetchSelectedProjectTECLabEPCData();
     }, [project_uid])
 
     return (

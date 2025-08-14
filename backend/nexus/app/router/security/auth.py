@@ -138,7 +138,7 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
 
 @router.get("/refresh")
 def refresh(request: Request):
-    print("🔥cookies:", request.cookies)
+    # print("🔥cookies:", request.cookies)
 
     if "refresh_token" not in request.cookies:
         raise HTTPException(

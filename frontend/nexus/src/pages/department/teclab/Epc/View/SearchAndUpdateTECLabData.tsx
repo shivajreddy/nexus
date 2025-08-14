@@ -1,10 +1,11 @@
 import MainLayout from "@templates/MainLayout.tsx";
-import {TiArrowBack} from "react-icons/ti";
-import {useNavigate} from "react-router-dom";
-import {Button} from "@components/ui/button.tsx";
-import {useState} from "react";
+import { TiArrowBack } from "react-icons/ti";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@components/ui/button.tsx";
+import { useState } from "react";
 // import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
-import TECLabDataForm from "@pages/department/teclab/Epc/View/TECLabDataForm.tsx";
+// import TECLabDataForm from "@pages/department/teclab/Epc/View/TECLabDataForm.tsx";
+import TECLabDataFormWithIHMS from "@/pages/dev/TECLabDataFormWithIHMS";
 // import {ScrollArea} from "@components/ui/scroll-area.tsx";
 import ProjectFinderWithResults from "@pages/Project/ProjectFinderWithResults.tsx";
 
@@ -37,8 +38,8 @@ function SearchAndUpdateTECLabData() {
                         {/* TODO: this should be role specific*/}
                         <div className="flex justify-center items-center">
                             <Button variant="default" className="w-40 flex justify-center items-center"
-                                    onClick={() => navigate('/epc')}>
-                                <p className="pr-2"><TiArrowBack/></p>
+                                onClick={() => navigate('/epc')}>
+                                <p className="pr-2"><TiArrowBack /></p>
                                 Back to EPC
                             </Button>
                         </div>
@@ -56,12 +57,12 @@ function SearchAndUpdateTECLabData() {
                 </div>
 
                 {chosenProject &&
-                  <TECLabDataForm className="ml-4 pt-2"
-                                  statusEPCDataFetch={statusEPCDataFetch}
-                                  setStatusEPCDataFetch={setStatusEPCDataFetch}
-                                  project_id={chosenProject.project_id}
-                                  project_uid={chosenProject.project_uid}
-                  />
+                    <TECLabDataFormWithIHMS className="ml-4 pt-2"
+                        statusEPCDataFetch={statusEPCDataFetch}
+                        setStatusEPCDataFetch={setStatusEPCDataFetch}
+                        project_id={chosenProject.project_id}
+                        project_uid={chosenProject.project_uid}
+                    />
                 }
 
             </div>
@@ -71,3 +72,11 @@ function SearchAndUpdateTECLabData() {
 
 
 export default SearchAndUpdateTECLabData;
+
+
+{/* <TECLabDataForm className="ml-4 pt-2" */ }
+{/*                 statusEPCDataFetch={statusEPCDataFetch} */ }
+{/*                 setStatusEPCDataFetch={setStatusEPCDataFetch} */ }
+{/*                 project_id={chosenProject.project_id} */ }
+{/*                 project_uid={chosenProject.project_uid} */ }
+{/* /> */ }

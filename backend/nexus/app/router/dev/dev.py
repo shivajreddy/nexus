@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter
-from app.database.schemas.department_data import EPCData
+from pydantic import BaseModel
+from app.logger import logger
+from app.database.schemas.department_data import IHMSFilteredHouseData, IHMSHouseData
+from app.router.utils import find_project
 from app.settings.config import settings
 from app.security.oauth2 import get_current_user_data
 
@@ -18,61 +21,90 @@ Purpose:
 
 router = APIRouter(prefix="/dev")
 
-@router.get("/", response_model=dict)
-def dev():
-    return {"TEST" : "OK"}
+
+class IHMSHouseId(BaseModel):
+    c: str
+    s: str
+    l: str
+
+@router.get("/test", response_model=dict)
+def dev(houseId: IHMSHouseId):
+    return {"TEST" : "OK", "data": houseId.model_dump()}
 
 
-@router.get("/ihms/epcdata", response_model=dict, dependencies=[Depends(get_current_user_data)])
-async def get_epc_fields():
-    community = "RB"
-    section = "S7"
-    lot_number = "28"
+from app.router.utils.find_project import find_project
+@router.get(path='/get/{project_uid}', dependencies=[Depends(get_current_user_data)])
+def get_epc_data_with_project_uid(project_uid: str):
+    target_project = find_project(project_uid)
+
+    # return target_project["teclab_data"]["epc_data"]
+    result_project = {
+        "project_info": target_project["project_info"],
+        "epc_data": target_project["teclab_data"]["epc_data"]
+    }
+    return result_project
+
+@router.get("/ihms/get/{project_uid}", dependencies=[Depends(get_current_user_data)])
+async def get_epc_fields(project_uid: str):
     try:
+        target_project = find_project(project_uid)
+        project_info = target_project["project_info"]
+        parts = project_info["project_id"].split('-')
+        community, section, lot_number = parts[0], "S"+parts[1], parts[2]
+        if len(lot_number) == 1: 
+            lot_number = "0"+lot_number
+        
+        logger.info(f"Searching IHMS: community={community}, section={section}, lot_number={lot_number}")
+        
         # Make API call to IHMS
         house_number = await get_house_number(community, section, lot_number)
-        print("::::HOUSE NUMBER::::", house_number)
-        res = await get_house_data(community, house_number)
-        # print(res)
-        epc_data = extract_epc_data(res)
-        return {"EPCDATA": epc_data}
-    except httpx.ConnectError as e:
-        # Handle connection errors
-        raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")
-    except httpx.TimeoutException:
-        # Handle timeout errors
-        raise HTTPException(status_code=504, detail="Request timed out")
+        if house_number is None or house_number == "": 
+            logger.error(f"Couldn't get IHMS house number using {community}-{section}-{lot_number}")
+            return {
+                "error": "House not found in IHMS",
+                "details": f"No house found for {community}-{section}-{lot_number}"
+            }
+        
+        logger.info(f"Found IHMS house number: {house_number}")
+        ihms_house_data = await get_ihms_house_data(community, house_number)
+        ihms_filtered_data = filter_ihms_house_data(ihms_house_data)
+
+        # Debug: Check what's actually being returned
+        # print("Before return - filtered_data:", ihms_filtered_data.model_dump())
+
+        return {
+            "IHMS_HOUSE_DATA": ihms_house_data.model_dump(by_alias=True),
+            "IHMS_FILTERED_DATA": ihms_filtered_data.model_dump(by_alias=True),
+            "metadata": {
+                "community": community,
+                "section": section, 
+                "lot_number": lot_number,
+                "house_number": house_number
+            }
+        }
+        
     except Exception as e:
-        # Handle other errors
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+        logger.error(f"Error fetching IHMS data: {str(e)}")
+        return {
+            "error": "Failed to fetch IHMS data",
+            "details": str(e)
+        }
 
-def parse_date(value: str) -> Optional[datetime]:
-    if not value:
-        return None
-    try:
-        return datetime.strptime(value, "%m/%d/%Y")
-    except ValueError:
-        try:
-            return datetime.strptime(value, "%Y-%m-%d")
-        except ValueError:
-            return None
 
-def extract_epc_data(house_data: dict) -> EPCData:
-    return EPCData(
-        contract_date=parse_date(house_data.get("CONTRACT_DATE")),
-        product_name=house_data.get("MODELCODE"),
-        elevation_name=house_data.get("ELEVATIONCODE"),
-        drafting_drafter=house_data.get("DRAFTEDBY"),
-        drafting_notes=house_data.get("NOTES"),
-        engineering_engineer=house_data.get("STRUCTURALCO"),
-        engineering_sent=parse_date(house_data.get("ENGORDEREDDATE")),
-        engineering_received=parse_date(house_data.get("ENGRECVDDATE")),
-        plat_sent=parse_date(house_data.get("PLATORDEREDDATE")),
-        plat_received=parse_date(house_data.get("PLATRECDATE")),
-        permitting_submitted=parse_date(house_data.get("PERMIT_DATE")),
-        permitting_notes=house_data.get("REMARKS"),
-        homesiting_completed_on=parse_date(house_data.get("HOMESITERPRTDATE")),
-    )
+def filter_ihms_house_data(house_data: IHMSHouseData) -> IHMSFilteredHouseData:
+    house_dict = house_data.model_dump(by_alias=True)
+    
+    # Use aliases as keys (assuming all fields have aliases)
+    filtered_data = {
+        field_info.alias: house_dict.get(field_info.alias)  # type: ignore
+        for field_info in IHMSFilteredHouseData.model_fields.values()
+    }
+    
+    # Create model using alias keys
+    result = IHMSFilteredHouseData.model_validate(filtered_data, from_attributes=False)
+    
+    return result
+
 
 @router.get("/ihms/test", response_model=dict, dependencies=[Depends(get_current_user_data)])
 async def test():
@@ -83,7 +115,7 @@ async def test():
         # Make API call to IHMS
         house_number = await get_house_number(community, section, lot_number)
         print("::::HOUSE NUMBER is", house_number)
-        res = await get_house_data(community, house_number)
+        res = await get_ihms_house_data(community, house_number)
         print("res:💡💡")
         # print(res)
         return {"TEST": "WARRANTY DASHBOARDS", "data": res}
@@ -100,7 +132,7 @@ async def test():
 """
 GET the house number
 """
-async def get_house_number(community, section, lot_number):
+async def get_house_number(community, section, lot_number) -> str:
     IHMS_api_endpoint = "https://api.ecimarksystems.com/rest/EVA"
     IHMS_company_code = "001"
     IHMS_development_code = community
@@ -130,9 +162,11 @@ async def get_house_number(community, section, lot_number):
             if response.status_code == 200:
                 all_houses = response.json()
             else:
-                return {"error": f"API returned status code {response.status_code}", "details": response.text}
+                logger.error(f"API returned status code {response.status_code} \ndetails: {response.text}")
+                return ""
         except httpx.RequestError as e:
-            return {"error": f"Request failed: {str(e)}"}
+            logger.error(f"Request failed: {str(e)}")
+            return ""
 
     # Find the house from the list of houses in the entire community
     # NOTE: finds the first house that matches with Community & Seciton & Lot.
@@ -142,6 +176,7 @@ async def get_house_number(community, section, lot_number):
         if house["BLOCKNUMBER"] == section and house["LOTNUMBER"] == lot_number:
             house_number = house["HOUSENUMBER"]
 
+    if house_number is None: return ""
     return house_number
 
 
@@ -149,35 +184,28 @@ async def get_house_number(community, section, lot_number):
 GET house details
 Makes a GET request to /authorization to get access_token
 """
-async def get_house_data(community, house_number):
+async def get_ihms_house_data(community: str, house_number: str) -> IHMSHouseData:
     IHMS_api_endpoint = "https://api.ecimarksystems.com/rest/EVA"
     IHMS_company_code = "001"
-    IHMS_development_code = community
-    IHMS_house_code = house_number
-
-    url = f"{IHMS_api_endpoint}/companies/{IHMS_company_code}/developments/{IHMS_development_code}/houses/{IHMS_house_code}"
+    url = f"{IHMS_api_endpoint}/companies/{IHMS_company_code}/developments/{community}/houses/{house_number}"
     access_token = await get_access_token()
     headers = {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
         "Authorization": access_token
     }
-    # print("::::MAKING REQUIEST TO", url, headers)
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(
-                url=url,
-                headers=headers,
-                timeout=10.0
-            )
-            # print("::::response::::", response)
-            
-            if response.status_code == 200:
-                return response.json()
-            else:
-                return {"error": f"API returned status code {response.status_code}", "details": response.text}
+            response = await client.get(url, headers=headers, timeout=10.0)
+            response.raise_for_status()  # raises for HTTP errors
+            data = response.json()
+            return IHMSHouseData(**data)  # always return Pydantic object
         except httpx.RequestError as e:
-            return {"error": f"Request failed: {str(e)}"}
+            raise RuntimeError(f"Request failed: {e}")
+        except httpx.HTTPStatusError as e:
+            raise RuntimeError(f"API returned status {e.response.status_code}: {e.response.text}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to parse IHMS data: {e}")
 
 
 """
@@ -218,13 +246,3 @@ async def get_access_token():
             return {"error": f"Request failed: {str(e)}"}
 
 
-
-
-
-@router.get("/newepcdata", response_model=dict)
-def new_epc_data():
-    # STEP 1: CONNECT TO IHMS
-    print("STARTING IHMS CONNECTION")
-
-    # Step 2: FILTER FOR THE TARGET PROJECT
-    # STEP 3: GET ALL THE REQUIRED FIELDS FROM THE PROJECT

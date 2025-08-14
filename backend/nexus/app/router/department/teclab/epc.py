@@ -9,7 +9,7 @@ from app.database.schemas.project import ContractInfo, ProjectInfo, ProjectMetaI
 from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.database.database import projects_coll 
-from app.database.schemas.department_data import CORData, UpdateTECLabData, EPCData
+from app.database.schemas.department_data import UpdateTECLabData, EPCData
 from app.database.schemas.user import User
 from app.email.utils import send_email_with_given_message_and_attachment
 from app.router.utils.find_project import find_project
@@ -82,7 +82,6 @@ def update_db():
     # return "updated db"
 
 
-# """
 @router.get('/all', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
 def get_all_lots():
     try:
@@ -103,13 +102,8 @@ def get_all_lots():
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
-# """
-
-
-@router.get(
-    path='/get/{project_uid}',
-    # response_model=
-    dependencies=[Depends(get_current_user_data)])
+# """ SENDING project_uid on param using GET
+@router.get(path='/get/{project_uid}', dependencies=[Depends(get_current_user_data)])
 def get_epc_data_with_project_uid(project_uid: str):
     target_project = find_project(project_uid)
 
@@ -119,6 +113,22 @@ def get_epc_data_with_project_uid(project_uid: str):
         "epc_data": target_project["teclab_data"]["epc_data"]
     }
     return result_project
+# """
+
+""" SENDING project_uid through body using POST(since we need body)
+class ProjectRequest(BaseModel):
+    project_uid: str
+@router.post(path='/get/', dependencies=[Depends(get_current_user_data)])
+def get_epc_data_with_project_uid(payload: ProjectRequest):
+    target_project = find_project(payload.project_uid)
+
+    # return target_project["teclab_data"]["epc_data"]
+    result_project = {
+        "project_info": target_project["project_info"],
+        "epc_data": target_project["teclab_data"]["epc_data"]
+    }
+    return result_project
+# """
 
 
 @router.post('/edit', dependencies=[Depends(get_current_user_data)])
@@ -445,7 +455,7 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
 
 # CUSTOM ROUTE: FOR BERTON EMAIL
 @router.get('/epc-backlog-tracker-custom-berton')
-def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+def generate_send_csv_2(current_user_data: Annotated[User, Depends(get_current_user_data)]):
     # query the data
     filtered_lots, result_data = query_tracker_data()
 

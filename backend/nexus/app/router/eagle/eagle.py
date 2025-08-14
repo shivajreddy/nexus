@@ -1,4 +1,3 @@
-from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
@@ -19,8 +18,9 @@ router = APIRouter(prefix="/eagle")
 @router.get(path='/departments', dependencies=[Depends(get_current_user_data)])
 def get_all_departments():
     departments_doc = eagle_data_coll.find_one({"table_name": "departments"})
+    if departments_doc is None: return []
     all_departments = departments_doc["departments_names"]
-    return all_departments
+    return all_departments if all_departments is not None else None
 
 
 # :: /communities
@@ -28,6 +28,7 @@ def get_all_departments():
 @router.get('/communities', dependencies=[Depends(get_current_user_data)])
 def get_all_communities():
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if communities_doc is None: return []
     return communities_doc["all_communities_names"]
 
 
@@ -35,6 +36,7 @@ def get_all_communities():
 @router.post("/communities", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def add_new_community(new_community: Community):
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if communities_doc is None: return []
     all_communities_names = communities_doc["all_communities_names"]
 
     new_community_name = new_community.community_name
@@ -49,14 +51,16 @@ def add_new_community(new_community: Community):
         {"$push": {"all_communities_names": new_community_name}}
     )
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if communities_doc is None: return []
     all_communities_names = communities_doc["all_communities_names"]
     return {"added": all_communities_names}
 
 
 # update a community
 @router.patch("/communities", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
-def delete_community(target_community: UpdateCommunity):
+def update_community(target_community: UpdateCommunity):
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if communities_doc is None: return []
     all_communities_names = communities_doc["all_communities_names"]
 
     target_community_name = target_community.target_community_name
@@ -74,6 +78,7 @@ def delete_community(target_community: UpdateCommunity):
     )
 
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if communities_doc is None: return []
     all_communities_names = communities_doc["all_communities_names"]
     return {"Updated. now": all_communities_names}
 
@@ -82,6 +87,7 @@ def delete_community(target_community: UpdateCommunity):
 @router.delete("/communities", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def delete_community(target_community: Community):
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if communities_doc is None: return []
     all_communities_names = communities_doc["all_communities_names"]
 
     target_community_name = target_community.community_name
@@ -94,6 +100,7 @@ def delete_community(target_community: Community):
         {"$pull": {"all_communities_names": target_community_name}}
     )
     communities_doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if communities_doc is None: return []
     all_communities_names = communities_doc["all_communities_names"]
     return {"deleted. now": all_communities_names}
 
@@ -103,6 +110,7 @@ def delete_community(target_community: Community):
 @router.get('/engineers', dependencies=[Depends(get_current_user_data)])
 def get_all_engineers():
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    if not engineers_doc: return []
     return engineers_doc["all_engineers_names"]
 
 
@@ -110,6 +118,7 @@ def get_all_engineers():
 @router.post("/engineers", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def add_new_engineer(new_engineer: Engineer):
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    if not engineers_doc: return []
     all_engineers_names = engineers_doc["all_engineers_names"]
 
     new_engineer_name = new_engineer.engineer_name
@@ -124,14 +133,16 @@ def add_new_engineer(new_engineer: Engineer):
         {"$push": {"all_engineers_names": new_engineer_name}}
     )
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    if not engineers_doc: return []
     all_engineers_names = engineers_doc["all_engineers_names"]
     return {"added": all_engineers_names}
 
 
 # update a engineer
 @router.patch("/engineers", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
-def delete_engineer(target_engineer: UpdateEngineer):
+def update_engineer(target_engineer: UpdateEngineer):
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    if not engineers_doc: return []
     all_engineers_names = engineers_doc["all_engineers_names"]
 
     target_engineer_name = target_engineer.target_engineer_name
@@ -149,6 +160,7 @@ def delete_engineer(target_engineer: UpdateEngineer):
     )
 
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    if not engineers_doc: return []
     all_engineers_names = engineers_doc["all_engineers_names"]
     return {"Updated. now": all_engineers_names}
 
@@ -157,6 +169,7 @@ def delete_engineer(target_engineer: UpdateEngineer):
 @router.delete("/engineers", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def delete_engineer(target_engineer: Engineer):
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    if not engineers_doc: return []
     all_engineers_names = engineers_doc["all_engineers_names"]
 
     target_engineer_name = target_engineer.engineer_name
@@ -169,6 +182,7 @@ def delete_engineer(target_engineer: Engineer):
         {"$pull": {"all_engineers_names": target_engineer_name}}
     )
     engineers_doc = eagle_data_coll.find_one({"table_name": "engineers"})
+    if not engineers_doc: return []
     all_engineers_names = engineers_doc["all_engineers_names"]
     return {"deleted. now": all_engineers_names}
 
@@ -178,6 +192,7 @@ def delete_engineer(target_engineer: Engineer):
 @router.get('/plat-engineers', dependencies=[Depends(get_current_user_data)])
 def get_all_plat_engineers():
     plat_engineers_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    if not plat_engineers_doc: return []
     return plat_engineers_doc["all_plat_engineers_names"]
 
 
@@ -185,6 +200,7 @@ def get_all_plat_engineers():
 @router.post("/plat-engineers", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def add_new_plat_engineer(new_plat_engineer: PlatEngineer):
     plat_engineer_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    if not plat_engineer_doc: return []
     all_plat_engineers_names = plat_engineer_doc["all_plat_engineers_names"]
 
     new_plat_engineer_name = new_plat_engineer.plat_engineer_name
@@ -199,14 +215,16 @@ def add_new_plat_engineer(new_plat_engineer: PlatEngineer):
         {"$push": {"all_plat_engineers_names": new_plat_engineer_name}}
     )
     plat_engineer_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    if not plat_engineer_doc: return []
     all_plat_engineers_names = plat_engineer_doc["all_plat_engineers_names"]
     return {"added": all_plat_engineers_names}
 
 
 # update a plat-engineer
 @router.patch("/plat-engineers", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
-def delete_plat_engineer(target_plat_engineer: UpdatePlatEngineer):
+def update_plat_engineer(target_plat_engineer: UpdatePlatEngineer):
     plat_engineer_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    if not plat_engineer_doc: return []
     all_plat_engineers_names = plat_engineer_doc["all_plat_engineers_names"]
 
     target_plat_engineer_name = target_plat_engineer.target_plat_engineer_name
@@ -224,6 +242,7 @@ def delete_plat_engineer(target_plat_engineer: UpdatePlatEngineer):
     )
 
     plat_engineer_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    if not plat_engineer_doc: return []
     all_plat_engineers_names = plat_engineer_doc["all_plat_engineers_names"]
     return {"Updated. now": all_plat_engineers_names}
 
@@ -232,6 +251,7 @@ def delete_plat_engineer(target_plat_engineer: UpdatePlatEngineer):
 @router.delete("/plat-engineers", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def delete_plat_engineer(target_plat_engineer: PlatEngineer):
     plat_engineer_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    if not plat_engineer_doc: return []
     all_plat_engineers_names = plat_engineer_doc["all_plat_engineers_names"]
 
     target_plat_engineer_name = target_plat_engineer.plat_engineer_name
@@ -244,6 +264,7 @@ def delete_plat_engineer(target_plat_engineer: PlatEngineer):
         {"$pull": {"all_plat_engineers_names": target_plat_engineer_name}}
     )
     plat_engineer_doc = eagle_data_coll.find_one({"table_name": "plat_engineers"})
+    if not plat_engineer_doc: return []
     all_plat_engineers_names = plat_engineer_doc["all_plat_engineers_names"]
     return {"deleted. now": all_plat_engineers_names}
 
@@ -252,6 +273,7 @@ def delete_plat_engineer(target_plat_engineer: PlatEngineer):
 @router.get('/counties', dependencies=[Depends(get_current_user_data)])
 def get_all_counties():
     counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    if not counties_doc: return []
     return counties_doc["all_counties_names"]
 
 
@@ -259,6 +281,7 @@ def get_all_counties():
 @router.post("/counties", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def add_new_county(new_county: County):
     county_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    if not county_doc: return []
     all_counties_names = county_doc["all_counties_names"]
 
     new_county_name = new_county.county_name
@@ -273,14 +296,16 @@ def add_new_county(new_county: County):
         {"$push": {"all_counties_names": new_county_name}}
     )
     county_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    if not county_doc: return []
     all_counties_names = county_doc["all_counties_names"]
     return {"added": all_counties_names}
 
 
 # update a county
 @router.patch("/counties", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
-def delete_county(target_county: UpdateCounty):
+def update_county(target_county: UpdateCounty):
     counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    if not counties_doc: return []
     all_counties_names = counties_doc["all_counties_names"]
 
     target_county_name = target_county.target_county_name
@@ -298,6 +323,7 @@ def delete_county(target_county: UpdateCounty):
     )
 
     counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    if not counties_doc: return []
     all_counties_names = counties_doc["all_counties_names"]
     return {"Updated. now": all_counties_names}
 
@@ -306,6 +332,7 @@ def delete_county(target_county: UpdateCounty):
 @router.delete("/counties", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
 def delete_county(target_county: County):
     counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    if not counties_doc: return []
     all_counties_names = counties_doc["all_counties_names"]
 
     target_county_name = target_county.county_name
@@ -318,5 +345,6 @@ def delete_county(target_county: County):
         {"$pull": {"all_counties_names": target_county_name}}
     )
     counties_doc = eagle_data_coll.find_one({"table_name": "counties"})
+    if not counties_doc: return []
     all_counties_names = counties_doc["all_counties_names"]
     return {"deleted. now": all_counties_names}

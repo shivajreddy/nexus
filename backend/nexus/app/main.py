@@ -1,3 +1,5 @@
+import colorlog
+
 # FASTAPI
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,10 +11,10 @@ from app.database.setup_data.eagle_data import eagle_data_coll_initial_data, dep
     projects_coll_initial_data
 
 # IMPORT ROUTERS
-from app.router.users.users import router as users_router
+from app.router.public.public import public_router
+from app.router.public import users  # ensure this is imported so routes are registered
 from app.router.security.auth import router as auth_router
 from app.router.eagle.eagle import router as eagle_router
-from app.router.public.public import router as public_router
 from app.router.admin.admin import router as admin_router
 from app.router.department.teclab.teclab import router as teclab_router
 from app.router.department.teclab.dashboard import router as teclab_dashboard_router
@@ -27,6 +29,8 @@ from app.router.dev.dev import router as dev_router
 
 from app.sockets.sockets import sio_app
 
+ropagate = False # Optional: prevent logs from propagating to the root logger
+
 # Include Routers into FASTAPI app
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,7 +38,6 @@ async def lifespan(app: FastAPI):
     app.include_router(auth_router)  # + include router's
     app.include_router(eagle_router)
     app.include_router(public_router)
-    app.include_router(users_router)
     app.include_router(teclab_router)
     app.include_router(teclab_dashboard_router)
     app.include_router(teclab_graphs_router)

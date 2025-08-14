@@ -1,7 +1,7 @@
-import {useAppSelector} from "@redux/hooks.ts";
-import {selectAuthState} from "@/features/auth/authSlice.ts";
-import {axiosPrivate} from "@/services/axios.ts";
-import {useEffect} from "react";
+import { useAppSelector } from "@redux/hooks.ts";
+import { selectAuthState } from "@/features/auth/authSlice.ts";
+import { axiosPrivate } from "@/services/axios.ts";
+import { useEffect } from "react";
 import useRefreshToken from "@hooks/useRefreshToken.ts";
 
 

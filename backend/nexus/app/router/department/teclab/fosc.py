@@ -64,22 +64,22 @@ def get_live_lots():
                         if data.get(field) is None:
                             data[field] = False
                     return data
-                def update_documents_with_defaults():
-                    # Define the boolean fields you want to check
-                    boolean_fields = [
-                        'foundation_needed', 'foundation_scan_status', 'foundation_report_status', 'foundation_uploaded',
-                        'slab_scan_status', 'slab_report_status', 'slab_uploaded', 'slab_needed',
-                        'frame_scan_status', 'frame_report_status', 'frame_uploaded', 'frame_needed',
-                        'mep_scan_status', 'mep_report_status', 'mep_uploaded', 'mep_needed',
-                        'misc_scan_status', 'misc_report_status'
-                    ]
-
-                    for field in boolean_fields:
-                        # Update documents where the field is None and set it to False
-                        projects_coll.update_many(
-                            {field: None},  # Check for None value
-                            {"$set": {field: False}}  # Set it to False
-                        )
+                # def update_documents_with_defaults():
+                #     # Define the boolean fields you want to check
+                #     boolean_fields = [
+                #         'foundation_needed', 'foundation_scan_status', 'foundation_report_status', 'foundation_uploaded',
+                #         'slab_scan_status', 'slab_report_status', 'slab_uploaded', 'slab_needed',
+                #         'frame_scan_status', 'frame_report_status', 'frame_uploaded', 'frame_needed',
+                #         'mep_scan_status', 'mep_report_status', 'mep_uploaded', 'mep_needed',
+                #         'misc_scan_status', 'misc_report_status'
+                #     ]
+                #
+                #     for field in boolean_fields:
+                #         # Update documents where the field is None and set it to False
+                #         projects_coll.update_many(
+                #             {field: None},  # Check for None value
+                #             {"$set": {field: False}}  # Set it to False
+                #         )
                 # update_documents_with_defaults()
 
                 # Assuming `raw_data` is the data you receive (e.g., from the API)
@@ -196,10 +196,7 @@ def get_all_lots():
 
 # """
 # Updating project data when given a specific project UID
-@router.get(
-    path='/get/{project_uid}',
-    # response_model=
-    dependencies=[Depends(get_current_user_data)])
+@router.get( path='/get/{project_uid}', dependencies=[Depends(get_current_user_data)])
 def get_fosc_data_with_project_uid(project_uid: str):
     target_project = find_project(project_uid)
 

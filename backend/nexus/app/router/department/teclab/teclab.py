@@ -18,6 +18,7 @@ router = APIRouter(prefix="/department/teclab")
 @router.get('/products', dependencies=[Depends(get_current_user_data)])
 def get_all_products():
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     products = teclab_doc["data"]["products"]
     all_products_names = products["all_products_names"]
@@ -27,6 +28,7 @@ def get_all_products():
 @router.post('/products', dependencies=[Depends(get_current_user_data)])
 def add_new_product(new_product: Product):
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     products = teclab_doc["data"]["products"]
     all_products_names = products["all_products_names"]
@@ -47,6 +49,7 @@ def add_new_product(new_product: Product):
 @router.patch('/products', dependencies=[Depends(get_current_user_data)])
 def update_product(product: UpdateProduct):
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     products = teclab_doc["data"]["products"]
     all_products_names = products["all_products_names"]
@@ -70,6 +73,7 @@ def update_product(product: UpdateProduct):
 @router.delete('/products', dependencies=[Depends(get_current_user_data)])
 def delete_product(product: Product):
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     products = teclab_doc["data"]["products"]
     all_products_names = products["all_products_names"]
@@ -91,6 +95,7 @@ def delete_product(product: Product):
 @router.get('/core-models', dependencies=[Depends(get_current_user_data)])
 def get_all_core_models():
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     core_models = teclab_doc["data"]["core_models"]
     all_core_models_names = core_models["all_core_models_names"]
@@ -101,12 +106,14 @@ def get_all_core_models():
 @router.get('/elevations', dependencies=[Depends(get_current_user_data)])
 def get_all_elevation_names():
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
     return teclab_doc["data"]["elevations"]["all_elevations_names"]
 
 
 @router.post('/elevations', dependencies=[Depends(get_current_user_data)])
 def add_new_elevation(new_elevation: Elevation):
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     elevations = teclab_doc["data"]["elevations"]
     all_elevations_names = elevations["all_elevations_names"]
@@ -127,6 +134,7 @@ def add_new_elevation(new_elevation: Elevation):
 @router.patch('/elevations', dependencies=[Depends(get_current_user_data)])
 def update_elevation(elevation: UpdateElevation):
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     elevations = teclab_doc["data"]["elevations"]
     all_elevations_names = elevations["all_elevations_names"]
@@ -150,13 +158,15 @@ def update_elevation(elevation: UpdateElevation):
 @router.delete('/elevations', dependencies=[Depends(get_current_user_data)])
 def delete_elevation(elevation: Elevation):
     teclab_doc = department_data_coll.find_one({"department_name": "TEC Lab"})
+    if teclab_doc is None: return []
 
     elevations = teclab_doc["data"]["elevations"]
     all_elevations_names = elevations["all_elevations_names"]
+    if all_elevations_names is None: return []
 
-    if elevation.target_elevation_name not in all_elevations_names:
+    if elevation.elevation_name not in all_elevations_names:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=f"{elevation.target_elevation_name} doesn't exist"
+            status_code=status.HTTP_409_CONFLICT, detail=f"{elevation.elevation_name} doesn't exist"
         )
 
     # Step 2: Update the MongoDB document
@@ -200,7 +210,7 @@ def get_all_field_ops_members_names():
     if not teclab_doc: return []
     all_teams = teclab_doc["data"]["teams"]
     for team in all_teams:
-        print(team["team_name"])
+        # print(team["team_name"])
         if team["team_name"] == "Field Ops":
             # return team["team_members"] + former_members
             return team["team_members"]

@@ -19,13 +19,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def create_access_token(data: User) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
-    # expire = datetime.utcnow() + timedelta(seconds=settings.ACCESS_TOKEN_EXPIRES_IN)
+    # expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
 
     access_token_payload = AccessTokenData(
         username=data.username,
         roles=data.security.roles,
-        created_at=datetime.utcnow().isoformat(),
+        # created_at=datetime.utcnow().isoformat(),
+        created_at=datetime.now().isoformat(),
         exp=expire.replace(tzinfo=timezone.utc),
     )
 
@@ -38,7 +39,8 @@ def create_access_token(data: User) -> str:
 
 
 def create_refresh_token(data: User):
-    expire = datetime.utcnow() + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRES_IN)
+    # expire = datetime.utcnow() + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRES_IN)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
 
     refresh_token_payload = RefreshTokenData(
         username=data.username,
@@ -62,26 +64,29 @@ def verify_access_token(given_token):
             settings.ACCESS_TOKEN_SECRET,
             algorithms=[settings.JWT_ALGORITHM],
         )
+        # print("payload = ", payload)
 
         # access_token_data = AccessTokenData(**payload)
         access_token_data = AccessTokenData(**payload)
 
     except ValidationError:
+        print("got ValidationError")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access-Token's payload is not of Type AccessTokenData",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-
     except ExpiredSignatureError:
+        print("got ExpiredSignatureError")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access-Token has expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except JWTError:
+    except PyJWTError:
+        print("got PyJWTError")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="JWTError - token is not able to decode",
@@ -114,7 +119,7 @@ def verify_refresh_token(given_token) -> RefreshTokenData:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except JWTError:
+    except PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="JWTError - token is not able to decode",
@@ -126,6 +131,7 @@ def verify_refresh_token(given_token) -> RefreshTokenData:
 
 # Dependency to check if user is logged in(has auth token) and token is valid
 def get_current_user_data(token: str = Depends(oauth2_scheme)) -> AccessTokenData:
+    # print("token given for get_current_user_data: ", token)
     return verify_access_token(token)
 
 

@@ -20,6 +20,45 @@ interface Iprops {
     className?: string;
 }
 
+interface IIHMSFilteredHouseData {
+    // Lot Info
+    HOUSENUMBER?: string;
+    // contract date
+    CONTRACT_DATE?: string;
+    // community
+    DEVELOPMENTCODE?: string;
+    // section
+    BLOCKNUMBER?: string;
+    // lot number
+    LOTNUMBER?: string;
+    // product
+    MODELCODE?: string;
+    // elevation
+    ELEVATIONCODE?: string;
+
+    // Drafting
+    DRAFTEDBY?: string;
+    LSLATECHANGEDATE?: string;
+
+    // Engineering
+    STRUCTURALCO?: string;
+    ENGORDEREDDATE?: string;
+    ENGRECVDDATE?: string;
+
+    // Plat
+    PLATORDEREDDATE?: string;
+    PLATRECDATE?: string;
+
+    // Permitting
+    PERMITNUMBER?: string;
+    PERMIT_DATE?: string;
+
+    // Notes
+    REMARKS?: string;
+    NOTES?: string;
+    COMMENTS?: string;
+}
+
 
 const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, setStatusEPCDataFetch, className }: Iprops) => {
 
@@ -32,6 +71,12 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
         lot_number: "",
         notes: ""
     });
+
+    type IHMSFetchStatus = "initial" | "loading" | "failed" | "success";
+    const [statusIHMSDataFetch, setStatusIHMSDataFetch] = useState<IHMSFetchStatus>("initial");
+    console.log("statusIHMSDataFetch::", statusIHMSDataFetch);
+    const [selectedProjectIHMSData, setSelectedProjectIHMSData] = useState<IIHMSFilteredHouseData>();
+    console.log("selectedProjectIHMSData", selectedProjectIHMSData);
 
     function handleStateChange(pieceOfStateName: keyof TECLabEPCData, newValue: any) {
         setSelectedProjectsTECLabEPCData((prevLotData) => {
@@ -113,9 +158,7 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                 all_counties: customSort(countiesResponse.data),
                 all_homesiting_drafters: customSort(homesitingDraftersResponse.data),
                 all_field_ops_members: customSort(fieldOpsMembersResponse.data)
-
             });
-
             // console.log("all_communities:", communitiesResponse.data);
             // console.log("all_products:", productsResponse.data);
             // console.log("all_elevations:", elevationsResponse.data);
@@ -127,9 +170,9 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
             // console.log("all_field_ops_members:", fieldOpsMembersResponse.data);
         }
 
-        getData().then(() => {
-        });
-    }, [])
+        // console.log("EXECUTING THE useEffect - getData")
+        getData();
+    }, [axios])
 
     // + Fetch the chosen project's TEC-lab data
     useEffect(() => {
@@ -140,7 +183,7 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                 // console.log("Response for /get/{project_uid}: ", response);
 
                 const lotData = response.data;
-                console.log(":::lotData = ", lotData)
+                // console.log(":::lotData = ", lotData)
 
                 // Data transformation
                 const transformedData: TECLabEPCData = {
@@ -188,19 +231,41 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
 
                     notes: lotData.epc_data.notes
                 };
-                console.log("transformedData=", transformedData);
+                // console.log("transformedData=", transformedData);
                 // Set the data to the lot-state
                 setSelectedProjectsTECLabEPCData(transformedData);
                 setStatusEPCDataFetch("success");
-
             } catch (e: any) {
                 setStatusEPCDataFetch("failed");
                 console.error(e);
             }
         };
-        fetchSelectedProjectTECLabEPCData().then(() => {
-        })
-    }, [project_uid])
+
+        fetchSelectedProjectTECLabEPCData();
+    }, [axios, setStatusEPCDataFetch, project_uid])
+
+    // + Fetch the chosen project's IHMS data
+    useEffect(() => {
+        const fetchSelectedProjectIHMSData = async () => {
+            try {
+                // const response = await axios.get(`/department/teclab/epc/ihms/get/${project_uid}`)
+                const response = await axios.get(`/dev/ihms/get/${project_uid}`)
+                console.log("fetchSelectedProjectIHMSData()->response", response);
+                if (response.data["IHMS_FILTERED_DATA"]["HOUSENUMBER"] === "" ||
+                    response.data["IHMS_FILTERED_DATA"]["HOUSENUMBER"] === undefined) {
+                    setStatusIHMSDataFetch("failed");
+                } else {
+                    setSelectedProjectIHMSData(response.data["IHMS_FILTERED_DATA"]);
+                    setStatusIHMSDataFetch("success");
+                }
+            }
+            catch (e: any) {
+                setStatusIHMSDataFetch("failed");
+                console.error(e);
+            }
+        };
+        fetchSelectedProjectIHMSData();
+    }, [])
 
     return (
         <div className={cn(className)}>
@@ -214,10 +279,7 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                     }
                 </div>
 
-                {statusEPCDataFetch === 'loading' &&
-                    <LoadingSpinner2 />
-                }
-
+                {statusEPCDataFetch === 'loading' && <LoadingSpinner2 />}
                 {statusEPCDataFetch === 'failed' &&
                     <p className="text-center text-xl text-red-500 font-semibold">
                         FAILED to get Project's TEC-Lab data
@@ -234,6 +296,9 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                 <CardDescription>Lot's identity Information</CardDescription>
                             </CardHeader>
                             <CardContent>
+                                {statusIHMSDataFetch === "success" &&
+                                    <p>House Number: {selectedProjectIHMSData?.HOUSENUMBER}</p>
+                                }
                                 <FieldDropDown id="1_contract_type"
                                     name={"Contract Type"}
                                     dropdownData={["SPEC", "Permit & Hold", "Contract"]}
