@@ -173,7 +173,10 @@ async def get_house_number(community, section, lot_number) -> str:
     # there shouldn't be multiple homes with same commuty-section-lot but
     # if there are multiple, then handle it (later)
     for house in all_houses:
-        if house["BLOCKNUMBER"] == section and house["LOTNUMBER"] == lot_number:
+        if house["BLOCKNUMBER"] is None or house["BLOCKNUMBER"] == "":
+            if house["LOTNUMBER"] == lot_number:
+                house_number = house["HOUSENUMBER"]
+        elif house["BLOCKNUMBER"] == section and house["LOTNUMBER"] == lot_number:
             house_number = house["HOUSENUMBER"]
 
     if house_number is None: return ""

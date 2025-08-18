@@ -74,9 +74,10 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
 
     type IHMSFetchStatus = "initial" | "loading" | "failed" | "success";
     const [statusIHMSDataFetch, setStatusIHMSDataFetch] = useState<IHMSFetchStatus>("initial");
-    console.log("statusIHMSDataFetch::", statusIHMSDataFetch);
+    const [ihmsErrorMessage, setIhmsErrorMessage] = useState<string>("");   // only if there is any error
+    // console.log("statusIHMSDataFetch::", statusIHMSDataFetch);
     const [selectedProjectIHMSData, setSelectedProjectIHMSData] = useState<IIHMSFilteredHouseData>();
-    console.log("selectedProjectIHMSData", selectedProjectIHMSData);
+    // console.log("selectedProjectIHMSData", selectedProjectIHMSData);
 
     function handleStateChange(pieceOfStateName: keyof TECLabEPCData, newValue: any) {
         setSelectedProjectsTECLabEPCData((prevLotData) => {
@@ -246,22 +247,27 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
 
     // + Fetch the chosen project's IHMS data
     useEffect(() => {
+        setStatusIHMSDataFetch("loading");
         const fetchSelectedProjectIHMSData = async () => {
             try {
                 // const response = await axios.get(`/department/teclab/epc/ihms/get/${project_uid}`)
                 const response = await axios.get(`/dev/ihms/get/${project_uid}`)
-                console.log("fetchSelectedProjectIHMSData()->response", response);
-                if (response.data["IHMS_FILTERED_DATA"]["HOUSENUMBER"] === "" ||
-                    response.data["IHMS_FILTERED_DATA"]["HOUSENUMBER"] === undefined) {
+                // console.log("fetchSelectedProjectIHMSData()->response", response);
+
+                const data = response.data?.["IHMS_FILTERED_DATA"];
+                if (!data || data["HOUSENUMBER"] === undefined || data["HOUSENUMBER"] === "") {
                     setStatusIHMSDataFetch("failed");
-                } else {
-                    setSelectedProjectIHMSData(response.data["IHMS_FILTERED_DATA"]);
+                    setIhmsErrorMessage(`Couldn't find ${selectedProjectsTECLabEPCData.project_id} on IHMS`);
+                }
+                else {
+                    setSelectedProjectIHMSData(data);
                     setStatusIHMSDataFetch("success");
                 }
             }
             catch (e: any) {
                 setStatusIHMSDataFetch("failed");
-                console.error(e);
+                setIhmsErrorMessage(e.message || "Unknown error occurred while fetching IHMS data");
+                console.error("failed to get ihms data: ", e);
             }
         };
         fetchSelectedProjectIHMSData();
@@ -272,10 +278,9 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
             <div className="bg-default-bg2 mx-4 p-4 pb-0 relative border rounded-md">
                 <div
                     className="flex justify-center absolute -top-4 left-0 right-0 ml-auto mr-auto w-fit bg-default-bg2 px-4">
-                    <p className="font-semibold text-2xl text-center">TEC-LAB Data</p>
-                    {project_id &&
-                        <p
-                            className="font-semibold text-2xl text-center text-primary">&nbsp;:&nbsp;{project_id}</p>
+                    {/* <p className="font-semibold text-2xl text-center">TEC-LAB Data</p> */}
+                    {selectedProjectsTECLabEPCData.project_id &&
+                        <p className="font-semibold text-2xl text-center text-primary">{selectedProjectsTECLabEPCData.project_id}</p>
                     }
                 </div>
 
@@ -285,6 +290,15 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                         FAILED to get Project's TEC-Lab data
                     </p>
                 }
+
+                <>
+                    <p className="flex justify-center">
+                        {statusIHMSDataFetch === "loading" && <span className="text-yellow-500">IHMS DATA: Fetching...</span>}
+                        {statusIHMSDataFetch === "failed" && <span className="text-red-400">IHMS DATA: Failed to Fetch</span>}
+                        {statusIHMSDataFetch === "success" && <span className="text-blue-400">IHMS DATA: Successfully fetched</span>}
+                    </p>
+                </>
+                {ihmsErrorMessage && <p className="flex justify-center text-red-400">{ihmsErrorMessage}</p>}
 
                 {statusEPCDataFetch === 'success' &&
                     <div className="rounded-lg bg-default-bg2 flex flex-wrap justify-center"
@@ -296,9 +310,6 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                 <CardDescription>Lot's identity Information</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                {statusIHMSDataFetch === "success" &&
-                                    <p>House Number: {selectedProjectIHMSData?.HOUSENUMBER}</p>
-                                }
                                 <FieldDropDown id="1_contract_type"
                                     name={"Contract Type"}
                                     dropdownData={["SPEC", "Permit & Hold", "Contract"]}
@@ -340,6 +351,12 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                     value={selectedProjectsTECLabEPCData.lot_number}
                                     onUpdate={(e) => handleStateChange('lot_number', e.target.value)}
                                 />
+                                {statusIHMSDataFetch === "success" &&
+                                    <p className="text-slate-500">House Number: {selectedProjectIHMSData?.HOUSENUMBER}</p>
+                                }
+                                {statusIHMSDataFetch === "success" &&
+                                    <p className="text-slate-500">DevelopmentCode: {selectedProjectIHMSData?.DEVELOPMENTCODE}</p>
+                                }
                                 <div className="w-[50%] my-2 border-b border border-gray-200 mx-auto" />
                                 <FieldDropDown id="1_product"
                                     name={"Product"}
@@ -353,12 +370,22 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                     value={selectedProjectsTECLabEPCData.elevation_name}
                                     onUpdate={(newValue) => handleStateChange('elevation_name', newValue)}
                                 />
+                                {statusIHMSDataFetch === "success" &&
+                                    <p className="text-slate-500">ModelCode: {selectedProjectIHMSData?.MODELCODE}</p>
+                                }
+                                {statusIHMSDataFetch === "success" &&
+                                    <p className="text-slate-500">ElevationCode: {selectedProjectIHMSData?.ELEVATIONCODE}</p>
+                                }
                                 <div className="w-[50%] my-2 border-b border border-gray-200 mx-auto" />
                                 <FieldDate id="1_ph_tostart_date"
                                     name="P.H. Start"
                                     value={selectedProjectsTECLabEPCData.permithold_start}
                                     onUpdate={(newValue) => handleStateChange('permithold_start', newValue)}
                                 />
+                                {statusIHMSDataFetch === "success" &&
+                                    <p className="text-slate-500">LS-LastChange: {selectedProjectIHMSData?.LSLATECHANGEDATE}</p>
+                                }
+
                             </CardContent>
                         </Card>
 
@@ -390,6 +417,9 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                         value={selectedProjectsTECLabEPCData.drafting_notes ?? ""}
                                         onChange={newNotes => handleStateChange('drafting_notes', newNotes.target.value)}
                                     />
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">DraftedBy: {selectedProjectIHMSData?.DRAFTEDBY}</p>
+                                    }
                                 </CardContent>
                             </Card>
 
@@ -419,6 +449,15 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                         value={selectedProjectsTECLabEPCData.engineering_notes ?? ""}
                                         onChange={newNotes => handleStateChange('engineering_notes', newNotes.target.value)}
                                     />
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">Engineer: {selectedProjectIHMSData?.STRUCTURALCO}</p>
+                                    }
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">Ordered: {selectedProjectIHMSData?.ENGORDEREDDATE}</p>
+                                    }
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">Received: {selectedProjectIHMSData?.ENGRECVDDATE}</p>
+                                    }
                                 </CardContent>
                             </Card>
                         </div>
@@ -451,6 +490,12 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                         value={selectedProjectsTECLabEPCData.plat_notes ?? ""}
                                         onChange={newNotes => handleStateChange('plat_notes', newNotes.target.value)}
                                     />
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">Ordered: {selectedProjectIHMSData?.PLATORDEREDDATE}</p>
+                                    }
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">Received: {selectedProjectIHMSData?.PLATRECDATE}</p>
+                                    }
                                 </CardContent>
                             </Card>
 
@@ -480,6 +525,12 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                         value={selectedProjectsTECLabEPCData.permitting_notes ?? ""}
                                         onChange={newNotes => handleStateChange('permitting_notes', newNotes.target.value)}
                                     />
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">Permit No.: {selectedProjectIHMSData?.PERMITNUMBER}</p>
+                                    }
+                                    {statusIHMSDataFetch === "success" &&
+                                        <p className="text-slate-500">PermitDate: {selectedProjectIHMSData?.PERMIT_DATE}</p>
+                                    }
                                 </CardContent>
                             </Card>
                         </div>
@@ -543,11 +594,17 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                 <CardDescription>TEC-Lab notes for the lot</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                {/* ! TODO: provide the onChange handler for the Textarea content cuz i am giving the value to begin with*/}
                                 <Textarea placeholder="General notes ..."
                                     value={selectedProjectsTECLabEPCData.notes ?? ""}
                                     onChange={newNotes => handleStateChange('notes', newNotes.target.value)}
                                 />
+                                {statusIHMSDataFetch === "success" &&
+                                    <>
+                                        <p className="text-slate-500">Notes: {selectedProjectIHMSData?.NOTES}</p>
+                                        <p className="text-slate-500">Comments: {selectedProjectIHMSData?.COMMENTS}</p>
+                                        <p className="text-slate-500">Remarks: {selectedProjectIHMSData?.REMARKS}</p>
+                                    </>
+                                }
                             </CardContent>
                         </Card>
 
