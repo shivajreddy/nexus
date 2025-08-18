@@ -282,6 +282,8 @@ class IHMSFilteredHouseData(BaseModel):
     model_code: Optional[str] = Field(None, alias="MODELCODE")
     # elevation
     elevation_code: Optional[str] = Field(None, alias="ELEVATIONCODE")
+    # superintedant
+    super_user_id: Optional[str] = Field(None, alias="SUPERUSERID")
 
     ## Drafting
     # Drafter

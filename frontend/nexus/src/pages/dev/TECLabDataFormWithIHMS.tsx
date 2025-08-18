@@ -57,6 +57,9 @@ interface IIHMSFilteredHouseData {
     REMARKS?: string;
     NOTES?: string;
     COMMENTS?: string;
+
+    // SuperIntendant
+    SUPERUSERID?: string;
 }
 
 
@@ -252,7 +255,7 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
             try {
                 // const response = await axios.get(`/department/teclab/epc/ihms/get/${project_uid}`)
                 const response = await axios.get(`/dev/ihms/get/${project_uid}`)
-                // console.log("fetchSelectedProjectIHMSData()->response", response);
+                console.log("fetchSelectedProjectIHMSData()->response", response);
 
                 const data = response.data?.["IHMS_FILTERED_DATA"];
                 if (!data || data["HOUSENUMBER"] === undefined || data["HOUSENUMBER"] === "") {
@@ -603,6 +606,7 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                         <p className="text-slate-500">Notes: {selectedProjectIHMSData?.NOTES}</p>
                                         <p className="text-slate-500">Comments: {selectedProjectIHMSData?.COMMENTS}</p>
                                         <p className="text-slate-500">Remarks: {selectedProjectIHMSData?.REMARKS}</p>
+                                        <p className="text-slate-500">SuperIntendant: {selectedProjectIHMSData?.SUPERUSERID}</p>
                                     </>
                                 }
                             </CardContent>
