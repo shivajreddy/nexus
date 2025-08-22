@@ -60,6 +60,7 @@ import AuthGraphs from "./pages/department/teclab/graphs/AuthGraphs";
 import GraphsHomePage from "./pages/department/teclab/graphs/GraphsHomepage";
 import { SaveProject } from "./pages/dev/project/SaveProject";
 import { EpcProjectWithIHMS } from "./pages/dev/EpcProjectWithIHMS";
+import { ProjectConsole } from "./pages/dev/ProjectConsole";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -152,6 +153,7 @@ const router = createBrowserRouter(
             {/* DEV PAGES : UNDER DEVELOPMENT*/}
             <Route path="/dev/saveproject/p1" element={<SaveProject />} />
             <Route path="/dev/newepc" element={<EpcProjectWithIHMS />} />
+            <Route path="/dev/projectconsole" element={<ProjectConsole />} />
 
         </Route>
     )

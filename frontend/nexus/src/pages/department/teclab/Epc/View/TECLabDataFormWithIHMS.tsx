@@ -255,7 +255,7 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
             try {
                 // const response = await axios.get(`/department/teclab/epc/ihms/get/${project_uid}`)
                 const response = await axios.get(`/dev/ihms/get/${project_uid}`)
-                console.log("fetchSelectedProjectIHMSData()->response", response);
+                // console.log("fetchSelectedProjectIHMSData()->response", response);
 
                 const data = response.data?.["IHMS_FILTERED_DATA"];
                 if (!data || data["HOUSENUMBER"] === undefined || data["HOUSENUMBER"] === "") {

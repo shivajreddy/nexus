@@ -4,7 +4,7 @@ import { Button } from "@components/ui/button.tsx";
 import { TiArrowBack } from "react-icons/ti";
 import { useState } from "react";
 // import TECLabDataForm from "@pages/department/teclab/Epc/View/TECLabDataForm.tsx";
-import TECLabDataFormWithIHMS from "@/pages/dev/TECLabDataFormWithIHMS";
+import TECLabDataFormWithIHMS from "@/pages/department/teclab/Epc/View/TECLabDataFormWithIHMS";
 
 
 function EditTECLabData() {

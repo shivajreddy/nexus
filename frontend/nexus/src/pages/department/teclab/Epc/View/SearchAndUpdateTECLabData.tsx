@@ -5,7 +5,7 @@ import { Button } from "@components/ui/button.tsx";
 import { useState } from "react";
 // import ProjectFinder from "@pages/Project/ProjectFinder.tsx";
 // import TECLabDataForm from "@pages/department/teclab/Epc/View/TECLabDataForm.tsx";
-import TECLabDataFormWithIHMS from "@/pages/dev/TECLabDataFormWithIHMS";
+import TECLabDataFormWithIHMS from "@/pages/department/teclab/Epc/View/TECLabDataFormWithIHMS";
 // import {ScrollArea} from "@components/ui/scroll-area.tsx";
 import ProjectFinderWithResults from "@pages/Project/ProjectFinderWithResults.tsx";
 

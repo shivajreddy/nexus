@@ -1,5 +1,5 @@
 import MainLayout from "@/templates/MainLayout"
-import TECLabDataFormWithIHMS from "./TECLabDataFormWithIHMS"
+import TECLabDataFormWithIHMS from "../department/teclab/Epc/View/TECLabDataFormWithIHMS"
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
