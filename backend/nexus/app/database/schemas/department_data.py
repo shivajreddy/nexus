@@ -266,6 +266,7 @@ class IHMSHouseData(BaseModel):
     lot_settle_date: Optional[str] = Field(None, alias="LOTSETTLEDATE")
     promissory3_date: Optional[str] = Field(None, alias="PROMISSORY3DATE")
 
+
 # Fields from IHMS House Data, that EPC cares about
 class IHMSFilteredHouseData(BaseModel):
     ## Lot Info
@@ -312,6 +313,9 @@ class IHMSFilteredHouseData(BaseModel):
     notes: Optional[str] = Field(None, alias="NOTES")
     comments: Optional[str] = Field(None, alias="COMMENTS")
 
+    ## BuildByPlans
+    const_start_date: Optional[str] = Field(None, alias="CONSTSTART_DATE")
+
 
 class FOSCData(BaseModel):
     # Status
@@ -328,39 +332,39 @@ class FOSCData(BaseModel):
     foundation_report_status: bool = False
     foundation_reporter: Optional[str] = None
     foundation_report_date: Optional[datetime] = None
-    foundation_uploaded:bool = False 
+    foundation_uploaded: bool = False
     foundation_needed: bool = True
 
     # Slab
-    slab_scan_status: bool = False 
+    slab_scan_status: bool = False
     slab_scan_date: Optional[datetime] = None
-    slab_report_status: bool = False 
+    slab_report_status: bool = False
     slab_reporter: Optional[str] = None
     slab_report_date: Optional[datetime] = None
-    slab_uploaded: bool = False  
+    slab_uploaded: bool = False
     slab_needed: bool = True
 
     # Frame
-    frame_scan_status: bool = False  
+    frame_scan_status: bool = False
     frame_scan_date: Optional[datetime] = None
-    frame_report_status: bool = False  
+    frame_report_status: bool = False
     frame_reporter: Optional[str] = None
     frame_report_date: Optional[datetime] = None
-    frame_uploaded: bool = False  
+    frame_uploaded: bool = False
     frame_needed: bool = True
 
     # MEP
-    mep_scan_status: bool = False  
+    mep_scan_status: bool = False
     mep_scan_date: Optional[datetime] = None
-    mep_report_status: bool = False  
+    mep_report_status: bool = False
     mep_reporter: Optional[str] = None
     mep_report_date: Optional[datetime] = None
     mep_uploaded: bool = False
     mep_needed: bool = True
 
-    misc_report_status: bool = False  
+    misc_report_status: bool = False
     # Misc (warranty, extra)
-    misc_scan_status: bool = False  
+    misc_scan_status: bool = False
 
     # BOC related
     proposed_BOC: Optional[str] = None
@@ -393,17 +397,17 @@ class UpdateFOSCData(BaseModel):
 
 
 class CORData(BaseModel):
-    product: str = ''
-    elevation: str = ''
+    product: str = ""
+    elevation: str = ""
     locations: Optional[List[str]] = Field(default_factory=list)
     categories: Optional[List[str]] = Field(default_factory=list)
-    custom_notes: Optional[str] = ''
+    custom_notes: Optional[str] = ""
 
 
 class UpdateCORData(BaseModel):
     project_id: str
     project_uid: str
-    cor_data: 'CORData'
+    cor_data: "CORData"
 
 
 class QueryCOR(BaseModel):
@@ -414,6 +418,7 @@ class QueryCOR(BaseModel):
 
 
 # :: SALES ::
+
 
 class B(BaseModel):
     pass

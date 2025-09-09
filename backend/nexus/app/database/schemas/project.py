@@ -12,15 +12,15 @@ Each of the document is the giant data structure that will hold every data point
 
 
 class Project(BaseModel):
-    project_info: 'ProjectInfo'
+    project_info: "ProjectInfo"
 
-    meta_info: 'ProjectMetaInfo'
+    meta_info: "ProjectMetaInfo"
 
-    contract_info: 'ContractInfo'
+    contract_info: "ContractInfo"
 
     # department-specific-data
-    teclab_data: 'TecLabProjectData'
-    sales_data: 'SalesProjectData'
+    teclab_data: "TecLabProjectData"
+    sales_data: "SalesProjectData"
 
 
 class ProjectInfo(BaseModel):
@@ -43,9 +43,9 @@ class ContractInfo(BaseModel):
 
 
 class TecLabProjectData(BaseModel):
-    epc_data: 'EPCData' = Field(default_factory=EPCData)
-    cor_data: 'CORData' = Field(default_factory=CORData)
-    fosc_data: 'FOSCData' = Field(default_factory=FOSCData)
+    epc_data: "EPCData" = Field(default_factory=EPCData)
+    cor_data: "CORData" = Field(default_factory=CORData)
+    fosc_data: "FOSCData" = Field(default_factory=FOSCData)
 
 
 class SalesProjectData(BaseModel):

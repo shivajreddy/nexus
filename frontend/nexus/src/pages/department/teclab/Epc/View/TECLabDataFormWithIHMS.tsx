@@ -40,6 +40,9 @@ interface IIHMSFilteredHouseData {
     DRAFTEDBY?: string;
     LSLATECHANGEDATE?: string;
 
+    PMREVIEWDATE?: string;  // pm review date(construction start date - 7 days)
+    CONSTSTART_DATE?: string;// construction start
+
     // Engineering
     STRUCTURALCO?: string;
     ENGORDEREDDATE?: string;
@@ -255,7 +258,7 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
             try {
                 // const response = await axios.get(`/department/teclab/epc/ihms/get/${project_uid}`)
                 const response = await axios.get(`/dev/ihms/get/${project_uid}`)
-                // console.log("fetchSelectedProjectIHMSData()->response", response);
+                console.log("fetchSelectedProjectIHMSData()->response", response);
 
                 const data = response.data?.["IHMS_FILTERED_DATA"];
                 if (!data || data["HOUSENUMBER"] === undefined || data["HOUSENUMBER"] === "") {
@@ -263,6 +266,22 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                     setIhmsErrorMessage(`Couldn't find ${selectedProjectsTECLabEPCData.project_id} on IHMS`);
                 }
                 else {
+                    // set pm_review_date based on construction start date
+                    if (data.CONSTSTART_DATE) {
+                        const start_date = new Date(data.CONSTSTART_DATE);
+                        const pm_review_date = new Date(start_date);
+                        pm_review_date.setDate(start_date.getDate() - 7);
+                        // Format as MM/DD/YYYY
+
+                        const month = String(pm_review_date.getMonth() + 1).padStart(2, "0"); // getMonth() is 0-based
+                        const day = String(pm_review_date.getDate()).padStart(2, "0");
+                        const year = pm_review_date.getFullYear();
+
+                        data.PMREVIEWDATE = `${month}/${day}/${year}`;
+                    } else {
+                        data.PMREVIEWDATE = "";
+                    }
+                    console.log("IHMS data after modifying on frontend", data);
                     setSelectedProjectIHMSData(data);
                     setStatusIHMSDataFetch("success");
                 }
@@ -586,6 +605,12 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                                     value={selectedProjectsTECLabEPCData.bbp_posted}
                                     onUpdate={newDate => handleStateChange('bbp_posted', newDate)}
                                 />
+                                {statusIHMSDataFetch === "success" &&
+                                    <>
+                                        <p className="text-slate-500">PM Review: {selectedProjectIHMSData?.PMREVIEWDATE}</p>
+                                        <p className="text-slate-500">Con. Start: {selectedProjectIHMSData?.CONSTSTART_DATE}</p>
+                                    </>
+                                }
                             </CardContent>
                         </Card>
 
