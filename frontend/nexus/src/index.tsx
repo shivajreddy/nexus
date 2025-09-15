@@ -11,7 +11,6 @@ import "@assets/index.css";
 import HomePage from "@/pages/HomePage/HomePage";
 import Epc from "@pages/department/teclab/Epc/View/Epc.tsx";
 import Updates from "@pages/Updates/Updates";
-import Pipeline from "@pages/pipeline/Pipeline";
 import UserHome from "@pages/User/UserHome";
 import PageNotFound from "@/pages/common/PageNotFound";
 import UiErrorPage from "@/pages/common/UiErrorPage";
@@ -61,6 +60,9 @@ import GraphsHomePage from "./pages/department/teclab/graphs/GraphsHomepage";
 import { SaveProject } from "./pages/dev/project/SaveProject";
 import { EpcProjectWithIHMS } from "./pages/dev/EpcProjectWithIHMS";
 import { ProjectConsole } from "./pages/dev/ProjectConsole";
+import ProjectGraph from "./pages/dev/projectgraphview/ProjectGraph";
+import Pipeline from "./pages/department/eagle/reports/pipeline/view/Pipeline";
+import AuthPipeline from "./pages/department/eagle/reports/pipeline/AuthPipeline";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -99,6 +101,12 @@ const router = createBrowserRouter(
                         <Route index element={<GraphsHomePage />} />
                     </Route>
 
+                    <Route path="pipeline" element={<AuthPipeline />}>
+                        <Route index element={<Pipeline />} />
+                        {/* <Route path="variant2" element={< pipeline variant 2 />} /> */}
+                    </Route>
+
+
                     <Route path="epc" element={<AuthEpc />}>
                         <Route index element={<Epc />} />
                         <Route path="all-lots" element={<EPCAll />} />
@@ -129,7 +137,6 @@ const router = createBrowserRouter(
                         </Route>
                     </Route>
 
-                    <Route path="pipeline" element={<Pipeline />} />
                     <Route path="core-dashboard" element={<CoreDashboard />} />
                     <Route path="updates" element={<Updates />} />
                     <Route path="user" element={<UserHome />} />
@@ -151,6 +158,7 @@ const router = createBrowserRouter(
             < Route path="*" element={< PageNotFound />} />
 
             {/* DEV PAGES : UNDER DEVELOPMENT*/}
+            <Route path="/dev/projectgraph" element={<ProjectGraph />} />
             <Route path="/dev/saveproject/p1" element={<SaveProject />} />
             <Route path="/dev/newepc" element={<EpcProjectWithIHMS />} />
             <Route path="/dev/projectconsole" element={<ProjectConsole />} />

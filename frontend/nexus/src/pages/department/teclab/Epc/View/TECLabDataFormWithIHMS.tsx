@@ -256,11 +256,21 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
         setStatusIHMSDataFetch("loading");
         const fetchSelectedProjectIHMSData = async () => {
             try {
-                // const response = await axios.get(`/department/teclab/epc/ihms/get/${project_uid}`)
-                const response = await axios.get(`/dev/ihms/get/${project_uid}`)
-                console.log("fetchSelectedProjectIHMSData()->response", response);
+                // API returns an array of 2 itmes, [some_data, error] one of which will be null
+                const response = await axios.get(`/department/teclab/epc/ihms/get/${project_uid}`)
+                // console.log("fetchSelectedProjectIHMSData()->response", response);
 
-                const data = response.data?.["IHMS_FILTERED_DATA"];
+                const [responseData, responseError] = response.data;
+
+                // check for error first
+                if (responseError) {
+                    setStatusIHMSDataFetch("failed");
+                    setIhmsErrorMessage(`Error fetching IHMS data: ${responseError}`);
+                    return; // Early return on error
+                }
+
+                // If no error, check the data
+                const data = responseData?.["IHMS_FILTERED_DATA"];
                 if (!data || data["HOUSENUMBER"] === undefined || data["HOUSENUMBER"] === "") {
                     setStatusIHMSDataFetch("failed");
                     setIhmsErrorMessage(`Couldn't find ${selectedProjectsTECLabEPCData.project_id} on IHMS`);
@@ -281,9 +291,10 @@ const TECLabDataFormWithIHMS = ({ project_id, project_uid, statusEPCDataFetch, s
                     } else {
                         data.PMREVIEWDATE = "";
                     }
-                    console.log("IHMS data after modifying on frontend", data);
+                    // console.log("IHMS data after modifying on frontend", data);
                     setSelectedProjectIHMSData(data);
                     setStatusIHMSDataFetch("success");
+                    setIhmsErrorMessage("");
                 }
             }
             catch (e: any) {

@@ -5,15 +5,27 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import List, Annotated
 
-from app.database.schemas.project import ContractInfo, ProjectInfo, ProjectMetaInfo, SalesProjectData
+from app.database.schemas.project import (
+    ContractInfo,
+    ProjectInfo,
+    ProjectMetaInfo,
+    SalesProjectData,
+)
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.database.database import projects_coll 
+from app.database.database import projects_coll
 from app.database.schemas.department_data import UpdateTECLabData, EPCData
+from app.database.schemas.ihms_schema import IHMSHouseData, IHMSFilteredHouseData
+
 from app.database.schemas.user import User
 from app.email.utils import send_email_with_given_message_and_attachment
+from app.router.department.common.eci_marksystems import get_access_token
 from app.router.utils.find_project import find_project
 from app.security.oauth2 import get_current_user_data
+
+from app.logger import logger
+import httpx
+
 
 """
 TECLAB/EPC endpoint
@@ -23,20 +35,24 @@ router = APIRouter(prefix="/department/teclab/epc")
 
 
 # Filter out all finished and released lots
-@router.get('/live', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
+@router.get(
+    "/live", response_model=List[dict], dependencies=[Depends(get_current_user_data)]
+)
 def get_live_lots():
     # print("HERE @ /department/teclab/epc/live")
     try:
         result = []
         for doc in projects_coll.find().sort("project_info.meta_info.created_at", -1):
             project = {k: v for (k, v) in doc.items() if k != "_id"}
-            if not doc["teclab_data"]["epc_data"]["lot_status_finished"] and\
-                    not doc["teclab_data"]["epc_data"]["lot_status_released"]:
+            if (
+                not doc["teclab_data"]["epc_data"]["lot_status_finished"]
+                and not doc["teclab_data"]["epc_data"]["lot_status_released"]
+            ):
                 final_object = {
                     "project_uid": doc["project_info"]["project_uid"],
                     "community": doc["project_info"]["community"],
                     "section_number": doc["project_info"]["section"],
-                    "lot_number": doc["project_info"]["lot_number"]
+                    "lot_number": doc["project_info"]["lot_number"],
                 }
                 final_object.update(project["teclab_data"]["epc_data"])
                 result.append(final_object)
@@ -46,29 +62,29 @@ def get_live_lots():
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
-@router.get('/update-db')
+@router.get("/update-db")
 def update_db():
     # db = client["nexus"]
     # projects_coll = db["projects"]
 
     # projects_coll.update_many({'project_info.project_uid': '826a5f29-ab9f-4d44-aa84-5659ffe9b948'},
     # ! update all projects with new fields
-    projects_coll.update_many({},
-                              {'$set': {
-                                    # 'teclab_data.fosc_data.notes': ""
-
-                              }
-                               })
+    projects_coll.update_many(
+        {},
+        {
+            "$set": {
+                # 'teclab_data.fosc_data.notes': ""
+            }
+        },
+    )
 
     # ! update all projects that are 2018,19,20,21,22 as finished
     start_date = datetime(2018, 1, 1)
     end_date = datetime(2022, 12, 31, 23, 59, 59)
-    date_query = {'$gte': start_date, '$lt': end_date}
-    query = {'contract_info.contract_date': date_query}
+    date_query = {"$gte": start_date, "$lt": end_date}
+    query = {"contract_info.contract_date": date_query}
 
-    update_query = {
-        '$set': {'teclab_data.epc_data.lot_status_finished': True}
-    }
+    update_query = {"$set": {"teclab_data.epc_data.lot_status_finished": True}}
     projects_coll.update_many(query, update_query)
 
     # res = projects_coll.find(query)
@@ -82,7 +98,9 @@ def update_db():
     # return "updated db"
 
 
-@router.get('/all', response_model=List[dict], dependencies=[Depends(get_current_user_data)])
+@router.get(
+    "/all", response_model=List[dict], dependencies=[Depends(get_current_user_data)]
+)
 def get_all_lots():
     try:
         result = []
@@ -92,7 +110,7 @@ def get_all_lots():
                 "project_uid": doc["project_info"]["project_uid"],
                 "community": doc["project_info"]["community"],
                 "section_number": doc["project_info"]["section"],
-                "lot_number": doc["project_info"]["lot_number"]
+                "lot_number": doc["project_info"]["lot_number"],
             }
             final_object.update(project["teclab_data"]["epc_data"])
             result.append(final_object)
@@ -102,45 +120,31 @@ def get_all_lots():
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
-# """ SENDING project_uid on param using GET
-@router.get(path='/get/{project_uid}', dependencies=[Depends(get_current_user_data)])
+# SENDING project_uid on param using GET
+@router.get(path="/get/{project_uid}", dependencies=[Depends(get_current_user_data)])
 def get_epc_data_with_project_uid(project_uid: str):
     target_project = find_project(project_uid)
 
     # return target_project["teclab_data"]["epc_data"]
     result_project = {
         "project_info": target_project["project_info"],
-        "epc_data": target_project["teclab_data"]["epc_data"]
+        "epc_data": target_project["teclab_data"]["epc_data"],
     }
     return result_project
-# """
-
-""" SENDING project_uid through body using POST(since we need body)
-class ProjectRequest(BaseModel):
-    project_uid: str
-@router.post(path='/get/', dependencies=[Depends(get_current_user_data)])
-def get_epc_data_with_project_uid(payload: ProjectRequest):
-    target_project = find_project(payload.project_uid)
-
-    # return target_project["teclab_data"]["epc_data"]
-    result_project = {
-        "project_info": target_project["project_info"],
-        "epc_data": target_project["teclab_data"]["epc_data"]
-    }
-    return result_project
-# """
 
 
-@router.post('/edit', dependencies=[Depends(get_current_user_data)])
+@router.post("/edit", dependencies=[Depends(get_current_user_data)])
 def update_teclab_data_for_project(new_data: UpdateTECLabData):
     print("given new_data", new_data)
     # Check if the project exists
-    existing_project = projects_coll.find_one({"project_info.project_uid": new_data.project_uid})
+    existing_project = projects_coll.find_one(
+        {"project_info.project_uid": new_data.project_uid}
+    )
 
     if not existing_project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"{new_data.project_uid} doesn't exist in Projects"
+            detail=f"{new_data.project_uid} doesn't exist in Projects",
         )
 
     # print("existing_project=", existing_project)
@@ -148,7 +152,7 @@ def update_teclab_data_for_project(new_data: UpdateTECLabData):
     # Update the project in the database
     projects_coll.update_one(
         {"project_info.project_uid": new_data.project_uid},
-        {"$set": {"teclab_data.epc_data": new_data.epc_data.model_dump()}}
+        {"$set": {"teclab_data.epc_data": new_data.epc_data.model_dump()}},
     )
 
     return {"message": f"Project {new_data.project_uid} updated successfully"}
@@ -168,9 +172,9 @@ def query_tracker_data():
         project = {k: v for (k, v) in doc.items() if k != "_id"}
         p_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
         if (
-                not p_epc_data.lot_status_finished and
-                not p_epc_data.lot_status_released and
-                not p_epc_data.permitting_received
+            not p_epc_data.lot_status_finished
+            and not p_epc_data.lot_status_released
+            and not p_epc_data.permitting_received
         ):
             # filtered_lots.append(p_epc_data)
             filtered_lots.append(project)
@@ -194,26 +198,30 @@ def query_tracker_data():
         if p_community not in result_data:
             result_data[p_community] = [0, 0, 0, 0, 0, 0]
 
-        if p["contract_info"]["contract_type"] == 'Contract':
-            if not p['teclab_data']['epc_data']['drafting_finished']:
+        if p["contract_info"]["contract_type"] == "Contract":
+            if not p["teclab_data"]["epc_data"]["drafting_finished"]:
                 # contract_waiting_drafting.append(p)
                 result_data[p_community][0] += 1
-            elif not p['teclab_data']['epc_data']['engineering_received'] or not p['teclab_data']['epc_data'][
-                'plat_received']:
+            elif (
+                not p["teclab_data"]["epc_data"]["engineering_received"]
+                or not p["teclab_data"]["epc_data"]["plat_received"]
+            ):
                 # contract_waiting_eng_or_plat.append(p)
                 result_data[p_community][1] += 1
-            elif not p['teclab_data']['epc_data']['permitting_submitted']:
+            elif not p["teclab_data"]["epc_data"]["permitting_submitted"]:
                 # contract_waiting_to_send_permit.append(p)
                 result_data[p_community][2] += 1
         else:
-            if not p['teclab_data']['epc_data']['drafting_finished']:
+            if not p["teclab_data"]["epc_data"]["drafting_finished"]:
                 # pm_waiting_drafting.append(p)
                 result_data[p_community][3] += 1
-            elif not p['teclab_data']['epc_data']['engineering_received'] or not p['teclab_data']['epc_data'][
-                'plat_received']:
+            elif (
+                not p["teclab_data"]["epc_data"]["engineering_received"]
+                or not p["teclab_data"]["epc_data"]["plat_received"]
+            ):
                 # pm_waiting_eng_or_plat.append(p)
                 result_data[p_community][4] += 1
-            elif not p['teclab_data']['epc_data']['permitting_submitted']:
+            elif not p["teclab_data"]["epc_data"]["permitting_submitted"]:
                 # pm_waiting_to_send_permit.append(p)
                 result_data[p_community][5] += 1
 
@@ -223,9 +231,10 @@ def query_tracker_data():
 
     return filtered_lots, result_data
 
+
 # TEMPORARY FN, but you can use this logic later
 # download projects into CSCV
-# Filter for lots that are from&after 2024, That can be ongoing, can be finished, BUT cant be released 
+# Filter for lots that are from&after 2024, That can be ongoing, can be finished, BUT cant be released
 # http://localhost:8000/department/teclab/epc/download
 @router.get("/download")
 def download():
@@ -248,18 +257,21 @@ def download():
 
         # Skip the released lots
         # if p_teclab_epc_data.lot_status_released:
-            # continue
+        # continue
 
         # Skip lots without a contract date
         # if p_epc_data.contract_date is None:
-            # continue
+        # continue
 
         # Filter for lots with "contract_date" from 2025 and onwards i.e., skip anything before 2025
         # if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
-            # continue
+        # continue
 
         # Filter for lots with "drafting_assigned_on" from 2024 and onwards i.e., skip anything before 2025
-        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.drafting_assigned_on.year < 2024:
+        if (
+            p_teclab_epc_data.drafting_assigned_on
+            and p_teclab_epc_data.drafting_assigned_on.year < 2024
+        ):
             continue
 
         # # combine the p_epc_data and p_project_info
@@ -269,7 +281,15 @@ def download():
         # }
 
         # Collect data for CSV
-        filtered_lots.append((p_meta_info, p_project_info, p_contract_info, p_sales_data, p_teclab_epc_data))
+        filtered_lots.append(
+            (
+                p_meta_info,
+                p_project_info,
+                p_contract_info,
+                p_sales_data,
+                p_teclab_epc_data,
+            )
+        )
     # print(filtered_lots[0])
     # return
 
@@ -282,164 +302,213 @@ def download():
     print("filename=", csv_filename)
 
     # Write to CSV
-    with open(csv_filename, 'w', newline='') as csvfile:
+    with open(csv_filename, "w", newline="") as csvfile:
         csv_writer = csv.writer(csvfile)
 
         # Write header
-        csv_writer.writerow([
-            # Meta_info
-            "Created At",
-            "Created By",
-
-            # Project_info
-            "Community",
-            "Lot Number",
-            "Project_id",
-            "Project_uid",
-            "Section Number",
-
-            # Contract_info
-            "Contract Date",
-            "Contract Type",
-
-            # Sales_data
-            "Sales Agent",
-            "Selections Finished On",
-
-            # Teclab-EPC-Data
-            "Lot Status Finished",
-            "Lot Status Released",
-            "Contract Date",
-            "Contract Type",
-            "Product Name",
-            "Elevation Name",
-            "Drafting Drafter",
-            "Drafting Assigned On",
-            "Drafting Finished",
-            "Engineering Engineer",
-            "Engineering Sent",
-            "Engineering Received",
-            "Plat Engineer",
-            "Plat Sent",
-            "Plat Received",
-            "Permitting County Name",
-            "Permitting Submitted",
-            "Permitting Received",
-            "Homesiting Completed By",
-            "Homesiting Completed On",
-            "BBP Posted",
-            "Notes"
-
-            # Teclab-COR-Data
-            # "Product",
-            # "Eleavtion",
-            # "Locations",
-            # "Categories",
-            # "Custom Notes",
-        ])
+        csv_writer.writerow(
+            [
+                # Meta_info
+                "Created At",
+                "Created By",
+                # Project_info
+                "Community",
+                "Lot Number",
+                "Project_id",
+                "Project_uid",
+                "Section Number",
+                # Contract_info
+                "Contract Date",
+                "Contract Type",
+                # Sales_data
+                "Sales Agent",
+                "Selections Finished On",
+                # Teclab-EPC-Data
+                "Lot Status Finished",
+                "Lot Status Released",
+                "Contract Date",
+                "Contract Type",
+                "Product Name",
+                "Elevation Name",
+                "Drafting Drafter",
+                "Drafting Assigned On",
+                "Drafting Finished",
+                "Engineering Engineer",
+                "Engineering Sent",
+                "Engineering Received",
+                "Plat Engineer",
+                "Plat Sent",
+                "Plat Received",
+                "Permitting County Name",
+                "Permitting Submitted",
+                "Permitting Received",
+                "Homesiting Completed By",
+                "Homesiting Completed On",
+                "BBP Posted",
+                "Notes",
+                # Teclab-COR-Data
+                # "Product",
+                # "Eleavtion",
+                # "Locations",
+                # "Categories",
+                # "Custom Notes",
+            ]
+        )
 
         # Write rows
-        for (p_meta_info, p_project_info, p_contract_info, p_sales_data, p_teclab_epc_data) in filtered_lots:
-            csv_writer.writerow([
-                #Meta_info
-                p_meta_info.created_at,
-                p_meta_info.created_by,
-
-                # Project_info
-                p_project_info.community,
-                p_project_info.lot_number,
-                p_project_info.project_id,
-                p_project_info.project_uid,
-                p_project_info.section,
-
-                # Contract_info
-                p_contract_info.contract_date,
-                p_contract_info.contract_type,
-
-                # Sales_data
-                p_sales_data.salesman,
-                p_sales_data.selections_finished_on,
-
-                # Teclaba-EPC-Data
-                p_teclab_epc_data.lot_status_finished,
-                p_teclab_epc_data.lot_status_released,
-                p_teclab_epc_data.contract_date.strftime("%Y-%m-%d") if p_teclab_epc_data.contract_date else None,
-                p_teclab_epc_data.contract_type,
-                p_teclab_epc_data.product_name,
-                p_teclab_epc_data.elevation_name,
-                p_teclab_epc_data.drafting_drafter,
-                p_teclab_epc_data.drafting_assigned_on.strftime("%Y-%m-%d") if p_teclab_epc_data.drafting_assigned_on else None,
-                p_teclab_epc_data.drafting_finished.strftime("%Y-%m-%d") if p_teclab_epc_data.drafting_finished else None,
-                p_teclab_epc_data.engineering_engineer,
-                p_teclab_epc_data.engineering_sent.strftime("%Y-%m-%d") if p_teclab_epc_data.engineering_sent else None,
-                p_teclab_epc_data.engineering_received.strftime("%Y-%m-%d") if p_teclab_epc_data.engineering_received else None,
-                p_teclab_epc_data.plat_engineer,
-                p_teclab_epc_data.plat_sent.strftime("%Y-%m-%d") if p_teclab_epc_data.plat_sent else None,
-                p_teclab_epc_data.plat_received.strftime("%Y-%m-%d") if p_teclab_epc_data.plat_received else None,
-                p_teclab_epc_data.permitting_county_name,
-
-                p_teclab_epc_data.permitting_submitted.strftime("%Y-%m-%d") if p_teclab_epc_data.permitting_submitted else None,
-                p_teclab_epc_data.permitting_received.strftime("%Y-%m-%d") if p_teclab_epc_data.permitting_received else None,
-                p_teclab_epc_data.homesiting_completed_by,
-                p_teclab_epc_data.homesiting_completed_on,
-                # lot_data.homesiting_completed_on.strftime("%Y-%m-%d") if lot_data.homesiting_completed_on else None,
-                p_teclab_epc_data.bbp_posted.strftime("%Y-%m-%d") if p_teclab_epc_data.bbp_posted else None,
-                p_teclab_epc_data.notes,
-
-                # Teclaba-COR-Data
-                # p_teclab_cor_data.product,
-                # p_teclab_cor_data.elevation,
-                # p_teclab_cor_data.locations,
-                # p_teclab_cor_data.categories,
-                # p_teclab_cor_data.custom_notes
-            ])
+        for (
+            p_meta_info,
+            p_project_info,
+            p_contract_info,
+            p_sales_data,
+            p_teclab_epc_data,
+        ) in filtered_lots:
+            csv_writer.writerow(
+                [
+                    # Meta_info
+                    p_meta_info.created_at,
+                    p_meta_info.created_by,
+                    # Project_info
+                    p_project_info.community,
+                    p_project_info.lot_number,
+                    p_project_info.project_id,
+                    p_project_info.project_uid,
+                    p_project_info.section,
+                    # Contract_info
+                    p_contract_info.contract_date,
+                    p_contract_info.contract_type,
+                    # Sales_data
+                    p_sales_data.salesman,
+                    p_sales_data.selections_finished_on,
+                    # Teclaba-EPC-Data
+                    p_teclab_epc_data.lot_status_finished,
+                    p_teclab_epc_data.lot_status_released,
+                    (
+                        p_teclab_epc_data.contract_date.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.contract_date
+                        else None
+                    ),
+                    p_teclab_epc_data.contract_type,
+                    p_teclab_epc_data.product_name,
+                    p_teclab_epc_data.elevation_name,
+                    p_teclab_epc_data.drafting_drafter,
+                    (
+                        p_teclab_epc_data.drafting_assigned_on.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.drafting_assigned_on
+                        else None
+                    ),
+                    (
+                        p_teclab_epc_data.drafting_finished.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.drafting_finished
+                        else None
+                    ),
+                    p_teclab_epc_data.engineering_engineer,
+                    (
+                        p_teclab_epc_data.engineering_sent.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.engineering_sent
+                        else None
+                    ),
+                    (
+                        p_teclab_epc_data.engineering_received.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.engineering_received
+                        else None
+                    ),
+                    p_teclab_epc_data.plat_engineer,
+                    (
+                        p_teclab_epc_data.plat_sent.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.plat_sent
+                        else None
+                    ),
+                    (
+                        p_teclab_epc_data.plat_received.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.plat_received
+                        else None
+                    ),
+                    p_teclab_epc_data.permitting_county_name,
+                    (
+                        p_teclab_epc_data.permitting_submitted.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.permitting_submitted
+                        else None
+                    ),
+                    (
+                        p_teclab_epc_data.permitting_received.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.permitting_received
+                        else None
+                    ),
+                    p_teclab_epc_data.homesiting_completed_by,
+                    p_teclab_epc_data.homesiting_completed_on,
+                    # lot_data.homesiting_completed_on.strftime("%Y-%m-%d") if lot_data.homesiting_completed_on else None,
+                    (
+                        p_teclab_epc_data.bbp_posted.strftime("%Y-%m-%d")
+                        if p_teclab_epc_data.bbp_posted
+                        else None
+                    ),
+                    p_teclab_epc_data.notes,
+                    # Teclaba-COR-Data
+                    # p_teclab_cor_data.product,
+                    # p_teclab_cor_data.elevation,
+                    # p_teclab_cor_data.locations,
+                    # p_teclab_cor_data.categories,
+                    # p_teclab_cor_data.custom_notes
+                ]
+            )
 
     return {"message": "CSV file created successfully", "filename": csv_filename}
 
 
 # Send Eagle back tracking email
-@router.get('/epc-backlog-tracker')
-def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+@router.get("/epc-backlog-tracker")
+def generate_send_csv(
+    current_user_data: Annotated[User, Depends(get_current_user_data)],
+):
     # query the data
     filtered_lots, result_data = query_tracker_data()
 
     # create the csv file
     today_date = datetime.now().strftime("%d-%m-%y")
-    csv_filename = os.path.join("./app/files/epc", f"{today_date}-EagleBacklogTracker.csv")
+    csv_filename = os.path.join(
+        "./app/files/epc", f"{today_date}-EagleBacklogTracker.csv"
+    )
     print("filename=", csv_filename)
-    with open(csv_filename, 'w', newline='') as csvfile:
+    with open(csv_filename, "w", newline="") as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow([
-            "Community",
-            "Contract-Waiting_Drafting",
-            "Contract-Waiting_Eng_or_Plat",
-            "Contract-Waiting_Permit",
-            "Permit&Hold-Waiting_Drafting",
-            "Permit&Hold-Waiting_Eng_or_Plat",
-            "Permit&Hold-Waiting_Permit",
-            "Community Totals"
-        ])
+        csv_writer.writerow(
+            [
+                "Community",
+                "Contract-Waiting_Drafting",
+                "Contract-Waiting_Eng_or_Plat",
+                "Contract-Waiting_Permit",
+                "Permit&Hold-Waiting_Drafting",
+                "Permit&Hold-Waiting_Eng_or_Plat",
+                "Permit&Hold-Waiting_Permit",
+                "Community Totals",
+            ]
+        )
         for k, v in result_data.items():
             csv_writer.writerow([k] + v)
 
     # create email with attachment
     message = MIMEMultipart()
-    message['Subject'] = 'Eagle Backlog Tracker'
-    message['From'] = 'nexus@tecofva.com'
+    message["Subject"] = "Eagle Backlog Tracker"
+    message["From"] = "nexus@tecofva.com"
     # message['To'] = 'sreddy@tecofva.com'
-    message['To'] = current_user_data.username
-    message.attach(MIMEText('EPC Backlog Tracker as of today', 'plain'))
+    message["To"] = current_user_data.username
+    message.attach(MIMEText("EPC Backlog Tracker as of today", "plain"))
 
     # attach the csv file to message
-    with open(csv_filename, 'r') as file:
+    with open(csv_filename, "r") as file:
         attachment = MIMEText(file.read())
-        attachment.add_header('Content-Disposition', 'attachment', filename=(today_date + "-EagleBacklogTracker.csv"))
+        attachment.add_header(
+            "Content-Disposition",
+            "attachment",
+            filename=(today_date + "-EagleBacklogTracker.csv"),
+        )
         message.attach(attachment)
 
     send_email_with_given_message_and_attachment(
         current_user_data.username,
         # "sreddy@tecofva.com",
-        message
+        message,
     )
 
     return {
@@ -452,50 +521,61 @@ def generate_send_csv(current_user_data: Annotated[User, Depends(get_current_use
         # f"pm_waiting_eng_or_plat: + {len(pm_waiting_eng_or_plat)}": pm_waiting_eng_or_plat,
         # f"pm_waiting_to_send_permit: + {len(pm_waiting_to_send_permit)}": pm_waiting_to_send_permit
     }
+
 
 # CUSTOM ROUTE: FOR BERTON EMAIL
-@router.get('/epc-backlog-tracker-custom-berton')
-def generate_send_csv_2(current_user_data: Annotated[User, Depends(get_current_user_data)]):
+@router.get("/epc-backlog-tracker-custom-berton")
+def generate_send_csv_2(
+    current_user_data: Annotated[User, Depends(get_current_user_data)],
+):
     # query the data
     filtered_lots, result_data = query_tracker_data()
 
     # create the csv file
     today_date = datetime.now().strftime("%d-%m-%y")
-    csv_filename = os.path.join("./app/files/epc", f"{today_date}-EagleBacklogTrackerBerton.csv")
+    csv_filename = os.path.join(
+        "./app/files/epc", f"{today_date}-EagleBacklogTrackerBerton.csv"
+    )
     print("filename=", csv_filename)
-    with open(csv_filename, 'w', newline='') as csvfile:
+    with open(csv_filename, "w", newline="") as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow([
-            "Community",
-            "Contract-Waiting_Drafting",
-            "Contract-Waiting_Eng_or_Plat",
-            "Contract-Waiting_Permit",
-            "Permit&Hold-Waiting_Drafting",
-            "Permit&Hold-Waiting_Eng_or_Plat",
-            "Permit&Hold-Waiting_Permit",
-            "Community Totals"
-        ])
+        csv_writer.writerow(
+            [
+                "Community",
+                "Contract-Waiting_Drafting",
+                "Contract-Waiting_Eng_or_Plat",
+                "Contract-Waiting_Permit",
+                "Permit&Hold-Waiting_Drafting",
+                "Permit&Hold-Waiting_Eng_or_Plat",
+                "Permit&Hold-Waiting_Permit",
+                "Community Totals",
+            ]
+        )
         for k, v in result_data.items():
             csv_writer.writerow([k] + v)
 
     # create email with attachment
     message = MIMEMultipart()
-    message['Subject'] = 'Eagle Backlog Tracker'
-    message['From'] = 'nexus@tecofva.com'
+    message["Subject"] = "Eagle Backlog Tracker"
+    message["From"] = "nexus@tecofva.com"
     # message['To'] = 'sreddy@tecofva.com'
-    message['To'] = current_user_data.username
-    message.attach(MIMEText('EPC Backlog Tracker as of today', 'plain'))
+    message["To"] = current_user_data.username
+    message.attach(MIMEText("EPC Backlog Tracker as of today", "plain"))
 
     # attach the csv file to message
-    with open(csv_filename, 'r') as file:
+    with open(csv_filename, "r") as file:
         attachment = MIMEText(file.read())
-        attachment.add_header('Content-Disposition', 'attachment', filename=(today_date + "-EagleBacklogTracker.csv"))
+        attachment.add_header(
+            "Content-Disposition",
+            "attachment",
+            filename=(today_date + "-EagleBacklogTracker.csv"),
+        )
         message.attach(attachment)
 
     send_email_with_given_message_and_attachment(
         current_user_data.username,
         # "sreddy@tecofva.com",
-        message
+        message,
     )
 
     return {
@@ -508,3 +588,167 @@ def generate_send_csv_2(current_user_data: Annotated[User, Depends(get_current_u
         # f"pm_waiting_eng_or_plat: + {len(pm_waiting_eng_or_plat)}": pm_waiting_eng_or_plat,
         # f"pm_waiting_to_send_permit: + {len(pm_waiting_to_send_permit)}": pm_waiting_to_send_permit
     }
+
+
+# HELPER: given a IHMS house data, filters all the required fields on EPC
+# To add/modify fields that need to be filtered, simply copy the fields
+#  from IHMSHouseData into IHMSFilteredHouseData
+def filter_epc_fields_from_ihms_house_data(
+    house_data: IHMSHouseData,
+) -> IHMSFilteredHouseData:
+    house_dict = house_data.model_dump(by_alias=True)
+
+    # Use aliases as keys (assuming all fields have aliases)
+    filtered_data = {
+        field_info.alias: house_dict.get(field_info.alias)  # type: ignore
+        for field_info in IHMSFilteredHouseData.model_fields.values()
+    }
+
+    # Create model using alias keys
+    result = IHMSFilteredHouseData.model_validate(filtered_data, from_attributes=False)
+
+    return result
+
+
+async def get_house_number(
+    community, section, lot_number
+) -> tuple[str | None, str | None]:
+    """
+    GET the house number
+
+    Given a target CC-SS-LL filter all IHMS data for target lot
+    Returns: HouseNumber, Error  (one of which will be None)
+    """
+    IHMS_api_endpoint = "https://api.ecimarksystems.com/rest/EVA"
+    IHMS_company_code = "001"
+    IHMS_development_code = community
+
+    # https://api.ecimarksystems.com/rest/EVA/companies/001/developments/RB/houses
+    url = f"{IHMS_api_endpoint}/companies/{IHMS_company_code}/developments/{IHMS_development_code}/houses"
+    # TODO: save the access_token and get a new one only after it expires
+    access_token, token_error = await get_access_token()
+    if token_error:
+        return None, f"Failed to get access token: {token_error}"
+    headers = {"Content-Type": "application/json", "Authorization": access_token}
+
+    house_number = None
+    all_houses = []  # get all houses data, then filter them for target lot
+
+    # Get all the houses in the given community
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url=url, headers=headers, timeout=10.0)
+            # print("::::response::::", response)
+
+            if response.status_code == 200:
+                all_houses = response.json()
+            else:
+                logger.error(
+                    f"API returned status code {response.status_code} \ndetails: {response.text}"
+                )
+                return (
+                    None,
+                    f"API returned status code {response.status_code} \ndetails: {response.text}",
+                )
+        except httpx.RequestError as e:
+            logger.error(f"Request failed: {str(e)}")
+            return None, f"Request failed: {str(e)}"
+
+    # Find the house from the list of houses in the entire community
+    # NOTE: finds the first house that matches with Community & Seciton & Lot.
+    # there shouldn't be multiple homes with same commuty-section-lot but
+    # if there are multiple, then handle it (later)
+    for house in all_houses:
+        if house["BLOCKNUMBER"] is None or house["BLOCKNUMBER"] == "":
+            if house["LOTNUMBER"] == lot_number:
+                house_number = house["HOUSENUMBER"]
+        elif house["BLOCKNUMBER"] == section and house["LOTNUMBER"] == lot_number:
+            house_number = house["HOUSENUMBER"]
+
+    if house_number is None:
+        return None, f"Couldn't find {community}-{section}-{lot_number} on IHMS"
+
+    return house_number, None
+
+
+async def get_ihms_house_data(
+    community: str, house_number: str
+) -> tuple[IHMSHouseData | None, str | None]:
+    """
+    GET house details
+    """
+    IHMS_api_endpoint = "https://api.ecimarksystems.com/rest/EVA"
+    IHMS_company_code = "001"
+    url = f"{IHMS_api_endpoint}/companies/{IHMS_company_code}/developments/{community}/houses/{house_number}"
+    access_token, error_getting_accesstoken = await get_access_token()
+    if error_getting_accesstoken:
+        return None, error_getting_accesstoken
+    headers = {"Content-Type": "application/json", "Authorization": access_token}
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, headers=headers, timeout=10.0)
+            response.raise_for_status()  # raises for HTTP errors
+            data = response.json()
+            return IHMSHouseData(**data), None  # always return Pydantic object
+        except httpx.RequestError as e:
+            raise RuntimeError(f"Request failed: {e}")
+        except httpx.HTTPStatusError as e:
+            raise RuntimeError(
+                f"API returned status {e.response.status_code}: {e.response.text}"
+            )
+        except Exception as e:
+            raise RuntimeError(f"Failed to parse IHMS data: {e}")
+
+
+@router.get("/ihms/get/{project_uid}", dependencies=[Depends(get_current_user_data)])
+async def get_epc_fields_from_ihms_house_data(
+    project_uid: str,
+) -> tuple[dict | None, str | None]:
+    print("::::: trying get_epc_fields_from_ihms_house_data :::: ")
+    try:
+        target_project = find_project(project_uid)
+        project_info = target_project["project_info"]
+        parts = project_info["project_id"].split("-")
+        community, section, lot_number = parts[0], "S" + parts[1], parts[2]
+        if len(lot_number) == 1:
+            lot_number = "0" + lot_number
+
+        logger.info(
+            f"Searching IHMS: community={community}, section={section}, lot_number={lot_number}"
+        )
+
+        # Make API call to IHMS
+        house_number, error_getting_housenumber = await get_house_number(
+            community, section, lot_number
+        )
+        if error_getting_housenumber or house_number is None:
+            return None, error_getting_housenumber
+            # return {
+            #     "error": "House not found in IHMS",
+            #     "details": f"No house found for {community}-{section}-{lot_number}",
+            # }
+
+        logger.info(f"Found IHMS house number: {house_number}")
+        ihms_house_data, err = await get_ihms_house_data(community, house_number)
+        if err or ihms_house_data is None:
+            return None, err
+        ihms_filtered_data = filter_epc_fields_from_ihms_house_data(ihms_house_data)
+
+        # Debug: Check what's actually being returned
+        # print("Before return - filtered_data:", ihms_filtered_data.model_dump())
+
+        return {
+            "IHMS_HOUSE_DATA": ihms_house_data.model_dump(by_alias=True),
+            "IHMS_FILTERED_DATA": ihms_filtered_data.model_dump(by_alias=True),
+            "metadata": {
+                "community": community,
+                "section": section,
+                "lot_number": lot_number,
+                "house_number": house_number,
+            },
+        }, None
+
+    except Exception as e:
+        logger.error(f"Error fetching IHMS data: {str(e)}")
+        return None, f"Error fetching IHMS data: {str(e)}"

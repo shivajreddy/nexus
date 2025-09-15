@@ -6,9 +6,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 # IMPORT DATABASE
-from app.database.database import connect_mongodb, department_data_coll, users_coll, eagle_data_coll, projects_coll
-from app.database.setup_data.eagle_data import eagle_data_coll_initial_data, department_data_coll_initial_data, \
-    projects_coll_initial_data
+from app.database.database import (
+    connect_ihms_db,
+    connect_mongodb,
+    department_data_coll,
+    users_coll,
+    eagle_data_coll,
+    projects_coll,
+)
+from app.database.setup_data.eagle_data import (
+    eagle_data_coll_initial_data,
+    department_data_coll_initial_data,
+    projects_coll_initial_data,
+)
 
 # IMPORT ROUTERS
 from app.router.public.public import public_router
@@ -19,7 +29,9 @@ from app.router.admin.admin import router as admin_router
 from app.router.department.teclab.teclab import router as teclab_router
 from app.router.department.teclab.dashboard import router as teclab_dashboard_router
 from app.router.department.teclab.graphs import router as teclab_graphs_router
-from app.router.department.teclab.dashboardWarranty import router as warranty_dashboard_router
+from app.router.department.teclab.dashboardWarranty import (
+    router as warranty_dashboard_router,
+)
 from app.router.department.teclab.epc import router as teclab_epc_router
 from app.router.department.teclab.cor import router as teclab_cor_router
 from app.router.department.teclab.fosc import router as teclab_fosc_router
@@ -29,12 +41,14 @@ from app.router.dev.dev import router as dev_router
 
 from app.sockets.sockets import sio_app
 
-ropagate = False # Optional: prevent logs from propagating to the root logger
+ropagate = False  # Optional: prevent logs from propagating to the root logger
+
 
 # Include Routers into FASTAPI app
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     connect_mongodb()  # + connect to database
+    await connect_ihms_db()  # + connect to IHMS MySQL database
     app.include_router(auth_router)  # + include router's
     app.include_router(eagle_router)
     app.include_router(public_router)
@@ -59,15 +73,12 @@ app = FastAPI(
     title="Nexus",
     description="""Nexus is a central system designed for Home builders, to accelerate Home building.""",
     version="1.0.0",
-    contact={
-        "name": "Shiva Reddy",
-        "url": "https://github.com/shivajreddy"
-    },
+    contact={"name": "Shiva Reddy", "url": "https://github.com/shivajreddy"},
     license_info={
         "name": "MIT",
-        "url": "https://github.com/git/git-scm.com/blob/main/MIT-LICENSE.txt"
+        "url": "https://github.com/git/git-scm.com/blob/main/MIT-LICENSE.txt",
     },
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 app.mount("/ws", sio_app)
@@ -93,7 +104,7 @@ app.add_middleware(
 )
 
 
-'''
+"""
 @app.on_event("startup")
 async def app_init():
     connect_mongodb()  # + connect to database
@@ -106,9 +117,10 @@ async def app_init():
     app.include_router(teclab_cor_router)
     app.include_router(testing_router)
     app.include_router(projects_router)
-'''
+"""
 
-@app.get('/')
+
+@app.get("/")
 def test_public():
     return {"Hello World! from Nexus"}
 
@@ -123,17 +135,17 @@ def root():
 def setup_database():
     # + 'users' collection
     users_coll.drop()
-    users_coll.create_index('username', unique=True)
+    users_coll.create_index("username", unique=True)
     # users_coll.insert_many(users_coll_initial_data)
 
     # + 'eagle_data' collection
     eagle_data_coll.drop()
-    eagle_data_coll.create_index('table_name', unique=True)
+    eagle_data_coll.create_index("table_name", unique=True)
     eagle_data_coll.insert_many(eagle_data_coll_initial_data)
 
     # + 'department_data' collection
     department_data_coll.drop()
-    department_data_coll.create_index('department_name', unique=True)
+    department_data_coll.create_index("department_name", unique=True)
     department_data_coll.insert_many(department_data_coll_initial_data)
 
     # + 'projects' collection

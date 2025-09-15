@@ -32,6 +32,13 @@ class Settings(BaseSettings):
     CLIENT_ID: str
     CLIENT_SECRET: str
 
+    # IHMS Database
+    IHMS_DB_USER: str
+    IHMS_DB_PASS: str
+    IHMS_DB_HOST: str
+    IHMS_DB_PORT: str
+    IHMS_DB_NAME: str
+
     class Config:
         env_file: str
 

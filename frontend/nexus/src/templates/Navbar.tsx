@@ -6,6 +6,7 @@ import { FaExpand, FaRegCircle } from "react-icons/fa";
 
 import { BsCollection, BsGraphUp, BsHouses } from "react-icons/bs";
 import { MdAutoGraph } from "react-icons/md";
+import { FaChartColumn } from "react-icons/fa6";
 import { PiGraphBold } from "react-icons/pi";
 import { useUserRoles } from "@hooks/useUserRoles.ts";
 import { hasRoles } from "@/features/utils/utils.ts";
@@ -36,13 +37,19 @@ function Navbar() {
             roles: [213, 299, 999],
         },
         {
-            name: "PipeLine",
-            link: "/pipeline",
+            name: "ProjectGraph",
+            link: "/dev/projectgraph",
             icon: <PiGraphBold size="1.5em" />,
             isBeta: true,
             roles: [999],
         },
-
+        {
+            name: "Pipeline",
+            link: "/pipeline",
+            icon: <FaChartColumn size="1.5em" />,
+            isBeta: true,
+            roles: [999],
+        },
         {
             name: "EPC",
             link: "/epc",

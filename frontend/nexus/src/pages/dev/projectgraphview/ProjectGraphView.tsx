@@ -79,7 +79,7 @@ const nodeTypes = {
     counterNode: CounterNode,
 }
 
-const PipeLineView = () => {
+const ProjectGraphView = () => {
     return (
         <div>
             <div className="w-100vw h-[calc(100vh-84px)] m-4 border rounded-md bg-default-bg2 shadow-sm p-4">
@@ -95,4 +95,4 @@ const PipeLineView = () => {
     );
 };
 
-export default PipeLineView;
+export default ProjectGraphView;
