@@ -63,6 +63,7 @@ import { ProjectConsole } from "./pages/dev/ProjectConsole";
 import ProjectGraph from "./pages/dev/projectgraphview/ProjectGraph";
 import Pipeline from "./pages/department/eagle/reports/pipeline/view/Pipeline";
 import AuthPipeline from "./pages/department/eagle/reports/pipeline/AuthPipeline";
+import IhmsAll from "./pages/department/teclab/Epc/View/IhmsAll";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -104,6 +105,7 @@ const router = createBrowserRouter(
                     <Route path="pipeline" element={<AuthPipeline />}>
                         <Route index element={<Pipeline />} />
                         {/* <Route path="variant2" element={< pipeline variant 2 />} /> */}
+                        <Route path="all" element={<IhmsAll />} />
                     </Route>
 
 
