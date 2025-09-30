@@ -67,8 +67,8 @@ async def pipeline_all(session: AsyncSession = Depends((get_ihms_session))):
     return {"time_taken": time_taken, "data": res}
 
 
-@router.get("/pipeline/work2")
 # combined sql query
+@router.get("/pipeline/work2")
 async def ddd(session: AsyncSession = Depends((get_ihms_session))):
     start_time = datetime.now()
 

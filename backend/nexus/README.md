@@ -20,7 +20,8 @@
         - 213 - epc super user -> get emails, change form data
     22x - Field OPS related
         - 220 - FOSC viewer
-        - 221 - FOSC editor
+        - 221 - FOSC viewer (can see all lots)
+        - 222 - FOSC editor
         - 223 - FOSC super user -> get emails, change form data
 9** - MASTER KEY 
     999 - DEVELOPER -> access to everything
