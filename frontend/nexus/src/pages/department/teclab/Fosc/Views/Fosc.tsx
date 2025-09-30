@@ -211,7 +211,7 @@ function Fosc() {
                         }
                     </div>
                     <div className="flex mx-10">
-                        {hasRoles(userRoles, [221, 223, 291, 299, 999]) &&
+                        {hasRoles(userRoles, [223, 291, 299, 999]) &&
                             <div className="flex justify-center items-center bg-default-bg1">
                                 <Button
                                     className="min-w-[10em]"
@@ -235,7 +235,7 @@ function Fosc() {
                         {/* } */}
 
                         {/*List of all of the lots that exist and their status*/}
-                        {hasRoles(userRoles, [223, 299, 999]) &&
+                        {hasRoles(userRoles, [221, 222, 223, 299, 999]) &&
                             <div className="flex justify-center items-center ml-8 bg-default-bg2">
                                 <button
                                     className="flex items-center border border-b0 bg-default-bg2 hover:bg-default-fg2 hover:text-background p-1.5 px-4 rounded-md"
