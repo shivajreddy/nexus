@@ -46,9 +46,12 @@ const FOSCDataForm = ({ project_id, project_uid, statusFOSCDataFetch, setStatusF
 
     const ALL_DIRECTORS = ["J.Marcinkevich", "T.Burke", "B.Keller", "J.Wood", "M.Mugler"]
     ALL_DIRECTORS.sort()
+    // As of now since the PM's keep changing constantly, these are just hardcoded on the 
+    // frontend, and the backend end point '/department/teclab/fosc/edit' just takes in all the fields 
+    // given for the propery 'fosc_data' and sets that value in DB
     const ALL_PMS = ["P.Monge", "D.Johnson", "T.Burke", "M.Hardy", "P.Riley", "E.Phelps", "L.Saunders",
         "A.Ghannam", "W.Wallace", "P.Shaw", "S.Lambert", "C.Montgomery", "J.Bruce", "R.Adenauer",
-        "R.Kelley", "F.Cole", "J.Fleming", "D.Stosser", "M.Mugler", "Sam Taylor"]
+        "R.Kelley", "F.Cole", "J.Fleming", "D.Stosser", "M.Mugler", "Sam Taylor", "Tom Bakos"]
     ALL_PMS.sort()
 
     type IFormData = {
