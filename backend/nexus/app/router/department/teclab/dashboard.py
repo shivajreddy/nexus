@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from fastapi import APIRouter, Depends
 
-from app.database.database import projects_coll 
+from app.database.database import projects_coll
 from app.database.schemas.department_data import EPCData
 from app.database.schemas.project import Project
 from app.security.oauth2 import get_current_user_data
@@ -27,6 +27,8 @@ router = APIRouter(prefix="/department/teclab/dashboard")
 # def get_previous_month_ticker_data():
 #     pass
 # @router.get("/current-month-ticker-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
+
+""" THIS IS THE ORIGINAL CODE BEFORE THE 2026 FIX
 @router.get("/ticker-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
 def get_current_month_ticker_data():
     all_docs = list(projects_coll.find())
@@ -392,6 +394,540 @@ def get_current_month_ticker_data():
     },
     }
     return res
+"""
+
+
+@router.get(
+    "/ticker-data", response_model=dict, dependencies=[Depends(get_current_user_data)]
+)
+def get_current_month_ticker_data():
+    all_docs = list(projects_coll.find())
+
+    current_year = datetime.today().year
+    current_month = datetime.today().month
+
+    # Get current and previous month correctly
+    current_date = datetime.today()
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month = last_day_of_previous_month.month
+    previous_month_year = last_day_of_previous_month.year
+
+    current_month_name = current_date.strftime("%B")
+    previous_month_name = last_day_of_previous_month.strftime("%B")
+    current_year_name = str(current_year)
+
+    filtered_projects: List[Project] = (
+        []
+    )  # docs that have contract_date of current_year
+    filtered_p_teclab_epc_data: List[EPCData] = []
+
+    # FIX 1: Include projects from previous month's year onwards
+    min_year = min(current_year, previous_month_year)
+
+    for doc in all_docs:
+        # Remove MongoDB's `_id` field from the document
+        project_raw = {k: v for (k, v) in doc.items() if k != "_id"}
+        # print("project_raw:epc:", project_raw["teclab_data"]["epc_data"])
+        # print("project_raw:fosc:", project_raw["teclab_data"]["fosc_data"])
+        project: Project = Project(**project_raw)
+
+        p_teclab_epc_data: EPCData = EPCData(**project_raw["teclab_data"]["epc_data"])
+
+        # Filter for lots from min_year and onwards i.e., skip anything before min_year
+        if not p_teclab_epc_data.contract_date:
+            continue
+        if (
+            p_teclab_epc_data.contract_date
+            and p_teclab_epc_data.contract_date.year < min_year
+        ):
+            continue
+
+        filtered_projects.append(project)
+        # if project.teclab_data.epc_data.drafting_assigned_on and project.teclab_data.epc_data.drafting_finished:
+        #     days_taken_to_draft = (project.teclab_data.epc_data.drafting_finished - project.teclab_data.epc_data.drafting_assigned_on).days
+        #     if days_taken_to_draft <= 0:
+        #         print("ERROR: cant be -ve days", project.project_info)
+        filtered_p_teclab_epc_data.append(p_teclab_epc_data)
+
+    total_projects_current_year = len(filtered_p_teclab_epc_data)
+    total_projects_current_month = len(
+        [
+            p
+            for p in filtered_p_teclab_epc_data
+            if p.contract_date.month == current_month
+        ]
+    )
+    total_projects_previous_month = len(
+        [
+            p
+            for p in filtered_p_teclab_epc_data
+            if p.contract_date.month == previous_month
+            and p.contract_date.year == previous_month_year
+        ]
+    )
+
+    # Helper function to calculate min, max, avg for a specific time period
+    def calculate_stats(data_values, projects, filter_func):
+        filtered_values = [
+            value
+            for project, value in zip(projects, data_values)
+            if filter_func(project)
+        ]
+        if not filtered_values:
+            return 0, 0, 0, 0
+        return (
+            min(filtered_values),
+            max(filtered_values),
+            sum(filtered_values) // len(filtered_values),
+            len(filtered_values),
+        )
+
+    # Drafting calculations
+    drafting_projects = []
+    drafting_values = []
+    for p in filtered_projects:
+        if (
+            not p.teclab_data.epc_data.drafting_assigned_on
+            or not p.teclab_data.epc_data.drafting_finished
+        ):
+            continue
+        # days_taken_to_draft = (p.teclab_data.epc_data.drafting_finished - p.teclab_data.epc_data.drafting_assigned_on).days
+        delta = (
+            p.teclab_data.epc_data.drafting_finished
+            - p.teclab_data.epc_data.drafting_assigned_on
+        )
+        days_taken_to_draft = max(0, round(delta.total_seconds() / 86400))
+        if days_taken_to_draft < 0:
+            print(
+                f"ERROR: project_id:{p.project_info.project_id} days_taken_to_draft:{days_taken_to_draft} cant be < 0 days"
+            )
+            print(
+                f"finished-date:{p.teclab_data.epc_data.drafting_finished} assigned-date{p.teclab_data.epc_data.drafting_assigned_on}"
+            )
+            print(
+                f"differnce: {p.teclab_data.epc_data.drafting_finished - p.teclab_data.epc_data.drafting_assigned_on}"
+            )
+        drafting_projects.append(p)
+        drafting_values.append(days_taken_to_draft)
+    # print("drafting values:::", drafting_values)
+
+    # Calculate for different time periods
+    (
+        drafting_min_current_year,
+        drafting_max_current_year,
+        drafting_avg_current_year,
+        drafting_count_current_year,
+    ) = calculate_stats(
+        drafting_values,  # drafting values from the filtered projects
+        drafting_projects,  # we pass the filtered projects that are used to grab the drafting values
+        lambda p: p.teclab_data.epc_data.drafting_finished.year == current_year,
+    )
+
+    (
+        drafting_min_current_month,
+        drafting_max_current_month,
+        drafting_avg_current_month,
+        drafting_count_current_month,
+    ) = calculate_stats(
+        drafting_values,
+        drafting_projects,
+        lambda p: p.teclab_data.epc_data.drafting_finished.year == current_year
+        and p.teclab_data.epc_data.drafting_finished.month == current_month,
+    )
+
+    # FIX 2: Use previous_month_year instead of current_year
+    (
+        drafting_min_previous_month,
+        drafting_max_previous_month,
+        drafting_avg_previous_month,
+        drafting_count_previous_month,
+    ) = calculate_stats(
+        drafting_values,
+        drafting_projects,
+        lambda p: p.teclab_data.epc_data.drafting_finished.year == previous_month_year
+        and p.teclab_data.epc_data.drafting_finished.month == previous_month,
+    )
+
+    # Engineering calculations
+    engineering_values = []
+    engineering_projects = []
+
+    for p in filtered_projects:
+        if (
+            not p.teclab_data.epc_data.engineering_sent
+            or not p.teclab_data.epc_data.engineering_received
+        ):
+            continue
+        days_taken_to_engineer = (
+            p.teclab_data.epc_data.engineering_received
+            - p.teclab_data.epc_data.engineering_sent
+        ).days
+        engineering_projects.append(p)
+        engineering_values.append(days_taken_to_engineer)
+
+    # Calculate for different time periods
+    (
+        engineering_min_current_year,
+        engineering_max_current_year,
+        engineering_avg_current_year,
+        engineering_count_current_year,
+    ) = calculate_stats(
+        engineering_values,
+        engineering_projects,
+        lambda p: p.teclab_data.epc_data.engineering_received.year == current_year,
+    )
+
+    (
+        engineering_min_current_month,
+        engineering_max_current_month,
+        engineering_avg_current_month,
+        engineering_count_current_month,
+    ) = calculate_stats(
+        engineering_values,
+        engineering_projects,
+        lambda p: p.teclab_data.epc_data.engineering_received.year == current_year
+        and p.teclab_data.epc_data.engineering_received.month == current_month,
+    )
+
+    # FIX 2: Use previous_month_year instead of current_year
+    (
+        engineering_min_previous_month,
+        engineering_max_previous_month,
+        engineering_avg_previous_month,
+        engineering_count_previous_month,
+    ) = calculate_stats(
+        engineering_values,
+        engineering_projects,
+        lambda p: p.teclab_data.epc_data.engineering_received.year
+        == previous_month_year
+        and p.teclab_data.epc_data.engineering_received.month == previous_month,
+    )
+
+    # Plat calculations
+    plat_values = []
+    plat_projects = []
+    for p in filtered_projects:
+        if (
+            not p.teclab_data.epc_data.plat_sent
+            or not p.teclab_data.epc_data.plat_received
+        ):
+            continue
+        days_taken_for_plat = (
+            p.teclab_data.epc_data.plat_received - p.teclab_data.epc_data.plat_sent
+        ).days
+        plat_projects.append(p)
+        plat_values.append(days_taken_for_plat)
+
+    # Calculate for different time periods
+    (
+        plat_min_current_year,
+        plat_max_current_year,
+        plat_avg_current_year,
+        plat_count_current_year,
+    ) = calculate_stats(
+        plat_values,
+        plat_projects,
+        lambda p: p.teclab_data.epc_data.plat_received.year == current_year,
+    )
+
+    (
+        plat_min_current_month,
+        plat_max_current_month,
+        plat_avg_current_month,
+        plat_count_current_month,
+    ) = calculate_stats(
+        plat_values,
+        plat_projects,
+        lambda p: p.teclab_data.epc_data.plat_received.year == current_year
+        and p.teclab_data.epc_data.plat_received.month == current_month,
+    )
+
+    # FIX 2: Use previous_month_year instead of current_year
+    (
+        plat_min_previous_month,
+        plat_max_previous_month,
+        plat_avg_previous_month,
+        plat_count_previous_month,
+    ) = calculate_stats(
+        plat_values,
+        plat_projects,
+        lambda p: p.teclab_data.epc_data.plat_received.year == previous_month_year
+        and p.teclab_data.epc_data.plat_received.month == previous_month,
+    )
+
+    # Permitting calculations
+    permitting_values = []
+    permitting_projects = []
+    for p in filtered_projects:
+        if (
+            not p.teclab_data.epc_data.permitting_submitted
+            or not p.teclab_data.epc_data.permitting_received
+        ):
+            continue
+        days_taken_for_permitting = (
+            p.teclab_data.epc_data.permitting_received
+            - p.teclab_data.epc_data.permitting_submitted
+        ).days
+        permitting_projects.append(p)
+        permitting_values.append(days_taken_for_permitting)
+
+    # Calculate for different time periods
+    (
+        permitting_min_current_year,
+        permitting_max_current_year,
+        permitting_avg_current_year,
+        permitting_count_current_year,
+    ) = calculate_stats(
+        permitting_values,
+        permitting_projects,
+        lambda p: p.teclab_data.epc_data.permitting_received.year == current_year,
+    )
+
+    (
+        permitting_min_current_month,
+        permitting_max_current_month,
+        permitting_avg_current_month,
+        permitting_count_current_month,
+    ) = calculate_stats(
+        permitting_values,
+        permitting_projects,
+        lambda p: p.teclab_data.epc_data.permitting_received.year == current_year
+        and p.teclab_data.epc_data.permitting_received.month == current_month,
+    )
+
+    # FIX 2: Use previous_month_year instead of current_year
+    (
+        permitting_min_previous_month,
+        permitting_max_previous_month,
+        permitting_avg_previous_month,
+        permitting_count_previous_month,
+    ) = calculate_stats(
+        permitting_values,
+        permitting_projects,
+        lambda p: p.teclab_data.epc_data.permitting_received.year == previous_month_year
+        and p.teclab_data.epc_data.permitting_received.month == previous_month,
+    )
+
+    # BBP Posted calculations
+    bbp_posted_values = []
+    bbp_posted_projects = []
+    for p in filtered_projects:
+        if not p.teclab_data.epc_data.contract_date:
+            continue
+        if not p.teclab_data.epc_data.bbp_posted:
+            continue
+        date_that_matters = (
+            p.teclab_data.epc_data.permithold_start
+            if p.teclab_data.epc_data.permithold_start is not None
+            else p.teclab_data.epc_data.permitting_received
+        )
+        if not date_that_matters:
+            continue
+        # delta = p.teclab_data.epc_data.bbp_posted - p.teclab_data.epc_data.permitting_received
+        delta = (
+            p.teclab_data.epc_data.bbp_posted - date_that_matters
+        )  # Time taken to post buildbyplans
+        days_taken_for_bbp_posted = max(0, round(delta.total_seconds() / 86400))
+        if days_taken_for_bbp_posted == 78:
+            print("here stoppppp")
+            print(p.project_info)
+            print("delta:", delta)
+            print(
+                "p.teclab_data.epc_data.bbp_posted", p.teclab_data.epc_data.bbp_posted
+            )
+            print(
+                "p.teclab_data.epc_data.permithold_start",
+                p.teclab_data.epc_data.permithold_start,
+            )
+            print(
+                "p.teclab_data.epc_data.permitting_received",
+                p.teclab_data.epc_data.permitting_received,
+            )
+            print("date_that_matters", date_that_matters)
+        bbp_posted_projects.append(p)
+        bbp_posted_values.append(days_taken_for_bbp_posted)
+
+    # Calculate for different time periods
+    (
+        bbp_posted_min_current_year,
+        bbp_posted_max_current_year,
+        bbp_posted_avg_current_year,
+        bbp_posted_count_current_year,
+    ) = calculate_stats(
+        bbp_posted_values,
+        bbp_posted_projects,
+        lambda p: p.teclab_data.epc_data.bbp_posted.year == current_year,
+    )
+
+    (
+        bbp_posted_min_current_month,
+        bbp_posted_max_current_month,
+        bbp_posted_avg_current_month,
+        bbp_posted_count_current_month,
+    ) = calculate_stats(
+        bbp_posted_values,
+        bbp_posted_projects,
+        lambda p: p.teclab_data.epc_data.bbp_posted.year == current_year
+        and p.teclab_data.epc_data.bbp_posted.month == current_month,
+    )
+
+    # FIX 2: Use previous_month_year instead of current_year
+    (
+        bbp_posted_min_previous_month,
+        bbp_posted_max_previous_month,
+        bbp_posted_avg_previous_month,
+        bbp_posted_count_previous_month,
+    ) = calculate_stats(
+        bbp_posted_values,
+        bbp_posted_projects,
+        lambda p: p.teclab_data.epc_data.bbp_posted.year == previous_month_year
+        and p.teclab_data.epc_data.bbp_posted.month == previous_month,
+    )
+    print("bbp_posted_min_previous_month", bbp_posted_min_previous_month)
+    print("bbp_posted_max_previous_month", bbp_posted_max_previous_month)
+
+    res = {
+        "CURRENT MONTH": {
+            "title": current_month_name,
+            "total": total_projects_current_month,
+            "breakdown": {
+                "Drafting": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 20,
+                    "MIN": drafting_min_current_month,
+                    "MAX": drafting_max_current_month,
+                    "VAL": drafting_avg_current_month,
+                    "COUNT": drafting_count_current_month,
+                },
+                "Engineering": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 15,
+                    "MIN": engineering_min_current_month,
+                    "MAX": engineering_max_current_month,
+                    "VAL": engineering_avg_current_month,
+                    "COUNT": engineering_count_current_month,
+                },
+                "Plat": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 15,
+                    "MIN": plat_min_current_month,
+                    "MAX": plat_max_current_month,
+                    "VAL": plat_avg_current_month,
+                    "COUNT": plat_count_current_month,
+                },
+                "Permitting": {
+                    "USER_MIN": 14,
+                    "USER_MAX": 28,
+                    "MIN": permitting_min_current_month,
+                    "MAX": permitting_max_current_month,
+                    "VAL": permitting_avg_current_month,
+                    "COUNT": permitting_count_current_month,
+                },
+                "BBP Posted": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 5,
+                    "MIN": bbp_posted_min_current_month,
+                    "MAX": bbp_posted_max_current_month,
+                    "VAL": bbp_posted_avg_current_month,
+                    "COUNT": bbp_posted_count_current_month,
+                },
+            },
+        },
+        "PREVIOUS MONTH": {
+            "title": previous_month_name,
+            "total": total_projects_previous_month,
+            "breakdown": {
+                "Drafting": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 20,
+                    "MIN": drafting_min_previous_month,
+                    "MAX": drafting_max_previous_month,
+                    "VAL": drafting_avg_previous_month,
+                    "COUNT": drafting_count_previous_month,
+                },
+                "Engineering": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 15,
+                    "MIN": engineering_min_previous_month,
+                    "MAX": engineering_max_previous_month,
+                    "VAL": engineering_avg_previous_month,
+                    "COUNT": engineering_count_previous_month,
+                },
+                "Plat": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 15,
+                    "MIN": plat_min_previous_month,
+                    "MAX": plat_max_previous_month,
+                    "VAL": plat_avg_previous_month,
+                    "COUNT": plat_count_previous_month,
+                },
+                "Permitting": {
+                    "USER_MIN": 14,
+                    "USER_MAX": 28,
+                    "MIN": permitting_min_previous_month,
+                    "MAX": permitting_max_previous_month,
+                    "VAL": permitting_avg_previous_month,
+                    "COUNT": permitting_count_previous_month,
+                },
+                "BBP Posted": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 5,
+                    "MIN": bbp_posted_min_previous_month,
+                    "MAX": bbp_posted_max_previous_month,
+                    "VAL": bbp_posted_avg_previous_month,
+                    "COUNT": bbp_posted_count_previous_month,
+                },
+            },
+        },
+        "CURRENT YEAR": {
+            "title": current_year_name,
+            "total": total_projects_current_year,
+            "breakdown": {
+                "Drafting": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 20,
+                    "MIN": drafting_min_current_year,
+                    "MAX": drafting_max_current_year,
+                    "VAL": drafting_avg_current_year,
+                    "COUNT": drafting_count_current_year,
+                },
+                "Engineering": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 15,
+                    "MIN": engineering_min_current_year,
+                    "MAX": engineering_max_current_year,
+                    "VAL": engineering_avg_current_year,
+                    "COUNT": engineering_count_current_year,
+                },
+                "Plat": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 15,
+                    "MIN": plat_min_current_year,
+                    "MAX": plat_max_current_year,
+                    "VAL": plat_avg_current_year,
+                    "COUNT": plat_count_current_year,
+                },
+                "Permitting": {
+                    "USER_MIN": 14,
+                    "USER_MAX": 28,
+                    "MIN": permitting_min_current_year,
+                    "MAX": permitting_max_current_year,
+                    "VAL": permitting_avg_current_year,
+                    "COUNT": permitting_count_current_year,
+                },
+                "BBP Posted": {
+                    "USER_MIN": 1,
+                    "USER_MAX": 5,
+                    "MIN": bbp_posted_min_current_year,
+                    "MAX": bbp_posted_max_current_year,
+                    "VAL": bbp_posted_avg_current_year,
+                    "COUNT": bbp_posted_count_current_year,
+                },
+            },
+        },
+    }
+    return res
 
 
 """
@@ -417,7 +953,13 @@ RESPONSE SHAPE:
     },
 }
 """
-@router.get("/all-chart-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
+
+
+@router.get(
+    "/all-chart-data",
+    response_model=dict,
+    dependencies=[Depends(get_current_user_data)],
+)
 def get_all_chart_data():
     all_docs = list(projects_coll.find())
 
@@ -433,11 +975,12 @@ def get_all_chart_data():
     # part 3: Avg cyle Time in previous month
     # part 4: Avg cyle Time in current year
 
-    return {"result" : "all your chart data here"}
+    return {"result": "all your chart data here"}
+
 
 class EngineerData(BaseModel):
-    engineer: str   # name of the engineer
-    projects: int   # no. of projects handled by this engineer, for a given time frame
+    engineer: str  # name of the engineer
+    projects: int  # no. of projects handled by this engineer, for a given time frame
 
 
 class CardDataScheme(BaseModel):
@@ -445,10 +988,12 @@ class CardDataScheme(BaseModel):
     PIECHARTDATA: Dict
     BARCHARTDATA: Dict
 
+
 class SectionDataScheme(BaseModel):
     PREVIOUS_MONTH: CardDataScheme
     CURRENT_MONTH: CardDataScheme
     CURRENT_YEAR: CardDataScheme
+
 
 # Helper fn to flatten the nested defaultdict
 def to_dict(d):
@@ -461,27 +1006,37 @@ def to_dict(d):
 
 def get_engineering_dashboard_data(all_docs) -> SectionDataScheme:
     result = SectionDataScheme(
-        PREVIOUS_MONTH = CardDataScheme(
+        PREVIOUS_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_MONTH  = CardDataScheme(
+        CURRENT_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_YEAR = CardDataScheme(
+        CURRENT_YEAR=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
-        )
+            PIECHARTDATA={},
+            BARCHARTDATA={},
+        ),
     )
+
+    # FIX: Calculate previous month correctly
+    current_date = datetime.today()
+    current_year = current_date.year
+    current_month = current_date.month
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month = last_day_of_previous_month.month
+    previous_month_year = last_day_of_previous_month.year
+    min_year = min(current_year, previous_month_year)
 
     """
     Current-Year
     """
-    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.VALUE = str(current_year)
     result.CURRENT_YEAR.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
     result.CURRENT_YEAR.BARCHARTDATA = {}
 
@@ -491,36 +1046,53 @@ def get_engineering_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
         # Engineer's Name  field is empty
         if p_teclab_epc_data.engineering_engineer == None:
-            print("ERROR::engineer_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::engineer_name is empty::", project["project_info"]["project_id"]
+            )
             # continue
 
         engineer_name = p_teclab_epc_data.engineering_engineer
         product_name = p_teclab_epc_data.product_name
         result.CURRENT_YEAR.PIECHARTDATA[engineer_name][product_name] += 1
 
-        if p_teclab_epc_data.engineering_sent and p_teclab_epc_data.engineering_received:
-            delta_time = p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+        if (
+            p_teclab_epc_data.engineering_sent
+            and p_teclab_epc_data.engineering_received
+        ):
+            delta_time = (
+                p_teclab_epc_data.engineering_received
+                - p_teclab_epc_data.engineering_sent
+            )
             delta_days = delta_time.days
-            if p_teclab_epc_data.engineering_engineer not in result.CURRENT_YEAR.BARCHARTDATA:
-                result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.engineering_engineer] = [delta_days]
-            result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.engineering_engineer].append(delta_days)
+            if (
+                p_teclab_epc_data.engineering_engineer
+                not in result.CURRENT_YEAR.BARCHARTDATA
+            ):
+                result.CURRENT_YEAR.BARCHARTDATA[
+                    p_teclab_epc_data.engineering_engineer
+                ] = [delta_days]
+            result.CURRENT_YEAR.BARCHARTDATA[
+                p_teclab_epc_data.engineering_engineer
+            ].append(delta_days)
 
     result.CURRENT_YEAR.PIECHARTDATA = to_dict(result.CURRENT_YEAR.PIECHARTDATA)
 
     """
     Previous-Month
     """
-    previous_month_number = datetime.today().month - 1
-    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month_number]
+    # FIX: Use calendar.month_name with proper month calculation
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month]
     result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
     result.PREVIOUS_MONTH.BARCHARTDATA = {}
-
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -528,44 +1100,60 @@ def get_engineering_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # TODO: these filters are supposed to be for this sections time range
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
-            continue
-        # if p_teclab_epc_data.engineering_received:
-            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
-            # print("previous_month_number", previous_month_number)
-            # print("id", project["project_info"]["project_id"])
-        if not p_teclab_epc_data.engineering_received or p_teclab_epc_data.engineering_received.month != previous_month_number:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        # FIX: Check both year AND month for previous month
+        if (
+            not p_teclab_epc_data.engineering_received
+            or p_teclab_epc_data.engineering_received.year != previous_month_year
+            or p_teclab_epc_data.engineering_received.month != previous_month
+        ):
+            continue
+
         # Engineer's Name  field is empty
         if p_teclab_epc_data.engineering_engineer == None:
-            print("ERROR::engineer_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::engineer_name is empty::", project["project_info"]["project_id"]
+            )
             # continue
 
         engineer_name = p_teclab_epc_data.engineering_engineer
         product_name = p_teclab_epc_data.product_name
         result.PREVIOUS_MONTH.PIECHARTDATA[engineer_name][product_name] += 1
 
-        if p_teclab_epc_data.engineering_sent and p_teclab_epc_data.engineering_received:
-            delta_time = p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+        if (
+            p_teclab_epc_data.engineering_sent
+            and p_teclab_epc_data.engineering_received
+        ):
+            delta_time = (
+                p_teclab_epc_data.engineering_received
+                - p_teclab_epc_data.engineering_sent
+            )
             delta_days = delta_time.days
-            if p_teclab_epc_data.engineering_engineer not in result.PREVIOUS_MONTH.BARCHARTDATA:
-                result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer] = [delta_days]
-            result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer].append(delta_days)
+            if (
+                p_teclab_epc_data.engineering_engineer
+                not in result.PREVIOUS_MONTH.BARCHARTDATA
+            ):
+                result.PREVIOUS_MONTH.BARCHARTDATA[
+                    p_teclab_epc_data.engineering_engineer
+                ] = [delta_days]
+            result.PREVIOUS_MONTH.BARCHARTDATA[
+                p_teclab_epc_data.engineering_engineer
+            ].append(delta_days)
 
     result.PREVIOUS_MONTH.PIECHARTDATA = to_dict(result.PREVIOUS_MONTH.PIECHARTDATA)
 
     """
     Current-Month
     """
-    result.CURRENT_MONTH.VALUE = calendar.month_name[datetime.today().month]
+    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month]
     result.CURRENT_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
     result.CURRENT_MONTH.BARCHARTDATA = {}
-
-    current_month_number = datetime.today().month
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -573,61 +1161,88 @@ def get_engineering_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # TODO: these filters are supposed to be for this sections time range
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
-            continue
-        # if p_teclab_epc_data.engineering_received:
-        #     print("CURRENT_MONTH is it ?::::::::::", p_teclab_epc_data.engineering_received.month)
-        #     print("current_month_number", current_month_number)
-        #     print("id", project["project_info"]["project_id"])
-        if not p_teclab_epc_data.engineering_received or p_teclab_epc_data.engineering_received.month != current_month_number:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        if (
+            not p_teclab_epc_data.engineering_received
+            or p_teclab_epc_data.engineering_received.month != current_month
+        ):
+            continue
+
         # Engineer's Name  field is empty
         if p_teclab_epc_data.engineering_engineer == None:
-            print("ERROR::engineer_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::engineer_name is empty::", project["project_info"]["project_id"]
+            )
             # continue
 
         engineer_name = p_teclab_epc_data.engineering_engineer
         product_name = p_teclab_epc_data.product_name
         result.CURRENT_MONTH.PIECHARTDATA[engineer_name][product_name] += 1
 
-        if p_teclab_epc_data.engineering_sent and p_teclab_epc_data.engineering_received:
-            delta_time = p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+        if (
+            p_teclab_epc_data.engineering_sent
+            and p_teclab_epc_data.engineering_received
+        ):
+            delta_time = (
+                p_teclab_epc_data.engineering_received
+                - p_teclab_epc_data.engineering_sent
+            )
             delta_days = delta_time.days
-            if p_teclab_epc_data.engineering_engineer not in result.CURRENT_MONTH.BARCHARTDATA:
-                result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer] = [delta_days]
-            result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.engineering_engineer].append(delta_days)
+            if (
+                p_teclab_epc_data.engineering_engineer
+                not in result.CURRENT_MONTH.BARCHARTDATA
+            ):
+                result.CURRENT_MONTH.BARCHARTDATA[
+                    p_teclab_epc_data.engineering_engineer
+                ] = [delta_days]
+            result.CURRENT_MONTH.BARCHARTDATA[
+                p_teclab_epc_data.engineering_engineer
+            ].append(delta_days)
 
     result.CURRENT_MONTH.PIECHARTDATA = to_dict(result.CURRENT_MONTH.PIECHARTDATA)
 
     return result
 
+
 def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
     result = SectionDataScheme(
-        PREVIOUS_MONTH = CardDataScheme(
+        PREVIOUS_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_MONTH  = CardDataScheme(
+        CURRENT_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_YEAR = CardDataScheme(
+        CURRENT_YEAR=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
-        )
+            PIECHARTDATA={},
+            BARCHARTDATA={},
+        ),
     )
+
+    # FIX: Calculate previous month correctly
+    current_date = datetime.today()
+    current_year = current_date.year
+    current_month = current_date.month
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month = last_day_of_previous_month.month
+    previous_month_year = last_day_of_previous_month.year
+    min_year = min(current_year, previous_month_year)
 
     """
     Current-Year
     """
-    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.VALUE = str(current_year)
     result.CURRENT_YEAR.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
     result.CURRENT_YEAR.BARCHARTDATA = {}
 
@@ -637,13 +1252,18 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
         # Plat-Engineer's Name  field is empty
         if p_teclab_epc_data.plat_engineer == None:
-            print("ERROR::plat_engineer is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::plat_engineer is empty::", project["project_info"]["project_id"]
+            )
             # continue
 
         plat_engineer_name = p_teclab_epc_data.plat_engineer
@@ -654,19 +1274,22 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
             delta_time = p_teclab_epc_data.plat_received - p_teclab_epc_data.plat_sent
             delta_days = delta_time.days
             if p_teclab_epc_data.plat_engineer not in result.CURRENT_YEAR.BARCHARTDATA:
-                result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [delta_days]
-            result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(delta_days)
+                result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [
+                    delta_days
+                ]
+            result.CURRENT_YEAR.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(
+                delta_days
+            )
 
     result.CURRENT_YEAR.PIECHARTDATA = to_dict(result.CURRENT_YEAR.PIECHARTDATA)
 
     """
     Previous-Month
     """
-    result.PREVIOUS_MONTH.VALUE = calendar.month_name[datetime.today().month - 1]
+    # FIX: Use calendar.month_name with proper month calculation
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month]
     result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
     result.PREVIOUS_MONTH.BARCHARTDATA = {}
-
-    previous_month_number = datetime.today().month - 1
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -674,21 +1297,27 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # TODO: these filters are supposed to be for this sections time range
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
-            continue
-        # if p_teclab_epc_data.engineering_received:
-            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
-            # print("previous_month_number", previous_month_number)
-            # print("id", project["project_info"]["project_id"])
-        if not p_teclab_epc_data.plat_received or p_teclab_epc_data.plat_received.month != previous_month_number:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        # FIX: Check both year AND month for previous month
+        if (
+            not p_teclab_epc_data.plat_received
+            or p_teclab_epc_data.plat_received.year != previous_month_year
+            or p_teclab_epc_data.plat_received.month != previous_month
+        ):
+            continue
+
         # Plat-Engineer's Name  field is empty
         if p_teclab_epc_data.plat_engineer == None:
-            print("ERROR::plat_engineer_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::plat_engineer_name is empty::",
+                project["project_info"]["project_id"],
+            )
             # continue
 
         plat_engineer_name = p_teclab_epc_data.plat_engineer
@@ -698,20 +1327,25 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
         if p_teclab_epc_data.plat_sent and p_teclab_epc_data.plat_received:
             delta_time = p_teclab_epc_data.plat_received - p_teclab_epc_data.plat_sent
             delta_days = delta_time.days
-            if p_teclab_epc_data.plat_engineer not in result.PREVIOUS_MONTH.BARCHARTDATA:
-                result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [delta_days]
-            result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(delta_days)
+            if (
+                p_teclab_epc_data.plat_engineer
+                not in result.PREVIOUS_MONTH.BARCHARTDATA
+            ):
+                result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [
+                    delta_days
+                ]
+            result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(
+                delta_days
+            )
 
     result.PREVIOUS_MONTH.PIECHARTDATA = to_dict(result.PREVIOUS_MONTH.PIECHARTDATA)
 
     """
     Current-Month
     """
-    result.CURRENT_MONTH.VALUE = calendar.month_name[datetime.today().month]
+    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month]
     result.CURRENT_MONTH.PIECHARTDATA = defaultdict(lambda: defaultdict(int))
     result.CURRENT_MONTH.BARCHARTDATA = {}
-
-    current_month_number = datetime.today().month
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -719,21 +1353,25 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # TODO: these filters are supposed to be for this sections time range
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
-            continue
-        # if p_teclab_epc_data.engineering_received:
-        #     print("CURRENT_MONTH is it ?::::::::::", p_teclab_epc_data.engineering_received.month)
-        #     print("current_month_number", current_month_number)
-        #     print("id", project["project_info"]["project_id"])
-        if not p_teclab_epc_data.plat_received or p_teclab_epc_data.plat_received.month != current_month_number:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        if (
+            not p_teclab_epc_data.plat_received
+            or p_teclab_epc_data.plat_received.month != current_month
+        ):
+            continue
+
         # Engineer's Name  field is empty
         if p_teclab_epc_data.plat_engineer == None:
-            print("ERROR::plat_engineer_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::plat_engineer_name is empty::",
+                project["project_info"]["project_id"],
+            )
             # continue
 
         plat_engineer_name = p_teclab_epc_data.plat_engineer
@@ -744,36 +1382,51 @@ def get_plat_dashboard_data(all_docs) -> SectionDataScheme:
             delta_time = p_teclab_epc_data.plat_received - p_teclab_epc_data.plat_sent
             delta_days = delta_time.days
             if p_teclab_epc_data.plat_engineer not in result.CURRENT_MONTH.BARCHARTDATA:
-                result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [delta_days]
-            result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(delta_days)
+                result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer] = [
+                    delta_days
+                ]
+            result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.plat_engineer].append(
+                delta_days
+            )
 
     result.CURRENT_MONTH.PIECHARTDATA = to_dict(result.CURRENT_MONTH.PIECHARTDATA)
 
     return result
 
+
 def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
     result = SectionDataScheme(
-        PREVIOUS_MONTH = CardDataScheme(
+        PREVIOUS_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_MONTH  = CardDataScheme(
+        CURRENT_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_YEAR = CardDataScheme(
+        CURRENT_YEAR=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
-        )
+            PIECHARTDATA={},
+            BARCHARTDATA={},
+        ),
     )
+
+    # FIX: Calculate previous month correctly
+    current_date = datetime.today()
+    current_year = current_date.year
+    current_month = current_date.month
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month = last_day_of_previous_month.month
+    previous_month_year = last_day_of_previous_month.year
+    min_year = min(current_year, previous_month_year)
 
     """
     Current-Year
     """
-    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.VALUE = str(current_year)
     result.CURRENT_YEAR.PIECHARTDATA = defaultdict(int)
     result.CURRENT_YEAR.BARCHARTDATA = defaultdict(lambda: [])
 
@@ -783,22 +1436,32 @@ def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
         # Drafters's Name  field is empty
         if p_teclab_epc_data.drafting_drafter == None:
-            print("ERROR::drafting_drafter is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::drafting_drafter is empty::",
+                project["project_info"]["project_id"],
+            )
             # continue
 
-        # drafter_name = p_teclab_epc_data.drafting_drafter
-        # result.CURRENT_YEAR.PIECHARTDATA[drafter_name][product_name] += 1
         product_name = p_teclab_epc_data.product_name
         result.CURRENT_YEAR.PIECHARTDATA[product_name] += 1
 
-        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.drafting_finished:
-            delta_time = p_teclab_epc_data.drafting_finished - p_teclab_epc_data.drafting_assigned_on
+        if (
+            p_teclab_epc_data.drafting_assigned_on
+            and p_teclab_epc_data.drafting_finished
+        ):
+            delta_time = (
+                p_teclab_epc_data.drafting_finished
+                - p_teclab_epc_data.drafting_assigned_on
+            )
             delta_days = delta_time.days
             if delta_days < 0:
                 print("ERROR::delta_days is -ve", project["project_info"]["project_id"])
@@ -807,8 +1470,8 @@ def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
     """
     Previous-Month
     """
-    previous_month_number = datetime.today().month - 1
-    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month_number]
+    # FIX: Use calendar.month_name with proper month calculation
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month]
     result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(int)
     result.PREVIOUS_MONTH.BARCHARTDATA = defaultdict(lambda: [])
 
@@ -818,38 +1481,46 @@ def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # TODO: these filters are supposed to be for this sections time range
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
-            continue
-        # if p_teclab_epc_data.engineering_received:
-            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
-            # print("previous_month_number", previous_month_number)
-            # print("id", project["project_info"]["project_id"])
-        if not p_teclab_epc_data.engineering_sent or p_teclab_epc_data.engineering_sent.month != previous_month_number:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        # FIX: Use drafting_finished for consistency
+        if (
+            not p_teclab_epc_data.drafting_finished
+            or p_teclab_epc_data.drafting_finished.year != previous_month_year
+            or p_teclab_epc_data.drafting_finished.month != previous_month
+        ):
+            continue
+
         # Plat-Engineer's Name  field is empty
         if p_teclab_epc_data.product_name == None:
-            print("ERROR::product_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::product_name is empty::", project["project_info"]["project_id"]
+            )
             # continue
 
         product_name = p_teclab_epc_data.product_name
-        # product_name = p_teclab_epc_data.product_name
         result.PREVIOUS_MONTH.PIECHARTDATA[product_name] += 1
 
-        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.engineering_sent:
-            delta_time = p_teclab_epc_data.engineering_sent - p_teclab_epc_data.drafting_assigned_on
+        if (
+            p_teclab_epc_data.drafting_assigned_on
+            and p_teclab_epc_data.drafting_finished
+        ):
+            delta_time = (
+                p_teclab_epc_data.drafting_finished
+                - p_teclab_epc_data.drafting_assigned_on
+            )
             delta_days = delta_time.days
             result.PREVIOUS_MONTH.BARCHARTDATA[product_name].append(delta_days)
 
     """
     Current-Month
     """
-    current_year = datetime.today().year
-    current_month_number  = datetime.today().month
-    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month_number]
+    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month]
     result.CURRENT_MONTH.PIECHARTDATA = defaultdict(int)
     result.CURRENT_MONTH.BARCHARTDATA = defaultdict(lambda: [])
 
@@ -859,53 +1530,79 @@ def get_drafting_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Contract must be in current year
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < current_year:
-            continue
-        if not p_teclab_epc_data.drafting_assigned_on or p_teclab_epc_data.drafting_assigned_on.month != current_month_number:
+        # FIX: Filter from min_year onwards (not just current_year)
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        # FIX: Use drafting_finished instead of drafting_assigned_on for consistency
+        if (
+            not p_teclab_epc_data.drafting_finished
+            or p_teclab_epc_data.drafting_finished.year != current_year
+            or p_teclab_epc_data.drafting_finished.month != current_month
+        ):
+            continue
+
         # Plat-Engineer's Name  field is empty
         if p_teclab_epc_data.drafting_drafter == None:
-            print("ERROR::drafting_drafter is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::drafting_drafter is empty::",
+                project["project_info"]["project_id"],
+            )
             # continue
 
         product_name = p_teclab_epc_data.product_name
-        # product_name = p_teclab_epc_data.product_name
         result.CURRENT_MONTH.PIECHARTDATA[product_name] += 1
 
-        if p_teclab_epc_data.drafting_assigned_on and p_teclab_epc_data.drafting_finished:
-            delta_time = p_teclab_epc_data.drafting_finished - p_teclab_epc_data.drafting_assigned_on
+        if (
+            p_teclab_epc_data.drafting_assigned_on
+            and p_teclab_epc_data.drafting_finished
+        ):
+            delta_time = (
+                p_teclab_epc_data.drafting_finished
+                - p_teclab_epc_data.drafting_assigned_on
+            )
             delta_days = delta_time.days
             result.CURRENT_MONTH.BARCHARTDATA[product_name].append(delta_days)
 
-
     return result
+
 
 def get_permitting_dashboard_data(all_docs) -> SectionDataScheme:
     result = SectionDataScheme(
-        PREVIOUS_MONTH = CardDataScheme(
+        PREVIOUS_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_MONTH  = CardDataScheme(
+        CURRENT_MONTH=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
+            PIECHARTDATA={},
+            BARCHARTDATA={},
         ),
-        CURRENT_YEAR = CardDataScheme(
+        CURRENT_YEAR=CardDataScheme(
             VALUE="",
-            PIECHARTDATA = {},
-            BARCHARTDATA = {},
-        )
+            PIECHARTDATA={},
+            BARCHARTDATA={},
+        ),
     )
+
+    # FIX: Calculate previous month correctly
+    current_date = datetime.today()
+    current_year = current_date.year
+    current_month = current_date.month
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month = last_day_of_previous_month.month
+    previous_month_year = last_day_of_previous_month.year
+    min_year = min(current_year, previous_month_year)
 
     """
     Current-Year
     """
-    result.CURRENT_YEAR.VALUE = str(datetime.today().year)
+    result.CURRENT_YEAR.VALUE = str(current_year)
     result.CURRENT_YEAR.PIECHARTDATA = defaultdict(int)
     result.CURRENT_YEAR.BARCHARTDATA = defaultdict(lambda: [])
 
@@ -915,33 +1612,42 @@ def get_permitting_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
         # Drafters's Name  field is empty
         if p_teclab_epc_data.drafting_drafter == None:
-            print("ERROR::drafting_drafter is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::drafting_drafter is empty::",
+                project["project_info"]["project_id"],
+            )
             # continue
 
-        # drafter_name = p_teclab_epc_data.drafting_drafter
-        # result.CURRENT_YEAR.PIECHARTDATA[drafter_name][product_name] += 1
         county_name = p_teclab_epc_data.permitting_county_name
         result.CURRENT_YEAR.PIECHARTDATA[county_name] += 1
 
-        if p_teclab_epc_data.permitting_submitted and p_teclab_epc_data.permitting_received:
-            delta_time = p_teclab_epc_data.permitting_received - p_teclab_epc_data.permitting_submitted
+        if (
+            p_teclab_epc_data.permitting_submitted
+            and p_teclab_epc_data.permitting_received
+        ):
+            delta_time = (
+                p_teclab_epc_data.permitting_received
+                - p_teclab_epc_data.permitting_submitted
+            )
             delta_days = delta_time.days
             result.CURRENT_YEAR.BARCHARTDATA[county_name].append(delta_days)
 
     """
     Previous-Month
     """
-    result.PREVIOUS_MONTH.VALUE = calendar.month_name[datetime.today().month - 1]
+    # FIX: Use calendar.month_name with proper month calculation
+    result.PREVIOUS_MONTH.VALUE = calendar.month_name[previous_month]
     result.PREVIOUS_MONTH.PIECHARTDATA = defaultdict(int)
     result.PREVIOUS_MONTH.BARCHARTDATA = defaultdict(lambda: [])
-
-    previous_month_number = datetime.today().month - 1
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -949,40 +1655,51 @@ def get_permitting_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # TODO: these filters are supposed to be for this sections time range
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
-            continue
-        # if p_teclab_epc_data.engineering_received:
-            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
-            # print("previous_month_number", previous_month_number)
-            # print("id", project["project_info"]["project_id"])
-        if not p_teclab_epc_data.permitting_received or p_teclab_epc_data.permitting_received.month != previous_month_number:
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        # FIX: Check both year AND month for previous month
+        if (
+            not p_teclab_epc_data.permitting_received
+            or p_teclab_epc_data.permitting_received.year != previous_month_year
+            or p_teclab_epc_data.permitting_received.month != previous_month
+        ):
+            continue
+
         # Plat-Engineer's Name  field is empty
         if p_teclab_epc_data.permitting_county_name == None:
-            print("ERROR::permitting_county_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::permitting_county_name is empty::",
+                project["project_info"]["project_id"],
+            )
             # continue
 
         permitting_county_name = p_teclab_epc_data.permitting_county_name
-        # product_name = p_teclab_epc_data.product_name
         result.PREVIOUS_MONTH.PIECHARTDATA[permitting_county_name] += 1
 
-        if p_teclab_epc_data.permitting_submitted and p_teclab_epc_data.permitting_received:
-            delta_time = p_teclab_epc_data.permitting_received - p_teclab_epc_data.permitting_submitted
+        if (
+            p_teclab_epc_data.permitting_submitted
+            and p_teclab_epc_data.permitting_received
+        ):
+            delta_time = (
+                p_teclab_epc_data.permitting_received
+                - p_teclab_epc_data.permitting_submitted
+            )
             delta_days = delta_time.days
-            result.PREVIOUS_MONTH.BARCHARTDATA[p_teclab_epc_data.permitting_county_name].append(delta_days)
+            result.PREVIOUS_MONTH.BARCHARTDATA[
+                p_teclab_epc_data.permitting_county_name
+            ].append(delta_days)
 
     """
     Current-Month
     """
-    current_month_number  = datetime.today().month
-    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month_number ]
+    result.CURRENT_MONTH.VALUE = calendar.month_name[current_month]
     result.CURRENT_MONTH.PIECHARTDATA = defaultdict(int)
     result.CURRENT_MONTH.BARCHARTDATA = defaultdict(lambda: [])
-
 
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -990,36 +1707,51 @@ def get_permitting_dashboard_data(all_docs) -> SectionDataScheme:
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # TODO: these filters are supposed to be for this sections time range
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
-        if not p_teclab_epc_data.contract_date or p_teclab_epc_data.contract_date.year < 2025:
-            continue
-        # if p_teclab_epc_data.engineering_received:
-            # print("BEFORE::::::::::", p_teclab_epc_data.engineering_received.month)
-            # print("current_month_number ", current_month_number )
-            # print("id", project["project_info"]["project_id"])
-        if not p_teclab_epc_data.permitting_received or p_teclab_epc_data.permitting_received.month != current_month_number :
+        # FIX: Filter from min_year onwards
+        if (
+            not p_teclab_epc_data.contract_date
+            or p_teclab_epc_data.contract_date.year < min_year
+        ):
             continue
 
-        # print("HERE::::::::::::::::::")
+        if (
+            not p_teclab_epc_data.permitting_received
+            or p_teclab_epc_data.permitting_received.month != current_month
+        ):
+            continue
+
         # Plat-Engineer's Name  field is empty
         if p_teclab_epc_data.permitting_county_name == None:
-            print("ERROR::permitting_county_name is empty::", project["project_info"]["project_id"])
+            print(
+                "ERROR::permitting_county_name is empty::",
+                project["project_info"]["project_id"],
+            )
             # continue
 
         permitting_county_name = p_teclab_epc_data.permitting_county_name
-        # product_name = p_teclab_epc_data.product_name
         result.CURRENT_MONTH.PIECHARTDATA[permitting_county_name] += 1
 
-        if p_teclab_epc_data.permitting_submitted and p_teclab_epc_data.permitting_received:
-            delta_time = p_teclab_epc_data.permitting_received - p_teclab_epc_data.permitting_submitted
+        if (
+            p_teclab_epc_data.permitting_submitted
+            and p_teclab_epc_data.permitting_received
+        ):
+            delta_time = (
+                p_teclab_epc_data.permitting_received
+                - p_teclab_epc_data.permitting_submitted
+            )
             delta_days = delta_time.days
-            result.CURRENT_MONTH.BARCHARTDATA[p_teclab_epc_data.permitting_county_name].append(delta_days)
+            result.CURRENT_MONTH.BARCHARTDATA[
+                p_teclab_epc_data.permitting_county_name
+            ].append(delta_days)
 
     return result
 
-# @router.get("/engineer-dashboard-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
-@router.get("/engineer-dashboard-data", response_model=List[SectionDataScheme], dependencies=[Depends(get_current_user_data)])
+
+@router.get(
+    "/engineer-dashboard-data",
+    response_model=List[SectionDataScheme],
+    dependencies=[Depends(get_current_user_data)],
+)
 def engineeer_data():
 
     all_docs = list(projects_coll.find())
@@ -1028,15 +1760,35 @@ def engineeer_data():
     engineering_dashboard_data = get_engineering_dashboard_data(all_docs)
     plat_dashboard_data = get_plat_dashboard_data(all_docs)
     permitting_dashboard_data = get_permitting_dashboard_data(all_docs)
-    return [drafting_dashboard_data, engineering_dashboard_data, plat_dashboard_data, permitting_dashboard_data]
+    return [
+        drafting_dashboard_data,
+        engineering_dashboard_data,
+        plat_dashboard_data,
+        permitting_dashboard_data,
+    ]
 
 
 """
 Get the cycle time of engineers
 """
-@router.get("/engineer-data-2", response_model=dict, dependencies=[Depends(get_current_user_data)])
+
+
+@router.get(
+    "/engineer-data-2",
+    response_model=dict,
+    dependencies=[Depends(get_current_user_data)],
+)
 def engineeer_data_2():
     all_docs = list(projects_coll.find())
+
+    # FIX: Calculate min_year for proper filtering
+    current_date = datetime.today()
+    current_year = current_date.year
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month_year = last_day_of_previous_month.year
+    min_year = min(current_year, previous_month_year)
+
     engineers_map = {}
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -1044,30 +1796,46 @@ def engineeer_data_2():
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        # FIX: Filter from min_year onwards
         if not p_teclab_epc_data.contract_date:
             continue
-        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
+        if p_teclab_epc_data.contract_date.year < min_year:
             continue
 
         # FIX ERROR OF PROJECTS THAT don't have both the dates
-        if not p_teclab_epc_data.engineering_sent or not p_teclab_epc_data.engineering_received:
+        if (
+            not p_teclab_epc_data.engineering_sent
+            or not p_teclab_epc_data.engineering_received
+        ):
             continue
 
         if p_teclab_epc_data.engineering_engineer == None:
             print("WAIT: ", project["project_info"]["project_id"])
-        delta_time = p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+        delta_time = (
+            p_teclab_epc_data.engineering_received - p_teclab_epc_data.engineering_sent
+        )
         delta_days = delta_time.days
         if p_teclab_epc_data.engineering_engineer not in engineers_map:
             engineers_map[p_teclab_epc_data.engineering_engineer] = [delta_days]
         engineers_map[p_teclab_epc_data.engineering_engineer].append(delta_days)
 
-    # print(engineers_map)
     return engineers_map
 
-@router.get("/county-data", response_model=dict, dependencies=[Depends(get_current_user_data)])
+
+@router.get(
+    "/county-data", response_model=dict, dependencies=[Depends(get_current_user_data)]
+)
 def county_data():
     all_docs = list(projects_coll.find())
+
+    # FIX: Calculate min_year for proper filtering
+    current_date = datetime.today()
+    current_year = current_date.year
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month_year = last_day_of_previous_month.year
+    min_year = min(current_year, previous_month_year)
+
     counties_map = {}
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
@@ -1075,58 +1843,76 @@ def county_data():
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        # FIX: Filter from min_year onwards
         if not p_teclab_epc_data.contract_date:
             continue
-        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
+        if p_teclab_epc_data.contract_date.year < min_year:
             continue
 
         # THIS IS NOT SUPPOSED TO BE EMPTY
-        if p_teclab_epc_data.permitting_county_name == None or p_teclab_epc_data.permitting_county_name == "":
+        if (
+            p_teclab_epc_data.permitting_county_name == None
+            or p_teclab_epc_data.permitting_county_name == ""
+        ):
             print("WAIT: ", project["project_info"]["project_id"])
 
         if p_teclab_epc_data.permitting_county_name not in counties_map:
             counties_map[p_teclab_epc_data.permitting_county_name] = 0
         counties_map[p_teclab_epc_data.permitting_county_name] += 1
 
-    # print("counties_map:", counties_map)
     return counties_map
 
 
-@router.get("/county-data-2", response_model=dict, dependencies=[Depends(get_current_user_data)])
+@router.get(
+    "/county-data-2", response_model=dict, dependencies=[Depends(get_current_user_data)]
+)
 def county_data_2():
     all_docs = list(projects_coll.find())
+
+    # FIX: Calculate min_year for proper filtering
+    current_date = datetime.today()
+    current_year = current_date.year
+    first_day_of_current_month = current_date.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    previous_month_year = last_day_of_previous_month.year
+    min_year = min(current_year, previous_month_year)
+
     counties_map = {}
-    count = 1 # TODO: delete it
+    count = 1  # TODO: delete it
     for doc in all_docs:
         # Remove MongoDB's `_id` field from the document
         project = {k: v for (k, v) in doc.items() if k != "_id"}
 
         p_teclab_epc_data: EPCData = EPCData(**project["teclab_data"]["epc_data"])
 
-        # Filter for lots from 2025 and onwards i.e., skip anything before 2025
+        # FIX: Filter from min_year onwards
         if not p_teclab_epc_data.contract_date:
             continue
-
-        if p_teclab_epc_data.contract_date and p_teclab_epc_data.contract_date.year < 2025:
+        if p_teclab_epc_data.contract_date.year < min_year:
             continue
 
         # ONLY FINISHED PROJECTS (i.e., on going projects are not considered)
-        if not p_teclab_epc_data.permitting_submitted or not p_teclab_epc_data.permitting_received:
+        if (
+            not p_teclab_epc_data.permitting_submitted
+            or not p_teclab_epc_data.permitting_received
+        ):
             continue
         # THIS IS NOT SUPPOSED TO BE EMPTY
-        if p_teclab_epc_data.permitting_county_name == None or p_teclab_epc_data.permitting_county_name == "":
+        if (
+            p_teclab_epc_data.permitting_county_name == None
+            or p_teclab_epc_data.permitting_county_name == ""
+        ):
             print("WAIT: ", project["project_info"]["project_id"])
 
         count += 1
 
-        delta_time = p_teclab_epc_data.permitting_received - p_teclab_epc_data.permitting_submitted
+        delta_time = (
+            p_teclab_epc_data.permitting_received
+            - p_teclab_epc_data.permitting_submitted
+        )
         delta_days = delta_time.days
         if p_teclab_epc_data.permitting_county_name not in counties_map:
             counties_map[p_teclab_epc_data.permitting_county_name] = [delta_days]
         counties_map[p_teclab_epc_data.permitting_county_name].append(delta_days)
 
-    # print("Projects count", count)
-    # print("counties_map.len", len(counties_map))
     return counties_map
-
