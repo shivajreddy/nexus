@@ -49,3 +49,4 @@ uvloop==0.21.0
 watchfiles==0.22.0
 websockets==12.0
 wsproto==1.2.0
+openpyxl==3.1.2

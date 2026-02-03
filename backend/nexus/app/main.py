@@ -38,6 +38,7 @@ from app.router.department.teclab.fosc import router as teclab_fosc_router
 
 from app.router.projects.projects import router as projects_router
 from app.router.dev.dev import router as dev_router
+from app.router.dev.analysis import router as analysis_router
 
 from app.sockets.sockets import sio_app
 
@@ -66,6 +67,7 @@ async def lifespan(app: FastAPI):
     app.include_router(projects_router)
 
     app.include_router(dev_router)
+    app.include_router(analysis_router)
     yield
 
 
