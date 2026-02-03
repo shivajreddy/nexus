@@ -84,6 +84,11 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
                 delta = epc_data.drafting_finished - epc_data.drafting_assigned_on
                 drafting_days = max(0, round(delta.total_seconds() / 86400))
 
+            permitting_days = None
+            if epc_data.permitting_submitted and epc_data.permitting_received:
+                delta = epc_data.permitting_received - epc_data.permitting_submitted
+                permitting_days = max(0, round(delta.total_seconds() / 86400))
+
             project_info = {
                 "project_id": project.project_info.project_id,
                 "community": project.project_info.community,
@@ -98,6 +103,10 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
                 "drafting_finished": epc_data.drafting_finished,
                 "drafting_days": drafting_days,
                 "drafting_notes": epc_data.drafting_notes,
+                "permitting_county": epc_data.permitting_county_name,
+                "permitting_submitted": epc_data.permitting_submitted,
+                "permitting_received": epc_data.permitting_received,
+                "permitting_days": permitting_days,
             }
 
             projects_for_year.append(project_info)
@@ -111,7 +120,7 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
         key=lambda x: x["contract_date"] if x["contract_date"] else datetime.min
     )
 
-    # Calculate summary statistics
+    # Calculate summary statistics for drafting
     total_projects = len(projects_for_year)
     projects_with_drafting = [p for p in projects_for_year if p["drafting_assigned_on"]]
     projects_drafting_complete = [
@@ -119,6 +128,19 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
     ]
     drafting_days_list = [
         p["drafting_days"] for p in projects_for_year if p["drafting_days"] is not None
+    ]
+
+    # Calculate summary statistics for permitting
+    projects_with_permitting_submitted = [
+        p for p in projects_for_year if p["permitting_submitted"]
+    ]
+    projects_permitting_received = [
+        p for p in projects_for_year if p["permitting_received"]
+    ]
+    permitting_days_list = [
+        p["permitting_days"]
+        for p in projects_for_year
+        if p["permitting_days"] is not None
     ]
 
     summary = {
@@ -132,6 +154,19 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
         ),
         "min_drafting_days": min(drafting_days_list) if drafting_days_list else None,
         "max_drafting_days": max(drafting_days_list) if drafting_days_list else None,
+        "projects_with_permitting_submitted": len(projects_with_permitting_submitted),
+        "projects_permitting_received": len(projects_permitting_received),
+        "avg_permitting_days": (
+            round(sum(permitting_days_list) / len(permitting_days_list), 1)
+            if permitting_days_list
+            else None
+        ),
+        "min_permitting_days": (
+            min(permitting_days_list) if permitting_days_list else None
+        ),
+        "max_permitting_days": (
+            max(permitting_days_list) if permitting_days_list else None
+        ),
     }
 
     # Breakdown by product
@@ -176,11 +211,33 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
             "max_drafting_days": max(days) if days else None,
         }
 
+    # Breakdown by county (for permitting cycle times)
+    by_county: Dict[str, Dict[str, Any]] = {}
+    for p in projects_for_year:
+        county = p["permitting_county"] or "Unknown"
+        if county not in by_county:
+            by_county[county] = {"count": 0, "permitting_days": []}
+        by_county[county]["count"] += 1
+        if p["permitting_days"] is not None:
+            by_county[county]["permitting_days"].append(p["permitting_days"])
+
+    county_breakdown = {}
+    for county, data in by_county.items():
+        days = data["permitting_days"]
+        county_breakdown[county] = {
+            "total_projects": data["count"],
+            "permitting_complete": len(days),
+            "avg_permitting_days": round(sum(days) / len(days), 1) if days else None,
+            "min_permitting_days": min(days) if days else None,
+            "max_permitting_days": max(days) if days else None,
+        }
+
     return {
         "year": year,
         "summary": summary,
         "by_product": product_breakdown,
         "by_drafter": drafter_breakdown,
+        "by_county": county_breakdown,
         "projects": projects_for_year,
     }
 
@@ -230,21 +287,44 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
     ws_summary.title = "Summary"
 
     summary = data["summary"]
-    ws_summary["A1"] = f"{year} Drafting Analysis Summary"
+    ws_summary["A1"] = f"{year} Analysis Summary"
     ws_summary["A1"].font = Font(bold=True, size=14)
     ws_summary.merge_cells("A1:B1")
 
-    summary_rows = [
-        ("Total Projects", summary["total_projects"]),
+    # Drafting summary
+    ws_summary.cell(row=3, column=1, value="DRAFTING").font = Font(bold=True, size=12)
+    drafting_rows = [
         ("Projects with Drafting Assigned", summary["projects_with_drafting_assigned"]),
         ("Projects Drafting Complete", summary["projects_drafting_complete"]),
         ("Average Drafting Days", summary["avg_drafting_days"]),
         ("Min Drafting Days", summary["min_drafting_days"]),
         ("Max Drafting Days", summary["max_drafting_days"]),
     ]
-    for i, (label, value) in enumerate(summary_rows, start=3):
+    for i, (label, value) in enumerate(drafting_rows, start=4):
         ws_summary.cell(row=i, column=1, value=label).font = Font(bold=True)
         ws_summary.cell(row=i, column=2, value=value)
+
+    # Permitting summary
+    ws_summary.cell(row=10, column=1, value="PERMITTING").font = Font(
+        bold=True, size=12
+    )
+    permitting_rows = [
+        (
+            "Projects with Permitting Submitted",
+            summary["projects_with_permitting_submitted"],
+        ),
+        ("Projects Permitting Received", summary["projects_permitting_received"]),
+        ("Average Permitting Days", summary["avg_permitting_days"]),
+        ("Min Permitting Days", summary["min_permitting_days"]),
+        ("Max Permitting Days", summary["max_permitting_days"]),
+    ]
+    for i, (label, value) in enumerate(permitting_rows, start=11):
+        ws_summary.cell(row=i, column=1, value=label).font = Font(bold=True)
+        ws_summary.cell(row=i, column=2, value=value)
+
+    # Total projects at the end
+    ws_summary.cell(row=17, column=1, value="Total Projects").font = Font(bold=True)
+    ws_summary.cell(row=17, column=2, value=summary["total_projects"])
 
     auto_adjust_columns(ws_summary)
 
@@ -302,7 +382,34 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
 
     auto_adjust_columns(ws_drafter)
 
-    # === Sheet 4: All Projects ===
+    # === Sheet 4: By County (Permitting) ===
+    ws_county = wb.create_sheet("By County")
+
+    county_headers = [
+        "County",
+        "Total Projects",
+        "Permitting Complete",
+        "Avg Permitting Days",
+        "Min Permitting Days",
+        "Max Permitting Days",
+    ]
+    for col, header in enumerate(county_headers, start=1):
+        ws_county.cell(row=1, column=col, value=header)
+    style_header_row(ws_county, 1, len(county_headers))
+
+    row = 2
+    for county, stats in data["by_county"].items():
+        ws_county.cell(row=row, column=1, value=county)
+        ws_county.cell(row=row, column=2, value=stats["total_projects"])
+        ws_county.cell(row=row, column=3, value=stats["permitting_complete"])
+        ws_county.cell(row=row, column=4, value=stats["avg_permitting_days"])
+        ws_county.cell(row=row, column=5, value=stats["min_permitting_days"])
+        ws_county.cell(row=row, column=6, value=stats["max_permitting_days"])
+        row += 1
+
+    auto_adjust_columns(ws_county)
+
+    # === Sheet 5: All Projects ===
     ws_projects = wb.create_sheet("All Projects")
 
     project_headers = [
@@ -315,10 +422,14 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
         "Product",
         "Elevation",
         "Drafter",
-        "Assigned On",
-        "Finished",
-        "Days",
-        "Notes",
+        "Drafting Assigned",
+        "Drafting Finished",
+        "Drafting Days",
+        "Drafting Notes",
+        "County",
+        "Permitting Submitted",
+        "Permitting Received",
+        "Permitting Days",
     ]
     for col, header in enumerate(project_headers, start=1):
         ws_projects.cell(row=1, column=col, value=header)
@@ -361,6 +472,26 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
         )
         ws_projects.cell(row=row, column=12, value=p["drafting_days"])
         ws_projects.cell(row=row, column=13, value=p["drafting_notes"])
+        ws_projects.cell(row=row, column=14, value=p["permitting_county"])
+        ws_projects.cell(
+            row=row,
+            column=15,
+            value=(
+                p["permitting_submitted"].strftime("%Y-%m-%d")
+                if p["permitting_submitted"]
+                else None
+            ),
+        )
+        ws_projects.cell(
+            row=row,
+            column=16,
+            value=(
+                p["permitting_received"].strftime("%Y-%m-%d")
+                if p["permitting_received"]
+                else None
+            ),
+        )
+        ws_projects.cell(row=row, column=17, value=p["permitting_days"])
         row += 1
 
     auto_adjust_columns(ws_projects)
@@ -376,7 +507,11 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
 # ============ 2025 Routes ============
 
 
-@router.get("/2025/drafting", response_model=Dict[str, Any], dependencies=[Depends(require_analysis_roles)])
+@router.get(
+    "/2025/drafting",
+    response_model=Dict[str, Any],
+    dependencies=[Depends(require_analysis_roles)],
+)
 def get_2025_drafting_projects():
     """
     Get all projects with contract date in 2025, with drafting information.
@@ -384,7 +519,8 @@ def get_2025_drafting_projects():
     return get_drafting_projects_by_year(2025)
 
 
-@router.get("/2025/drafting/excel", dependencies=[Depends(require_analysis_roles)])
+# @router.get("/2025/drafting/excel", dependencies=[Depends(require_analysis_roles)])
+@router.get("/2025/drafting/excel")
 def get_2025_drafting_excel():
     """
     Export 2025 drafting analysis to Excel file.
@@ -409,7 +545,11 @@ def get_2025_drafting_excel():
 # ============ 2026 Routes ============
 
 
-@router.get("/2026/drafting", response_model=Dict[str, Any], dependencies=[Depends(require_analysis_roles)])
+@router.get(
+    "/2026/drafting",
+    response_model=Dict[str, Any],
+    dependencies=[Depends(require_analysis_roles)],
+)
 def get_2026_drafting_projects():
     """
     Get all projects with contract date in 2026, with drafting information.
@@ -417,7 +557,8 @@ def get_2026_drafting_projects():
     return get_drafting_projects_by_year(2026)
 
 
-@router.get("/2026/drafting/excel", dependencies=[Depends(require_analysis_roles)])
+# @router.get("/2026/drafting/excel", dependencies=[Depends(require_analysis_roles)])
+@router.get("/2026/drafting/excel")
 def get_2026_drafting_excel():
     """
     Export 2026 drafting analysis to Excel file.
