@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 from datetime import datetime
 from io import BytesIO
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from openpyxl import Workbook
@@ -12,6 +12,8 @@ from openpyxl.utils import get_column_letter
 from app.database.database import projects_coll
 from app.database.schemas.project import Project
 from app.database.schemas.department_data import EPCData
+from app.database.schemas.security import AccessTokenData
+from app.security.oauth2 import get_current_user_data
 
 """
 Endpoint: /dev/analysis
@@ -20,6 +22,22 @@ Purpose:
 """
 
 router = APIRouter(prefix="/dev/analysis")
+
+# Allowed roles for analysis endpoints
+ALLOWED_ROLES = [299, 999]
+
+
+def require_analysis_roles(user_data: AccessTokenData = Depends(get_current_user_data)):
+    """
+    Dependency that checks if user has any of the allowed roles (299 or 999).
+    """
+    user_roles = user_data.roles
+    if not any(role in user_roles for role in ALLOWED_ROLES):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have access to this resource. Required roles: 299 or 999",
+        )
+    return user_data
 
 
 class DraftingProjectResponse(BaseModel):
@@ -96,7 +114,9 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
     # Calculate summary statistics
     total_projects = len(projects_for_year)
     projects_with_drafting = [p for p in projects_for_year if p["drafting_assigned_on"]]
-    projects_drafting_complete = [p for p in projects_for_year if p["drafting_finished"]]
+    projects_drafting_complete = [
+        p for p in projects_for_year if p["drafting_finished"]
+    ]
     drafting_days_list = [
         p["drafting_days"] for p in projects_for_year if p["drafting_days"] is not None
     ]
@@ -174,7 +194,9 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
 
     # Styles
     header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    header_fill = PatternFill(
+        start_color="4472C4", end_color="4472C4", fill_type="solid"
+    )
     header_alignment = Alignment(horizontal="center", vertical="center")
     thin_border = Border(
         left=Side(style="thin"),
@@ -229,7 +251,14 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
     # === Sheet 2: By Product ===
     ws_product = wb.create_sheet("By Product")
 
-    product_headers = ["Product", "Total Projects", "Drafting Complete", "Avg Days", "Min Days", "Max Days"]
+    product_headers = [
+        "Product",
+        "Total Projects",
+        "Drafting Complete",
+        "Avg Days",
+        "Min Days",
+        "Max Days",
+    ]
     for col, header in enumerate(product_headers, start=1):
         ws_product.cell(row=1, column=col, value=header)
     style_header_row(ws_product, 1, len(product_headers))
@@ -249,7 +278,14 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
     # === Sheet 3: By Drafter ===
     ws_drafter = wb.create_sheet("By Drafter")
 
-    drafter_headers = ["Drafter", "Total Projects", "Drafting Complete", "Avg Days", "Min Days", "Max Days"]
+    drafter_headers = [
+        "Drafter",
+        "Total Projects",
+        "Drafting Complete",
+        "Avg Days",
+        "Min Days",
+        "Max Days",
+    ]
     for col, header in enumerate(drafter_headers, start=1):
         ws_drafter.cell(row=1, column=col, value=header)
     style_header_row(ws_drafter, 1, len(drafter_headers))
@@ -270,8 +306,19 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
     ws_projects = wb.create_sheet("All Projects")
 
     project_headers = [
-        "Project ID", "Community", "Section", "Lot", "Contract Date", "Contract Type",
-        "Product", "Elevation", "Drafter", "Assigned On", "Finished", "Days", "Notes"
+        "Project ID",
+        "Community",
+        "Section",
+        "Lot",
+        "Contract Date",
+        "Contract Type",
+        "Product",
+        "Elevation",
+        "Drafter",
+        "Assigned On",
+        "Finished",
+        "Days",
+        "Notes",
     ]
     for col, header in enumerate(project_headers, start=1):
         ws_projects.cell(row=1, column=col, value=header)
@@ -283,13 +330,35 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
         ws_projects.cell(row=row, column=2, value=p["community"])
         ws_projects.cell(row=row, column=3, value=p["section"])
         ws_projects.cell(row=row, column=4, value=p["lot"])
-        ws_projects.cell(row=row, column=5, value=p["contract_date"].strftime("%Y-%m-%d") if p["contract_date"] else None)
+        ws_projects.cell(
+            row=row,
+            column=5,
+            value=(
+                p["contract_date"].strftime("%Y-%m-%d") if p["contract_date"] else None
+            ),
+        )
         ws_projects.cell(row=row, column=6, value=p["contract_type"])
         ws_projects.cell(row=row, column=7, value=p["product_name"])
         ws_projects.cell(row=row, column=8, value=p["elevation_name"])
         ws_projects.cell(row=row, column=9, value=p["drafting_drafter"])
-        ws_projects.cell(row=row, column=10, value=p["drafting_assigned_on"].strftime("%Y-%m-%d") if p["drafting_assigned_on"] else None)
-        ws_projects.cell(row=row, column=11, value=p["drafting_finished"].strftime("%Y-%m-%d") if p["drafting_finished"] else None)
+        ws_projects.cell(
+            row=row,
+            column=10,
+            value=(
+                p["drafting_assigned_on"].strftime("%Y-%m-%d")
+                if p["drafting_assigned_on"]
+                else None
+            ),
+        )
+        ws_projects.cell(
+            row=row,
+            column=11,
+            value=(
+                p["drafting_finished"].strftime("%Y-%m-%d")
+                if p["drafting_finished"]
+                else None
+            ),
+        )
         ws_projects.cell(row=row, column=12, value=p["drafting_days"])
         ws_projects.cell(row=row, column=13, value=p["drafting_notes"])
         row += 1
@@ -306,7 +375,8 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
 
 # ============ 2025 Routes ============
 
-@router.get("/2025/drafting", response_model=Dict[str, Any])
+
+@router.get("/2025/drafting", response_model=Dict[str, Any], dependencies=[Depends(require_analysis_roles)])
 def get_2025_drafting_projects():
     """
     Get all projects with contract date in 2025, with drafting information.
@@ -314,7 +384,7 @@ def get_2025_drafting_projects():
     return get_drafting_projects_by_year(2025)
 
 
-@router.get("/2025/drafting/excel")
+@router.get("/2025/drafting/excel", dependencies=[Depends(require_analysis_roles)])
 def get_2025_drafting_excel():
     """
     Export 2025 drafting analysis to Excel file.
@@ -332,13 +402,14 @@ def get_2025_drafting_excel():
             "Content-Disposition": f'attachment; filename="{filename}"',
             "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "Cache-Control": "no-cache",
-        }
+        },
     )
 
 
 # ============ 2026 Routes ============
 
-@router.get("/2026/drafting", response_model=Dict[str, Any])
+
+@router.get("/2026/drafting", response_model=Dict[str, Any], dependencies=[Depends(require_analysis_roles)])
 def get_2026_drafting_projects():
     """
     Get all projects with contract date in 2026, with drafting information.
@@ -346,7 +417,7 @@ def get_2026_drafting_projects():
     return get_drafting_projects_by_year(2026)
 
 
-@router.get("/2026/drafting/excel")
+@router.get("/2026/drafting/excel", dependencies=[Depends(require_analysis_roles)])
 def get_2026_drafting_excel():
     """
     Export 2026 drafting analysis to Excel file.
@@ -364,5 +435,5 @@ def get_2026_drafting_excel():
             "Content-Disposition": f'attachment; filename="{filename}"',
             "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "Cache-Control": "no-cache",
-        }
+        },
     )
