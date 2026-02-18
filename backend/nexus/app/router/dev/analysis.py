@@ -1,5 +1,5 @@
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import List, Dict, Any, Optional
+from datetime import datetime, timedelta
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -58,89 +58,27 @@ class DraftingProjectResponse(BaseModel):
     drafting_notes: str | None
 
 
-def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
+def _build_summary_and_breakdowns(
+    projects: List[Dict[str, Any]],
+    period_label: Dict[str, Any],
+) -> Dict[str, Any]:
     """
-    Helper function to get all projects with contract date in a given year.
-    Returns projects sorted by contract date with drafting analysis.
+    Given a filtered+sorted list of project dicts, compute summary stats
+    and breakdowns by product, drafter, and county.
     """
-    all_docs = list(projects_coll.find())
-
-    projects_for_year: List[Dict[str, Any]] = []
-
-    for doc in all_docs:
-        project_raw = {k: v for (k, v) in doc.items() if k != "_id"}
-
-        try:
-            project: Project = Project(**project_raw)
-            epc_data: EPCData = EPCData(**project_raw["teclab_data"]["epc_data"])
-
-            if not epc_data.contract_date:
-                continue
-            if epc_data.contract_date.year != year:
-                continue
-
-            drafting_days = None
-            if epc_data.drafting_assigned_on and epc_data.drafting_finished:
-                delta = epc_data.drafting_finished - epc_data.drafting_assigned_on
-                drafting_days = max(0, round(delta.total_seconds() / 86400))
-
-            permitting_days = None
-            if epc_data.permitting_submitted and epc_data.permitting_received:
-                delta = epc_data.permitting_received - epc_data.permitting_submitted
-                permitting_days = max(0, round(delta.total_seconds() / 86400))
-
-            project_info = {
-                "project_id": project.project_info.project_id,
-                "community": project.project_info.community,
-                "section": project.project_info.section,
-                "lot": project.project_info.lot_number,
-                "contract_date": epc_data.contract_date,
-                "contract_type": epc_data.contract_type,
-                "product_name": epc_data.product_name,
-                "elevation_name": epc_data.elevation_name,
-                "drafting_drafter": epc_data.drafting_drafter,
-                "drafting_assigned_on": epc_data.drafting_assigned_on,
-                "drafting_finished": epc_data.drafting_finished,
-                "drafting_days": drafting_days,
-                "drafting_notes": epc_data.drafting_notes,
-                "permitting_county": epc_data.permitting_county_name,
-                "permitting_submitted": epc_data.permitting_submitted,
-                "permitting_received": epc_data.permitting_received,
-                "permitting_days": permitting_days,
-            }
-
-            projects_for_year.append(project_info)
-
-        except Exception as e:
-            print(f"ERROR parsing project: {e}")
-            continue
-
-    # Sort by contract date
-    projects_for_year.sort(
-        key=lambda x: x["contract_date"] if x["contract_date"] else datetime.min
-    )
-
-    # Calculate summary statistics for drafting
-    total_projects = len(projects_for_year)
-    projects_with_drafting = [p for p in projects_for_year if p["drafting_assigned_on"]]
-    projects_drafting_complete = [
-        p for p in projects_for_year if p["drafting_finished"]
-    ]
+    total_projects = len(projects)
+    projects_with_drafting = [p for p in projects if p["drafting_assigned_on"]]
+    projects_drafting_complete = [p for p in projects if p["drafting_finished"]]
     drafting_days_list = [
-        p["drafting_days"] for p in projects_for_year if p["drafting_days"] is not None
+        p["drafting_days"] for p in projects if p["drafting_days"] is not None
     ]
 
-    # Calculate summary statistics for permitting
     projects_with_permitting_submitted = [
-        p for p in projects_for_year if p["permitting_submitted"]
+        p for p in projects if p["permitting_submitted"]
     ]
-    projects_permitting_received = [
-        p for p in projects_for_year if p["permitting_received"]
-    ]
+    projects_permitting_received = [p for p in projects if p["permitting_received"]]
     permitting_days_list = [
-        p["permitting_days"]
-        for p in projects_for_year
-        if p["permitting_days"] is not None
+        p["permitting_days"] for p in projects if p["permitting_days"] is not None
     ]
 
     summary = {
@@ -171,7 +109,7 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
 
     # Breakdown by product
     by_product: Dict[str, Dict[str, Any]] = {}
-    for p in projects_for_year:
+    for p in projects:
         product = p["product_name"] or "Unknown"
         if product not in by_product:
             by_product[product] = {"count": 0, "drafting_days": []}
@@ -192,7 +130,7 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
 
     # Breakdown by drafter
     by_drafter: Dict[str, Dict[str, Any]] = {}
-    for p in projects_for_year:
+    for p in projects:
         drafter = p["drafting_drafter"] or "Unassigned"
         if drafter not in by_drafter:
             by_drafter[drafter] = {"count": 0, "drafting_days": []}
@@ -213,7 +151,7 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
 
     # Breakdown by county (for permitting cycle times)
     by_county: Dict[str, Dict[str, Any]] = {}
-    for p in projects_for_year:
+    for p in projects:
         county = p["permitting_county"] or "Unknown"
         if county not in by_county:
             by_county[county] = {"count": 0, "permitting_days": []}
@@ -233,20 +171,130 @@ def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
         }
 
     return {
-        "year": year,
+        **period_label,
         "summary": summary,
         "by_product": product_breakdown,
         "by_drafter": drafter_breakdown,
         "by_county": county_breakdown,
-        "projects": projects_for_year,
+        "projects": projects,
     }
+
+
+def _fetch_all_project_infos() -> List[Dict[str, Any]]:
+    """
+    Fetch and parse all projects from the database into a flat info dict list.
+    Only projects with a contract_date are included.
+    """
+    all_docs = list(projects_coll.find())
+    result: List[Dict[str, Any]] = []
+
+    for doc in all_docs:
+        project_raw = {k: v for (k, v) in doc.items() if k != "_id"}
+        try:
+            project: Project = Project(**project_raw)
+            epc_data: EPCData = EPCData(**project_raw["teclab_data"]["epc_data"])
+
+            if not epc_data.contract_date:
+                continue
+
+            drafting_days = None
+            if epc_data.drafting_assigned_on and epc_data.drafting_finished:
+                delta = epc_data.drafting_finished - epc_data.drafting_assigned_on
+                drafting_days = max(0, round(delta.total_seconds() / 86400))
+
+            permitting_days = None
+            if epc_data.permitting_submitted and epc_data.permitting_received:
+                delta = epc_data.permitting_received - epc_data.permitting_submitted
+                permitting_days = max(0, round(delta.total_seconds() / 86400))
+
+            result.append(
+                {
+                    "project_id": project.project_info.project_id,
+                    "community": project.project_info.community,
+                    "section": project.project_info.section,
+                    "lot": project.project_info.lot_number,
+                    "contract_date": epc_data.contract_date,
+                    "contract_type": epc_data.contract_type,
+                    "product_name": epc_data.product_name,
+                    "elevation_name": epc_data.elevation_name,
+                    "drafting_drafter": epc_data.drafting_drafter,
+                    "drafting_assigned_on": epc_data.drafting_assigned_on,
+                    "drafting_finished": epc_data.drafting_finished,
+                    "drafting_days": drafting_days,
+                    "drafting_notes": epc_data.drafting_notes,
+                    "permitting_county": epc_data.permitting_county_name,
+                    "permitting_submitted": epc_data.permitting_submitted,
+                    "permitting_received": epc_data.permitting_received,
+                    "permitting_days": permitting_days,
+                }
+            )
+        except Exception as e:
+            print(f"ERROR parsing project: {e}")
+            continue
+
+    return result
+
+
+def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
+    """
+    Returns projects with contract date in the given year, with drafting analysis.
+    """
+    all_projects = _fetch_all_project_infos()
+    filtered = [p for p in all_projects if p["contract_date"].year == year]
+    filtered.sort(key=lambda x: x["contract_date"])
+    return _build_summary_and_breakdowns(filtered, {"year": year})
+
+
+def get_drafting_projects_by_month(year: int, month: int) -> Dict[str, Any]:
+    """
+    Returns projects with contract date in the given year+month, with drafting analysis.
+    """
+    all_projects = _fetch_all_project_infos()
+    filtered = [
+        p
+        for p in all_projects
+        if p["contract_date"].year == year and p["contract_date"].month == month
+    ]
+    filtered.sort(key=lambda x: x["contract_date"])
+    return _build_summary_and_breakdowns(filtered, {"year": year, "month": month})
+
+
+def get_drafting_projects_current_week() -> Dict[str, Any]:
+    """
+    Returns projects with contract date in the current calendar week (Mon–Sun),
+    with drafting analysis.
+    """
+    today = datetime.utcnow().date()
+    week_start = datetime.combine(today - timedelta(days=today.weekday()), datetime.min.time())
+    week_end = week_start + timedelta(days=7)
+
+    all_projects = _fetch_all_project_infos()
+    filtered = [
+        p
+        for p in all_projects
+        if week_start <= p["contract_date"].replace(tzinfo=None) < week_end
+    ]
+    filtered.sort(key=lambda x: x["contract_date"])
+    return _build_summary_and_breakdowns(
+        filtered,
+        {
+            "week_start": week_start.strftime("%Y-%m-%d"),
+            "week_end": (week_end - timedelta(days=1)).strftime("%Y-%m-%d"),
+        },
+    )
 
 
 def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
     """
     Helper function to generate Excel file from drafting data.
     """
-    year = data["year"]
+    if "week_start" in data:
+        period_title = f"Week of {data['week_start']} – {data['week_end']}"
+    elif "month" in data:
+        period_title = f"{data['year']} {MONTH_NAMES.get(data['month'], data['month'])}"
+    else:
+        period_title = str(data["year"])
+
     wb = Workbook()
 
     # Styles
@@ -287,7 +335,7 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
     ws_summary.title = "Summary"
 
     summary = data["summary"]
-    ws_summary["A1"] = f"{year} Analysis Summary"
+    ws_summary["A1"] = f"{period_title} Analysis Summary"
     ws_summary["A1"].font = Font(bold=True, size=14)
     ws_summary.merge_cells("A1:B1")
 
@@ -504,6 +552,46 @@ def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
     return output
 
 
+# ============ Current Week Routes ============
+
+
+@router.get(
+    "/current-week/drafting",
+    response_model=Dict[str, Any],
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_current_week_drafting_projects():
+    """
+    Get all projects with contract date in the current calendar week (Mon–Sun).
+    """
+    return get_drafting_projects_current_week()
+
+
+@router.get(
+    "/current-week/drafting/excel",
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_current_week_drafting_excel():
+    """
+    Export current-week drafting analysis to Excel file.
+    """
+    data = get_drafting_projects_current_week()
+    output = generate_drafting_excel(data)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"current_week_drafting_analysis_{timestamp}.xlsx"
+
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Cache-Control": "no-cache",
+        },
+    )
+
+
 # ============ 2025 Routes ============
 
 
@@ -568,6 +656,63 @@ def get_2026_drafting_excel():
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"2026_drafting_analysis_{timestamp}.xlsx"
+
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Cache-Control": "no-cache",
+        },
+    )
+
+
+# ============ 2026 Monthly Routes ============
+
+MONTH_NAMES = {
+    1: "January", 2: "February", 3: "March", 4: "April",
+    5: "May", 6: "June", 7: "July", 8: "August",
+    9: "September", 10: "October", 11: "November", 12: "December",
+}
+
+
+@router.get(
+    "/2026/{month}/drafting",
+    response_model=Dict[str, Any],
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_2026_monthly_drafting_projects(month: int):
+    """
+    Get all projects with contract date in a given month of 2026 (month = 1–12).
+    """
+    if month < 1 or month > 12:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Month must be between 1 and 12",
+        )
+    return get_drafting_projects_by_month(2026, month)
+
+
+@router.get(
+    "/2026/{month}/drafting/excel",
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_2026_monthly_drafting_excel(month: int):
+    """
+    Export a given month of 2026 drafting analysis to Excel file.
+    """
+    if month < 1 or month > 12:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Month must be between 1 and 12",
+        )
+    data = get_drafting_projects_by_month(2026, month)
+    output = generate_drafting_excel(data)
+
+    month_name = MONTH_NAMES.get(month, str(month))
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"2026_{month_name}_drafting_analysis_{timestamp}.xlsx"
 
     return StreamingResponse(
         output,
