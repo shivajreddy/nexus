@@ -1,10 +1,9 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from datetime import datetime, timedelta
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
@@ -19,18 +18,26 @@ from app.security.oauth2 import get_current_user_data
 Endpoint: /dev/analysis
 Purpose:
   - Analysis and reporting endpoints for project data
+  - Categories: drafting, engineering, plat, county (permitting)
+  - Periods: yearly (/2025, /2026), monthly (/2026/1 … /2026/12), weekly (/current-week)
 """
 
 router = APIRouter(prefix="/dev/analysis")
 
-# Allowed roles for analysis endpoints
 ALLOWED_ROLES = [299, 999]
 
+MONTH_NAMES = {
+    1: "January", 2: "February", 3: "March", 4: "April",
+    5: "May", 6: "June", 7: "July", 8: "August",
+    9: "September", 10: "October", 11: "November", 12: "December",
+}
+
+
+# ---------------------------------------------------------------------------
+# Auth dependency
+# ---------------------------------------------------------------------------
 
 def require_analysis_roles(user_data: AccessTokenData = Depends(get_current_user_data)):
-    """
-    Dependency that checks if user has any of the allowed roles (299 or 999).
-    """
     user_roles = user_data.roles
     if not any(role in user_roles for role in ALLOWED_ROLES):
         raise HTTPException(
@@ -40,194 +47,72 @@ def require_analysis_roles(user_data: AccessTokenData = Depends(get_current_user
     return user_data
 
 
-class DraftingProjectResponse(BaseModel):
-    """Response model for drafting project data"""
+# ---------------------------------------------------------------------------
+# Data helpers
+# ---------------------------------------------------------------------------
 
-    project_id: str
-    community: str
-    section: str
-    lot: str
-    contract_date: datetime | None
-    contract_type: str | None
-    product_name: str | None
-    elevation_name: str | None
-    drafting_drafter: str | None
-    drafting_assigned_on: datetime | None
-    drafting_finished: datetime | None
-    drafting_days: int | None
-    drafting_notes: str | None
+def _days_between(start: datetime | None, end: datetime | None) -> int | None:
+    if start and end:
+        return max(0, round((end - start).total_seconds() / 86400))
+    return None
 
 
-def _build_summary_and_breakdowns(
-    projects: List[Dict[str, Any]],
-    period_label: Dict[str, Any],
-) -> Dict[str, Any]:
-    """
-    Given a filtered+sorted list of project dicts, compute summary stats
-    and breakdowns by product, drafter, and county.
-    """
-    total_projects = len(projects)
-    projects_with_drafting = [p for p in projects if p["drafting_assigned_on"]]
-    projects_drafting_complete = [p for p in projects if p["drafting_finished"]]
-    drafting_days_list = [
-        p["drafting_days"] for p in projects if p["drafting_days"] is not None
-    ]
-
-    projects_with_permitting_submitted = [
-        p for p in projects if p["permitting_submitted"]
-    ]
-    projects_permitting_received = [p for p in projects if p["permitting_received"]]
-    permitting_days_list = [
-        p["permitting_days"] for p in projects if p["permitting_days"] is not None
-    ]
-
-    summary = {
-        "total_projects": total_projects,
-        "projects_with_drafting_assigned": len(projects_with_drafting),
-        "projects_drafting_complete": len(projects_drafting_complete),
-        "avg_drafting_days": (
-            round(sum(drafting_days_list) / len(drafting_days_list), 1)
-            if drafting_days_list
-            else None
-        ),
-        "min_drafting_days": min(drafting_days_list) if drafting_days_list else None,
-        "max_drafting_days": max(drafting_days_list) if drafting_days_list else None,
-        "projects_with_permitting_submitted": len(projects_with_permitting_submitted),
-        "projects_permitting_received": len(projects_permitting_received),
-        "avg_permitting_days": (
-            round(sum(permitting_days_list) / len(permitting_days_list), 1)
-            if permitting_days_list
-            else None
-        ),
-        "min_permitting_days": (
-            min(permitting_days_list) if permitting_days_list else None
-        ),
-        "max_permitting_days": (
-            max(permitting_days_list) if permitting_days_list else None
-        ),
-    }
-
-    # Breakdown by product
-    by_product: Dict[str, Dict[str, Any]] = {}
-    for p in projects:
-        product = p["product_name"] or "Unknown"
-        if product not in by_product:
-            by_product[product] = {"count": 0, "drafting_days": []}
-        by_product[product]["count"] += 1
-        if p["drafting_days"] is not None:
-            by_product[product]["drafting_days"].append(p["drafting_days"])
-
-    product_breakdown = {}
-    for product, data in by_product.items():
-        days = data["drafting_days"]
-        product_breakdown[product] = {
-            "total_projects": data["count"],
-            "drafting_complete": len(days),
-            "avg_drafting_days": round(sum(days) / len(days), 1) if days else None,
-            "min_drafting_days": min(days) if days else None,
-            "max_drafting_days": max(days) if days else None,
-        }
-
-    # Breakdown by drafter
-    by_drafter: Dict[str, Dict[str, Any]] = {}
-    for p in projects:
-        drafter = p["drafting_drafter"] or "Unassigned"
-        if drafter not in by_drafter:
-            by_drafter[drafter] = {"count": 0, "drafting_days": []}
-        by_drafter[drafter]["count"] += 1
-        if p["drafting_days"] is not None:
-            by_drafter[drafter]["drafting_days"].append(p["drafting_days"])
-
-    drafter_breakdown = {}
-    for drafter, data in by_drafter.items():
-        days = data["drafting_days"]
-        drafter_breakdown[drafter] = {
-            "total_projects": data["count"],
-            "drafting_complete": len(days),
-            "avg_drafting_days": round(sum(days) / len(days), 1) if days else None,
-            "min_drafting_days": min(days) if days else None,
-            "max_drafting_days": max(days) if days else None,
-        }
-
-    # Breakdown by county (for permitting cycle times)
-    by_county: Dict[str, Dict[str, Any]] = {}
-    for p in projects:
-        county = p["permitting_county"] or "Unknown"
-        if county not in by_county:
-            by_county[county] = {"count": 0, "permitting_days": []}
-        by_county[county]["count"] += 1
-        if p["permitting_days"] is not None:
-            by_county[county]["permitting_days"].append(p["permitting_days"])
-
-    county_breakdown = {}
-    for county, data in by_county.items():
-        days = data["permitting_days"]
-        county_breakdown[county] = {
-            "total_projects": data["count"],
-            "permitting_complete": len(days),
-            "avg_permitting_days": round(sum(days) / len(days), 1) if days else None,
-            "min_permitting_days": min(days) if days else None,
-            "max_permitting_days": max(days) if days else None,
-        }
-
-    return {
-        **period_label,
-        "summary": summary,
-        "by_product": product_breakdown,
-        "by_drafter": drafter_breakdown,
-        "by_county": county_breakdown,
-        "projects": projects,
-    }
+def _fmt_date(dt: datetime | None) -> str | None:
+    return dt.strftime("%Y-%m-%d") if dt else None
 
 
 def _fetch_all_project_infos() -> List[Dict[str, Any]]:
     """
-    Fetch and parse all projects from the database into a flat info dict list.
+    Fetch and parse all projects from MongoDB into flat dicts.
     Only projects with a contract_date are included.
     """
-    all_docs = list(projects_coll.find())
     result: List[Dict[str, Any]] = []
 
-    for doc in all_docs:
-        project_raw = {k: v for (k, v) in doc.items() if k != "_id"}
+    for doc in projects_coll.find():
+        project_raw = {k: v for k, v in doc.items() if k != "_id"}
         try:
             project: Project = Project(**project_raw)
-            epc_data: EPCData = EPCData(**project_raw["teclab_data"]["epc_data"])
+            epc: EPCData = EPCData(**project_raw["teclab_data"]["epc_data"])
 
-            if not epc_data.contract_date:
+            if not epc.contract_date:
                 continue
 
-            drafting_days = None
-            if epc_data.drafting_assigned_on and epc_data.drafting_finished:
-                delta = epc_data.drafting_finished - epc_data.drafting_assigned_on
-                drafting_days = max(0, round(delta.total_seconds() / 86400))
-
-            permitting_days = None
-            if epc_data.permitting_submitted and epc_data.permitting_received:
-                delta = epc_data.permitting_received - epc_data.permitting_submitted
-                permitting_days = max(0, round(delta.total_seconds() / 86400))
-
-            result.append(
-                {
-                    "project_id": project.project_info.project_id,
-                    "community": project.project_info.community,
-                    "section": project.project_info.section,
-                    "lot": project.project_info.lot_number,
-                    "contract_date": epc_data.contract_date,
-                    "contract_type": epc_data.contract_type,
-                    "product_name": epc_data.product_name,
-                    "elevation_name": epc_data.elevation_name,
-                    "drafting_drafter": epc_data.drafting_drafter,
-                    "drafting_assigned_on": epc_data.drafting_assigned_on,
-                    "drafting_finished": epc_data.drafting_finished,
-                    "drafting_days": drafting_days,
-                    "drafting_notes": epc_data.drafting_notes,
-                    "permitting_county": epc_data.permitting_county_name,
-                    "permitting_submitted": epc_data.permitting_submitted,
-                    "permitting_received": epc_data.permitting_received,
-                    "permitting_days": permitting_days,
-                }
-            )
+            result.append({
+                # identity
+                "project_id":    project.project_info.project_id,
+                "community":     project.project_info.community,
+                "section":       project.project_info.section,
+                "lot":           project.project_info.lot_number,
+                # contract
+                "contract_date": epc.contract_date,
+                "contract_type": epc.contract_type,
+                "product_name":  epc.product_name,
+                "elevation_name": epc.elevation_name,
+                # drafting
+                "drafting_drafter":     epc.drafting_drafter,
+                "drafting_assigned_on": epc.drafting_assigned_on,
+                "drafting_finished":    epc.drafting_finished,
+                "drafting_days":        _days_between(epc.drafting_assigned_on, epc.drafting_finished),
+                "drafting_notes":       epc.drafting_notes,
+                # engineering
+                "engineering_engineer": epc.engineering_engineer,
+                "engineering_sent":     epc.engineering_sent,
+                "engineering_received": epc.engineering_received,
+                "engineering_days":     _days_between(epc.engineering_sent, epc.engineering_received),
+                "engineering_notes":    epc.engineering_notes,
+                # plat
+                "plat_engineer":  epc.plat_engineer,
+                "plat_sent":      epc.plat_sent,
+                "plat_received":  epc.plat_received,
+                "plat_days":      _days_between(epc.plat_sent, epc.plat_received),
+                "plat_notes":     epc.plat_notes,
+                # permitting / county
+                "permitting_county":    epc.permitting_county_name,
+                "permitting_submitted": epc.permitting_submitted,
+                "permitting_received":  epc.permitting_received,
+                "permitting_days":      _days_between(epc.permitting_submitted, epc.permitting_received),
+                "permitting_notes":     epc.permitting_notes,
+            })
         except Exception as e:
             print(f"ERROR parsing project: {e}")
             continue
@@ -235,352 +120,401 @@ def _fetch_all_project_infos() -> List[Dict[str, Any]]:
     return result
 
 
-def get_drafting_projects_by_year(year: int) -> Dict[str, Any]:
-    """
-    Returns projects with contract date in the given year, with drafting analysis.
-    """
-    all_projects = _fetch_all_project_infos()
-    filtered = [p for p in all_projects if p["contract_date"].year == year]
-    filtered.sort(key=lambda x: x["contract_date"])
-    return _build_summary_and_breakdowns(filtered, {"year": year})
+def _stats(days_list: List[int]) -> Dict[str, Any]:
+    if not days_list:
+        return {"avg": None, "min": None, "max": None}
+    return {
+        "avg": round(sum(days_list) / len(days_list), 1),
+        "min": min(days_list),
+        "max": max(days_list),
+    }
 
 
-def get_drafting_projects_by_month(year: int, month: int) -> Dict[str, Any]:
+def _build_report(projects: List[Dict[str, Any]], period_label: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Returns projects with contract date in the given year+month, with drafting analysis.
+    Build the full report dict from a filtered, sorted project list.
     """
-    all_projects = _fetch_all_project_infos()
-    filtered = [
-        p
-        for p in all_projects
-        if p["contract_date"].year == year and p["contract_date"].month == month
+    # --- summary ---
+    def _count(key): return sum(1 for p in projects if p[key])
+
+    drafting_days   = [p["drafting_days"]   for p in projects if p["drafting_days"]   is not None]
+    engineering_days = [p["engineering_days"] for p in projects if p["engineering_days"] is not None]
+    plat_days       = [p["plat_days"]       for p in projects if p["plat_days"]       is not None]
+    permitting_days = [p["permitting_days"] for p in projects if p["permitting_days"] is not None]
+
+    ds = _stats(drafting_days)
+    es = _stats(engineering_days)
+    ps = _stats(plat_days)
+    cs = _stats(permitting_days)
+
+    summary = {
+        "total_projects": len(projects),
+        # drafting
+        "drafting_assigned":        _count("drafting_assigned_on"),
+        "drafting_complete":        _count("drafting_finished"),
+        "drafting_avg_days":        ds["avg"],
+        "drafting_min_days":        ds["min"],
+        "drafting_max_days":        ds["max"],
+        # engineering
+        "engineering_sent":         _count("engineering_sent"),
+        "engineering_received":     _count("engineering_received"),
+        "engineering_avg_days":     es["avg"],
+        "engineering_min_days":     es["min"],
+        "engineering_max_days":     es["max"],
+        # plat
+        "plat_sent":                _count("plat_sent"),
+        "plat_received":            _count("plat_received"),
+        "plat_avg_days":            ps["avg"],
+        "plat_min_days":            ps["min"],
+        "plat_max_days":            ps["max"],
+        # permitting / county
+        "permitting_submitted":     _count("permitting_submitted"),
+        "permitting_received":      _count("permitting_received"),
+        "permitting_avg_days":      cs["avg"],
+        "permitting_min_days":      cs["min"],
+        "permitting_max_days":      cs["max"],
+    }
+
+    # --- by drafter ---
+    by_drafter: Dict[str, Any] = {}
+    for p in projects:
+        name = p["drafting_drafter"] or "Unassigned"
+        bucket = by_drafter.setdefault(name, {"count": 0, "days": []})
+        bucket["count"] += 1
+        if p["drafting_days"] is not None:
+            bucket["days"].append(p["drafting_days"])
+    drafter_breakdown = {
+        name: {"total_projects": b["count"], "complete": len(b["days"]), **_stats(b["days"])}
+        for name, b in by_drafter.items()
+    }
+
+    # --- by engineer ---
+    by_engineer: Dict[str, Any] = {}
+    for p in projects:
+        name = p["engineering_engineer"] or "Unassigned"
+        bucket = by_engineer.setdefault(name, {"count": 0, "days": []})
+        bucket["count"] += 1
+        if p["engineering_days"] is not None:
+            bucket["days"].append(p["engineering_days"])
+    engineer_breakdown = {
+        name: {"total_projects": b["count"], "complete": len(b["days"]), **_stats(b["days"])}
+        for name, b in by_engineer.items()
+    }
+
+    # --- by plat engineer ---
+    by_plat: Dict[str, Any] = {}
+    for p in projects:
+        name = p["plat_engineer"] or "Unassigned"
+        bucket = by_plat.setdefault(name, {"count": 0, "days": []})
+        bucket["count"] += 1
+        if p["plat_days"] is not None:
+            bucket["days"].append(p["plat_days"])
+    plat_breakdown = {
+        name: {"total_projects": b["count"], "complete": len(b["days"]), **_stats(b["days"])}
+        for name, b in by_plat.items()
+    }
+
+    # --- by county ---
+    by_county: Dict[str, Any] = {}
+    for p in projects:
+        name = p["permitting_county"] or "Unknown"
+        bucket = by_county.setdefault(name, {"count": 0, "days": []})
+        bucket["count"] += 1
+        if p["permitting_days"] is not None:
+            bucket["days"].append(p["permitting_days"])
+    county_breakdown = {
+        name: {"total_projects": b["count"], "complete": len(b["days"]), **_stats(b["days"])}
+        for name, b in by_county.items()
+    }
+
+    return {
+        **period_label,
+        "summary":      summary,
+        "by_drafter":   drafter_breakdown,
+        "by_engineer":  engineer_breakdown,
+        "by_plat":      plat_breakdown,
+        "by_county":    county_breakdown,
+        "projects":     projects,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Period helpers
+# ---------------------------------------------------------------------------
+
+# Start dates used to determine if a lot "belongs" to a period.
+# A lot is included if ANY of these dates fall within the period.
+_WORK_START_FIELDS = [
+    "drafting_assigned_on",
+    "engineering_sent",
+    "plat_sent",
+    "permitting_submitted",
+]
+
+
+def _any_in_period(p: Dict[str, Any], start: datetime, end: datetime) -> bool:
+    """Return True if any work-start date falls within [start, end)."""
+    for field in _WORK_START_FIELDS:
+        dt = p.get(field)
+        if dt is not None:
+            dt = dt.replace(tzinfo=None)
+            if start <= dt < end:
+                return True
+    return False
+
+
+def _report_for_year(year: int) -> Dict[str, Any]:
+    period_start = datetime(year, 1, 1)
+    period_end   = datetime(year + 1, 1, 1)
+    projects = [
+        p for p in _fetch_all_project_infos()
+        if _any_in_period(p, period_start, period_end)
     ]
-    filtered.sort(key=lambda x: x["contract_date"])
-    return _build_summary_and_breakdowns(filtered, {"year": year, "month": month})
+    projects.sort(key=lambda p: min(
+        (p[f].replace(tzinfo=None) for f in _WORK_START_FIELDS if p[f]),
+        default=datetime.max,
+    ))
+    return _build_report(projects, {"year": year})
 
 
-def get_drafting_projects_current_week() -> Dict[str, Any]:
-    """
-    Returns projects with contract date in the current calendar week (Mon–Sun),
-    with drafting analysis.
-    """
-    today = datetime.utcnow().date()
-    week_start = datetime.combine(today - timedelta(days=today.weekday()), datetime.min.time())
-    week_end = week_start + timedelta(days=7)
-
-    all_projects = _fetch_all_project_infos()
-    filtered = [
-        p
-        for p in all_projects
-        if week_start <= p["contract_date"].replace(tzinfo=None) < week_end
-    ]
-    filtered.sort(key=lambda x: x["contract_date"])
-    return _build_summary_and_breakdowns(
-        filtered,
-        {
-            "week_start": week_start.strftime("%Y-%m-%d"),
-            "week_end": (week_end - timedelta(days=1)).strftime("%Y-%m-%d"),
-        },
-    )
-
-
-def generate_drafting_excel(data: Dict[str, Any]) -> BytesIO:
-    """
-    Helper function to generate Excel file from drafting data.
-    """
-    if "week_start" in data:
-        period_title = f"Week of {data['week_start']} – {data['week_end']}"
-    elif "month" in data:
-        period_title = f"{data['year']} {MONTH_NAMES.get(data['month'], data['month'])}"
+def _report_for_month(year: int, month: int) -> Dict[str, Any]:
+    period_start = datetime(year, month, 1)
+    # advance to first day of next month
+    if month == 12:
+        period_end = datetime(year + 1, 1, 1)
     else:
-        period_title = str(data["year"])
+        period_end = datetime(year, month + 1, 1)
+    projects = [
+        p for p in _fetch_all_project_infos()
+        if _any_in_period(p, period_start, period_end)
+    ]
+    projects.sort(key=lambda p: min(
+        (p[f].replace(tzinfo=None) for f in _WORK_START_FIELDS if p[f]),
+        default=datetime.max,
+    ))
+    return _build_report(projects, {"year": year, "month": month})
 
+
+def _report_for_current_week() -> Dict[str, Any]:
+    today = datetime.utcnow().date()
+    period_start = datetime.combine(today - timedelta(days=today.weekday()), datetime.min.time())
+    period_end   = period_start + timedelta(days=7)
+
+    projects = [
+        p for p in _fetch_all_project_infos()
+        if _any_in_period(p, period_start, period_end)
+    ]
+    projects.sort(key=lambda p: min(
+        (p[f].replace(tzinfo=None) for f in _WORK_START_FIELDS if p[f]),
+        default=datetime.max,
+    ))
+    return _build_report(projects, {
+        "week_start": period_start.strftime("%Y-%m-%d"),
+        "week_end":   (period_end - timedelta(days=1)).strftime("%Y-%m-%d"),
+    })
+
+
+# ---------------------------------------------------------------------------
+# Excel generator
+# ---------------------------------------------------------------------------
+
+def _period_title(data: Dict[str, Any]) -> str:
+    if "week_start" in data:
+        return f"Week of {data['week_start']} – {data['week_end']}"
+    if "month" in data:
+        return f"{data['year']} {MONTH_NAMES.get(data['month'], data['month'])}"
+    return str(data["year"])
+
+
+def _period_filename(data: Dict[str, Any]) -> str:
+    if "week_start" in data:
+        return f"week_{data['week_start']}"
+    if "month" in data:
+        return f"{data['year']}_{MONTH_NAMES.get(data['month'], data['month'])}"
+    return str(data["year"])
+
+
+def generate_excel(data: Dict[str, Any]) -> BytesIO:
+    title = _period_title(data)
     wb = Workbook()
 
-    # Styles
-    header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(
-        start_color="4472C4", end_color="4472C4", fill_type="solid"
-    )
+    # Shared styles
+    header_font      = Font(bold=True, color="FFFFFF")
+    header_fill      = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
     header_alignment = Alignment(horizontal="center", vertical="center")
-    thin_border = Border(
-        left=Side(style="thin"),
-        right=Side(style="thin"),
-        top=Side(style="thin"),
-        bottom=Side(style="thin"),
+    thin_border      = Border(
+        left=Side(style="thin"), right=Side(style="thin"),
+        top=Side(style="thin"),  bottom=Side(style="thin"),
     )
 
-    def style_header_row(ws, row_num, num_cols):
+    def style_headers(ws, num_cols: int):
         for col in range(1, num_cols + 1):
-            cell = ws.cell(row=row_num, column=col)
-            cell.font = header_font
-            cell.fill = header_fill
+            cell = ws.cell(row=1, column=col)
+            cell.font      = header_font
+            cell.fill      = header_fill
             cell.alignment = header_alignment
-            cell.border = thin_border
+            cell.border    = thin_border
 
-    def auto_adjust_columns(ws):
-        for col_idx, column_cells in enumerate(ws.columns, 1):
-            max_length = 0
-            column = get_column_letter(col_idx)
-            for cell in column_cells:
-                try:
-                    if cell.value:
-                        max_length = max(max_length, len(str(cell.value)))
-                except:
-                    pass
-            ws.column_dimensions[column].width = min(max_length + 2, 50)
+    def auto_width(ws):
+        for col_idx, col_cells in enumerate(ws.columns, 1):
+            width = max((len(str(c.value)) for c in col_cells if c.value), default=0)
+            ws.column_dimensions[get_column_letter(col_idx)].width = min(width + 2, 50)
 
-    # === Sheet 1: Summary ===
-    ws_summary = wb.active
-    ws_summary.title = "Summary"
+    def write_breakdown_sheet(ws, col1_label: str, breakdown: Dict[str, Any], stat_keys: List[str], stat_headers: List[str]):
+        headers = [col1_label, "Total Projects", "Complete"] + stat_headers
+        for col, h in enumerate(headers, 1):
+            ws.cell(row=1, column=col, value=h)
+        style_headers(ws, len(headers))
+        for r, (name, stats) in enumerate(breakdown.items(), start=2):
+            ws.cell(row=r, column=1, value=name)
+            ws.cell(row=r, column=2, value=stats["total_projects"])
+            ws.cell(row=r, column=3, value=stats["complete"])
+            ws.cell(row=r, column=4, value=stats["avg"])
+            ws.cell(row=r, column=5, value=stats["min"])
+            ws.cell(row=r, column=6, value=stats["max"])
+        auto_width(ws)
 
     summary = data["summary"]
-    ws_summary["A1"] = f"{period_title} Analysis Summary"
+
+    # ── Sheet 1: Summary ─────────────────────────────────────────────────────
+    ws_summary = wb.active
+    ws_summary.title = "Summary"
+    ws_summary["A1"] = f"{title} Analysis Summary"
     ws_summary["A1"].font = Font(bold=True, size=14)
     ws_summary.merge_cells("A1:B1")
 
-    # Drafting summary
-    ws_summary.cell(row=3, column=1, value="DRAFTING").font = Font(bold=True, size=12)
-    drafting_rows = [
-        ("Projects with Drafting Assigned", summary["projects_with_drafting_assigned"]),
-        ("Projects Drafting Complete", summary["projects_drafting_complete"]),
-        ("Average Drafting Days", summary["avg_drafting_days"]),
-        ("Min Drafting Days", summary["min_drafting_days"]),
-        ("Max Drafting Days", summary["max_drafting_days"]),
+    sections = [
+        ("DRAFTING", [
+            ("Assigned",        summary["drafting_assigned"]),
+            ("Complete",        summary["drafting_complete"]),
+            ("Avg Days",        summary["drafting_avg_days"]),
+            ("Min Days",        summary["drafting_min_days"]),
+            ("Max Days",        summary["drafting_max_days"]),
+        ]),
+        ("ENGINEERING", [
+            ("Sent",            summary["engineering_sent"]),
+            ("Received",        summary["engineering_received"]),
+            ("Avg Days",        summary["engineering_avg_days"]),
+            ("Min Days",        summary["engineering_min_days"]),
+            ("Max Days",        summary["engineering_max_days"]),
+        ]),
+        ("PLAT", [
+            ("Sent",            summary["plat_sent"]),
+            ("Received",        summary["plat_received"]),
+            ("Avg Days",        summary["plat_avg_days"]),
+            ("Min Days",        summary["plat_min_days"]),
+            ("Max Days",        summary["plat_max_days"]),
+        ]),
+        ("COUNTY / PERMITTING", [
+            ("Submitted",       summary["permitting_submitted"]),
+            ("Received",        summary["permitting_received"]),
+            ("Avg Days",        summary["permitting_avg_days"]),
+            ("Min Days",        summary["permitting_min_days"]),
+            ("Max Days",        summary["permitting_max_days"]),
+        ]),
     ]
-    for i, (label, value) in enumerate(drafting_rows, start=4):
-        ws_summary.cell(row=i, column=1, value=label).font = Font(bold=True)
-        ws_summary.cell(row=i, column=2, value=value)
 
-    # Permitting summary
-    ws_summary.cell(row=10, column=1, value="PERMITTING").font = Font(
-        bold=True, size=12
+    current_row = 3
+    for section_title, rows in sections:
+        ws_summary.cell(row=current_row, column=1, value=section_title).font = Font(bold=True, size=12)
+        current_row += 1
+        for label, value in rows:
+            ws_summary.cell(row=current_row, column=1, value=label).font = Font(bold=True)
+            ws_summary.cell(row=current_row, column=2, value=value)
+            current_row += 1
+        current_row += 1  # blank row between sections
+
+    ws_summary.cell(row=current_row, column=1, value="Total Projects").font = Font(bold=True)
+    ws_summary.cell(row=current_row, column=2, value=summary["total_projects"])
+    auto_width(ws_summary)
+
+    # ── Sheet 2: By Drafter ───────────────────────────────────────────────────
+    write_breakdown_sheet(
+        wb.create_sheet("By Drafter"), "Drafter",
+        data["by_drafter"], [], ["Avg Days", "Min Days", "Max Days"],
     )
-    permitting_rows = [
-        (
-            "Projects with Permitting Submitted",
-            summary["projects_with_permitting_submitted"],
-        ),
-        ("Projects Permitting Received", summary["projects_permitting_received"]),
-        ("Average Permitting Days", summary["avg_permitting_days"]),
-        ("Min Permitting Days", summary["min_permitting_days"]),
-        ("Max Permitting Days", summary["max_permitting_days"]),
-    ]
-    for i, (label, value) in enumerate(permitting_rows, start=11):
-        ws_summary.cell(row=i, column=1, value=label).font = Font(bold=True)
-        ws_summary.cell(row=i, column=2, value=value)
 
-    # Total projects at the end
-    ws_summary.cell(row=17, column=1, value="Total Projects").font = Font(bold=True)
-    ws_summary.cell(row=17, column=2, value=summary["total_projects"])
+    # ── Sheet 3: By Engineer ──────────────────────────────────────────────────
+    write_breakdown_sheet(
+        wb.create_sheet("By Engineer"), "Engineer",
+        data["by_engineer"], [], ["Avg Days", "Min Days", "Max Days"],
+    )
 
-    auto_adjust_columns(ws_summary)
+    # ── Sheet 4: By Plat Engineer ─────────────────────────────────────────────
+    write_breakdown_sheet(
+        wb.create_sheet("By Plat Engineer"), "Plat Engineer",
+        data["by_plat"], [], ["Avg Days", "Min Days", "Max Days"],
+    )
 
-    # === Sheet 2: By Product ===
-    ws_product = wb.create_sheet("By Product")
+    # ── Sheet 5: By County ────────────────────────────────────────────────────
+    write_breakdown_sheet(
+        wb.create_sheet("By County"), "County",
+        data["by_county"], [], ["Avg Days", "Min Days", "Max Days"],
+    )
 
-    product_headers = [
-        "Product",
-        "Total Projects",
-        "Drafting Complete",
-        "Avg Days",
-        "Min Days",
-        "Max Days",
-    ]
-    for col, header in enumerate(product_headers, start=1):
-        ws_product.cell(row=1, column=col, value=header)
-    style_header_row(ws_product, 1, len(product_headers))
-
-    row = 2
-    for product, stats in data["by_product"].items():
-        ws_product.cell(row=row, column=1, value=product)
-        ws_product.cell(row=row, column=2, value=stats["total_projects"])
-        ws_product.cell(row=row, column=3, value=stats["drafting_complete"])
-        ws_product.cell(row=row, column=4, value=stats["avg_drafting_days"])
-        ws_product.cell(row=row, column=5, value=stats["min_drafting_days"])
-        ws_product.cell(row=row, column=6, value=stats["max_drafting_days"])
-        row += 1
-
-    auto_adjust_columns(ws_product)
-
-    # === Sheet 3: By Drafter ===
-    ws_drafter = wb.create_sheet("By Drafter")
-
-    drafter_headers = [
-        "Drafter",
-        "Total Projects",
-        "Drafting Complete",
-        "Avg Days",
-        "Min Days",
-        "Max Days",
-    ]
-    for col, header in enumerate(drafter_headers, start=1):
-        ws_drafter.cell(row=1, column=col, value=header)
-    style_header_row(ws_drafter, 1, len(drafter_headers))
-
-    row = 2
-    for drafter, stats in data["by_drafter"].items():
-        ws_drafter.cell(row=row, column=1, value=drafter)
-        ws_drafter.cell(row=row, column=2, value=stats["total_projects"])
-        ws_drafter.cell(row=row, column=3, value=stats["drafting_complete"])
-        ws_drafter.cell(row=row, column=4, value=stats["avg_drafting_days"])
-        ws_drafter.cell(row=row, column=5, value=stats["min_drafting_days"])
-        ws_drafter.cell(row=row, column=6, value=stats["max_drafting_days"])
-        row += 1
-
-    auto_adjust_columns(ws_drafter)
-
-    # === Sheet 4: By County (Permitting) ===
-    ws_county = wb.create_sheet("By County")
-
-    county_headers = [
-        "County",
-        "Total Projects",
-        "Permitting Complete",
-        "Avg Permitting Days",
-        "Min Permitting Days",
-        "Max Permitting Days",
-    ]
-    for col, header in enumerate(county_headers, start=1):
-        ws_county.cell(row=1, column=col, value=header)
-    style_header_row(ws_county, 1, len(county_headers))
-
-    row = 2
-    for county, stats in data["by_county"].items():
-        ws_county.cell(row=row, column=1, value=county)
-        ws_county.cell(row=row, column=2, value=stats["total_projects"])
-        ws_county.cell(row=row, column=3, value=stats["permitting_complete"])
-        ws_county.cell(row=row, column=4, value=stats["avg_permitting_days"])
-        ws_county.cell(row=row, column=5, value=stats["min_permitting_days"])
-        ws_county.cell(row=row, column=6, value=stats["max_permitting_days"])
-        row += 1
-
-    auto_adjust_columns(ws_county)
-
-    # === Sheet 5: All Projects ===
+    # ── Sheet 6: All Projects ─────────────────────────────────────────────────
     ws_projects = wb.create_sheet("All Projects")
-
     project_headers = [
-        "Project ID",
-        "Community",
-        "Section",
-        "Lot",
-        "Contract Date",
-        "Contract Type",
-        "Product",
-        "Elevation",
-        "Drafter",
-        "Drafting Assigned",
-        "Drafting Finished",
-        "Drafting Days",
-        "Drafting Notes",
-        "County",
-        "Permitting Submitted",
-        "Permitting Received",
-        "Permitting Days",
+        "Project ID", "Community", "Section", "Lot",
+        "Contract Date", "Contract Type", "Product", "Elevation",
+        # drafting
+        "Drafter", "Drafting Assigned", "Drafting Finished", "Drafting Days", "Drafting Notes",
+        # engineering
+        "Engineer", "Eng Sent", "Eng Received", "Eng Days", "Eng Notes",
+        # plat
+        "Plat Engineer", "Plat Sent", "Plat Received", "Plat Days", "Plat Notes",
+        # permitting
+        "County", "Permit Submitted", "Permit Received", "Permit Days", "Permit Notes",
     ]
-    for col, header in enumerate(project_headers, start=1):
-        ws_projects.cell(row=1, column=col, value=header)
-    style_header_row(ws_projects, 1, len(project_headers))
+    for col, h in enumerate(project_headers, 1):
+        ws_projects.cell(row=1, column=col, value=h)
+    style_headers(ws_projects, len(project_headers))
 
-    row = 2
-    for p in data["projects"]:
-        ws_projects.cell(row=row, column=1, value=p["project_id"])
-        ws_projects.cell(row=row, column=2, value=p["community"])
-        ws_projects.cell(row=row, column=3, value=p["section"])
-        ws_projects.cell(row=row, column=4, value=p["lot"])
-        ws_projects.cell(
-            row=row,
-            column=5,
-            value=(
-                p["contract_date"].strftime("%Y-%m-%d") if p["contract_date"] else None
-            ),
-        )
-        ws_projects.cell(row=row, column=6, value=p["contract_type"])
-        ws_projects.cell(row=row, column=7, value=p["product_name"])
-        ws_projects.cell(row=row, column=8, value=p["elevation_name"])
-        ws_projects.cell(row=row, column=9, value=p["drafting_drafter"])
-        ws_projects.cell(
-            row=row,
-            column=10,
-            value=(
-                p["drafting_assigned_on"].strftime("%Y-%m-%d")
-                if p["drafting_assigned_on"]
-                else None
-            ),
-        )
-        ws_projects.cell(
-            row=row,
-            column=11,
-            value=(
-                p["drafting_finished"].strftime("%Y-%m-%d")
-                if p["drafting_finished"]
-                else None
-            ),
-        )
-        ws_projects.cell(row=row, column=12, value=p["drafting_days"])
-        ws_projects.cell(row=row, column=13, value=p["drafting_notes"])
-        ws_projects.cell(row=row, column=14, value=p["permitting_county"])
-        ws_projects.cell(
-            row=row,
-            column=15,
-            value=(
-                p["permitting_submitted"].strftime("%Y-%m-%d")
-                if p["permitting_submitted"]
-                else None
-            ),
-        )
-        ws_projects.cell(
-            row=row,
-            column=16,
-            value=(
-                p["permitting_received"].strftime("%Y-%m-%d")
-                if p["permitting_received"]
-                else None
-            ),
-        )
-        ws_projects.cell(row=row, column=17, value=p["permitting_days"])
-        row += 1
+    for r, p in enumerate(data["projects"], start=2):
+        ws_projects.cell(row=r, column=1,  value=p["project_id"])
+        ws_projects.cell(row=r, column=2,  value=p["community"])
+        ws_projects.cell(row=r, column=3,  value=p["section"])
+        ws_projects.cell(row=r, column=4,  value=p["lot"])
+        ws_projects.cell(row=r, column=5,  value=_fmt_date(p["contract_date"]))
+        ws_projects.cell(row=r, column=6,  value=p["contract_type"])
+        ws_projects.cell(row=r, column=7,  value=p["product_name"])
+        ws_projects.cell(row=r, column=8,  value=p["elevation_name"])
+        # drafting
+        ws_projects.cell(row=r, column=9,  value=p["drafting_drafter"])
+        ws_projects.cell(row=r, column=10, value=_fmt_date(p["drafting_assigned_on"]))
+        ws_projects.cell(row=r, column=11, value=_fmt_date(p["drafting_finished"]))
+        ws_projects.cell(row=r, column=12, value=p["drafting_days"])
+        ws_projects.cell(row=r, column=13, value=p["drafting_notes"])
+        # engineering
+        ws_projects.cell(row=r, column=14, value=p["engineering_engineer"])
+        ws_projects.cell(row=r, column=15, value=_fmt_date(p["engineering_sent"]))
+        ws_projects.cell(row=r, column=16, value=_fmt_date(p["engineering_received"]))
+        ws_projects.cell(row=r, column=17, value=p["engineering_days"])
+        ws_projects.cell(row=r, column=18, value=p["engineering_notes"])
+        # plat
+        ws_projects.cell(row=r, column=19, value=p["plat_engineer"])
+        ws_projects.cell(row=r, column=20, value=_fmt_date(p["plat_sent"]))
+        ws_projects.cell(row=r, column=21, value=_fmt_date(p["plat_received"]))
+        ws_projects.cell(row=r, column=22, value=p["plat_days"])
+        ws_projects.cell(row=r, column=23, value=p["plat_notes"])
+        # permitting
+        ws_projects.cell(row=r, column=24, value=p["permitting_county"])
+        ws_projects.cell(row=r, column=25, value=_fmt_date(p["permitting_submitted"]))
+        ws_projects.cell(row=r, column=26, value=_fmt_date(p["permitting_received"]))
+        ws_projects.cell(row=r, column=27, value=p["permitting_days"])
+        ws_projects.cell(row=r, column=28, value=p["permitting_notes"])
 
-    auto_adjust_columns(ws_projects)
+    auto_width(ws_projects)
 
-    # Save to BytesIO
     output = BytesIO()
     wb.save(output)
     output.seek(0)
-
     return output
 
 
-# ============ Current Week Routes ============
-
-
-@router.get(
-    "/current-week/drafting",
-    response_model=Dict[str, Any],
-    dependencies=[Depends(require_analysis_roles)],
-)
-def get_current_week_drafting_projects():
-    """
-    Get all projects with contract date in the current calendar week (Mon–Sun).
-    """
-    return get_drafting_projects_current_week()
-
-
-@router.get(
-    "/current-week/drafting/excel",
-    dependencies=[Depends(require_analysis_roles)],
-)
-def get_current_week_drafting_excel():
-    """
-    Export current-week drafting analysis to Excel file.
-    """
-    data = get_drafting_projects_current_week()
-    output = generate_drafting_excel(data)
-
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"current_week_drafting_analysis_{timestamp}.xlsx"
-
+def _excel_response(data: Dict[str, Any], prefix: str) -> StreamingResponse:
+    output = generate_excel(data)
+    filename = f"{prefix}_{_period_filename(data)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
     return StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -592,134 +526,105 @@ def get_current_week_drafting_excel():
     )
 
 
-# ============ 2025 Routes ============
-
+# ---------------------------------------------------------------------------
+# Routes — Current Week
+# ---------------------------------------------------------------------------
 
 @router.get(
-    "/2025/drafting",
+    "/current-week/report",
     response_model=Dict[str, Any],
     dependencies=[Depends(require_analysis_roles)],
 )
-def get_2025_drafting_projects():
-    """
-    Get all projects with contract date in 2025, with drafting information.
-    """
-    return get_drafting_projects_by_year(2025)
-
-
-# @router.get("/2025/drafting/excel", dependencies=[Depends(require_analysis_roles)])
-@router.get("/2025/drafting/excel")
-def get_2025_drafting_excel():
-    """
-    Export 2025 drafting analysis to Excel file.
-    """
-    data = get_drafting_projects_by_year(2025)
-    output = generate_drafting_excel(data)
-
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"2025_drafting_analysis_{timestamp}.xlsx"
-
-    return StreamingResponse(
-        output,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
-            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "Cache-Control": "no-cache",
-        },
-    )
-
-
-# ============ 2026 Routes ============
+def get_current_week_report():
+    """Full report for the current calendar week (Mon–Sun)."""
+    return _report_for_current_week()
 
 
 @router.get(
-    "/2026/drafting",
+    "/current-week/report/excel",
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_current_week_report_excel():
+    """Excel export for the current calendar week."""
+    return _excel_response(_report_for_current_week(), "report")
+
+
+# ---------------------------------------------------------------------------
+# Routes — 2025
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/2025/report",
     response_model=Dict[str, Any],
     dependencies=[Depends(require_analysis_roles)],
 )
-def get_2026_drafting_projects():
-    """
-    Get all projects with contract date in 2026, with drafting information.
-    """
-    return get_drafting_projects_by_year(2026)
-
-
-# @router.get("/2026/drafting/excel", dependencies=[Depends(require_analysis_roles)])
-@router.get("/2026/drafting/excel")
-def get_2026_drafting_excel():
-    """
-    Export 2026 drafting analysis to Excel file.
-    """
-    data = get_drafting_projects_by_year(2026)
-    output = generate_drafting_excel(data)
-
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"2026_drafting_analysis_{timestamp}.xlsx"
-
-    return StreamingResponse(
-        output,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
-            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "Cache-Control": "no-cache",
-        },
-    )
-
-
-# ============ 2026 Monthly Routes ============
-
-MONTH_NAMES = {
-    1: "January", 2: "February", 3: "March", 4: "April",
-    5: "May", 6: "June", 7: "July", 8: "August",
-    9: "September", 10: "October", 11: "November", 12: "December",
-}
+def get_2025_report():
+    """Full report for 2025."""
+    return _report_for_year(2025)
 
 
 @router.get(
-    "/2026/{month}/drafting",
+    "/2025/report/excel",
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_2025_report_excel():
+    """Excel export for 2025."""
+    return _excel_response(_report_for_year(2025), "report")
+
+
+# ---------------------------------------------------------------------------
+# Routes — 2026 yearly
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/2026/report",
     response_model=Dict[str, Any],
     dependencies=[Depends(require_analysis_roles)],
 )
-def get_2026_monthly_drafting_projects(month: int):
-    """
-    Get all projects with contract date in a given month of 2026 (month = 1–12).
-    """
+def get_2026_report():
+    """Full report for 2026."""
+    return _report_for_year(2026)
+
+
+@router.get(
+    "/2026/report/excel",
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_2026_report_excel():
+    """Excel export for 2026."""
+    return _excel_response(_report_for_year(2026), "report")
+
+
+# ---------------------------------------------------------------------------
+# Routes — 2026 monthly  (/2026/{month}/report, month = 1–12)
+# NOTE: registered after the static /2026/report routes so FastAPI
+#       matches those first.
+# ---------------------------------------------------------------------------
+
+def _validate_month(month: int):
     if month < 1 or month > 12:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Month must be between 1 and 12",
         )
-    return get_drafting_projects_by_month(2026, month)
 
 
 @router.get(
-    "/2026/{month}/drafting/excel",
+    "/2026/{month}/report",
+    response_model=Dict[str, Any],
     dependencies=[Depends(require_analysis_roles)],
 )
-def get_2026_monthly_drafting_excel(month: int):
-    """
-    Export a given month of 2026 drafting analysis to Excel file.
-    """
-    if month < 1 or month > 12:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Month must be between 1 and 12",
-        )
-    data = get_drafting_projects_by_month(2026, month)
-    output = generate_drafting_excel(data)
+def get_2026_monthly_report(month: int):
+    """Full report for a specific month of 2026."""
+    _validate_month(month)
+    return _report_for_month(2026, month)
 
-    month_name = MONTH_NAMES.get(month, str(month))
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"2026_{month_name}_drafting_analysis_{timestamp}.xlsx"
 
-    return StreamingResponse(
-        output,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
-            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "Cache-Control": "no-cache",
-        },
-    )
+@router.get(
+    "/2026/{month}/report/excel",
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_2026_monthly_report_excel(month: int):
+    """Excel export for a specific month of 2026."""
+    _validate_month(month)
+    return _excel_response(_report_for_month(2026, month), "report")
