@@ -295,9 +295,14 @@ def _report_for_month(year: int, month: int) -> Dict[str, Any]:
     return _build_report(projects, {"year": year, "month": month})
 
 
-def _report_for_current_week() -> Dict[str, Any]:
+def _report_for_week(week_offset: int = 0) -> Dict[str, Any]:
+    """
+    Returns the report for a calendar week (Mon–Sun).
+    week_offset=0 → current week, week_offset=1 → last week, etc.
+    """
     today = datetime.utcnow().date()
-    period_start = datetime.combine(today - timedelta(days=today.weekday()), datetime.min.time())
+    monday = today - timedelta(days=today.weekday()) - timedelta(weeks=week_offset)
+    period_start = datetime.combine(monday, datetime.min.time())
     period_end   = period_start + timedelta(days=7)
 
     projects = [
@@ -312,6 +317,10 @@ def _report_for_current_week() -> Dict[str, Any]:
         "week_start": period_start.strftime("%Y-%m-%d"),
         "week_end":   (period_end - timedelta(days=1)).strftime("%Y-%m-%d"),
     })
+
+
+def _report_for_current_week() -> Dict[str, Any]:
+    return _report_for_week(0)
 
 
 # ---------------------------------------------------------------------------
@@ -527,7 +536,7 @@ def _excel_response(data: Dict[str, Any], prefix: str) -> StreamingResponse:
 
 
 # ---------------------------------------------------------------------------
-# Routes — Current Week
+# Routes — Weekly
 # ---------------------------------------------------------------------------
 
 @router.get(
@@ -537,7 +546,7 @@ def _excel_response(data: Dict[str, Any], prefix: str) -> StreamingResponse:
 )
 def get_current_week_report():
     """Full report for the current calendar week (Mon–Sun)."""
-    return _report_for_current_week()
+    return _report_for_week(0)
 
 
 @router.get(
@@ -546,7 +555,39 @@ def get_current_week_report():
 )
 def get_current_week_report_excel():
     """Excel export for the current calendar week."""
-    return _excel_response(_report_for_current_week(), "report")
+    return _excel_response(_report_for_week(0), "report")
+
+
+@router.get(
+    "/past-week/{weeks_ago}/report",
+    response_model=Dict[str, Any],
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_past_week_report(weeks_ago: int):
+    """
+    Full report for a past calendar week.
+    weeks_ago=1 → last week, weeks_ago=2 → two weeks ago, etc.
+    """
+    if weeks_ago < 1:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="weeks_ago must be 1 or greater",
+        )
+    return _report_for_week(weeks_ago)
+
+
+@router.get(
+    "/past-week/{weeks_ago}/report/excel",
+    dependencies=[Depends(require_analysis_roles)],
+)
+def get_past_week_report_excel(weeks_ago: int):
+    """Excel export for a past calendar week."""
+    if weeks_ago < 1:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="weeks_ago must be 1 or greater",
+        )
+    return _excel_response(_report_for_week(weeks_ago), "report")
 
 
 # ---------------------------------------------------------------------------
