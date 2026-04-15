@@ -184,6 +184,11 @@ function SimpleListSection({
 
 // ── COMMUNITY SECTION (name + code) ───────────────────────────────────────────
 
+// Column widths as inline styles — avoids Tailwind purging arbitrary values in production
+const COL_NAME: React.CSSProperties  = { flex: "1 1 0", minWidth: 0 };
+const COL_CODE: React.CSSProperties  = { width: "90px", flexShrink: 0 };
+const COL_BTNS: React.CSSProperties  = { width: "56px", flexShrink: 0 };
+
 function CommunitiesSection({
     communities,
     communityCodes,
@@ -203,14 +208,62 @@ function CommunitiesSection({
     onUpdateCode: (name: string, newCode: string) => Promise<void>;
     onDeleteCode: (name: string) => Promise<void>;
 }) {
-    const [editingCommunity, setEditingCommunity] = useState<string | null>(null);
-    const [editingCode, setEditingCode] = useState<string | null>(null);
+    // editing state: tracks the community name being edited
+    const [editingName, setEditingName] = useState<string | null>(null);
+    const [draftName, setDraftName] = useState("");
+    const [draftCode, setDraftCode] = useState("");
+
     const [addingNew, setAddingNew] = useState(false);
     const [newCommunityName, setNewCommunityName] = useState("");
     const [newCommunityCode, setNewCommunityCode] = useState("");
     const [error, setError] = useState("");
 
     const codeMap = Object.fromEntries(communityCodes.map(c => [c.community_name, c.community_code]));
+
+    function openEdit(name: string) {
+        setEditingName(name);
+        setDraftName(name);
+        setDraftCode(codeMap[name] ?? "");
+        setError("");
+    }
+
+    function cancelEdit() {
+        setEditingName(null);
+        setDraftName("");
+        setDraftCode("");
+    }
+
+    async function handleSaveEdit() {
+        if (!draftName.trim()) { setError("Community name cannot be empty."); return; }
+        if (!draftCode.trim()) { setError("Code cannot be empty."); return; }
+        const existingCodes = Object.entries(codeMap)
+            .filter(([n]) => n !== editingName)
+            .map(([, c]) => c.toLowerCase());
+        if (existingCodes.includes(draftCode.trim().toLowerCase())) {
+            setError(`Code "${draftCode.trim()}" is already used by another community.`);
+            return;
+        }
+        setError("");
+        try {
+            const nameChanged = draftName.trim() !== editingName;
+            const codeChanged = draftCode.trim() !== (codeMap[editingName!] ?? "");
+
+            if (nameChanged) {
+                await onRenameCommunity(editingName!, draftName.trim());
+            }
+            const effectiveName = nameChanged ? draftName.trim() : editingName!;
+            if (codeChanged) {
+                if (codeMap[editingName!] !== undefined) {
+                    await onUpdateCode(effectiveName, draftCode.trim());
+                } else {
+                    await onAddCode(effectiveName, draftCode.trim());
+                }
+            }
+            cancelEdit();
+        } catch (e: any) {
+            setError(e?.response?.data?.detail ?? "Error saving changes");
+        }
+    }
 
     async function handleAddCommunity() {
         if (!newCommunityName.trim()) { setError("Community name cannot be empty."); return; }
@@ -232,17 +285,6 @@ function CommunitiesSection({
         }
     }
 
-    async function handleRenameCommunity(oldName: string, newName: string) {
-        if (!newName.trim()) { setEditingCommunity(null); return; }
-        setError("");
-        try {
-            await onRenameCommunity(oldName, newName.trim());
-            setEditingCommunity(null);
-        } catch (e: any) {
-            setError(e?.response?.data?.detail ?? "Error renaming community");
-        }
-    }
-
     async function handleDeleteCommunity(name: string) {
         if (!window.confirm(`Delete community "${name}"? This will also remove its code mapping.`)) return;
         setError("");
@@ -256,117 +298,97 @@ function CommunitiesSection({
         }
     }
 
-    async function handleSaveCode(communityName: string, newCode: string) {
-        if (!newCode.trim()) { setError("Code cannot be empty."); setEditingCode(null); return; }
-        const existingCodes = Object.entries(codeMap)
-            .filter(([name]) => name !== communityName)
-            .map(([, code]) => code.toLowerCase());
-        if (existingCodes.includes(newCode.trim().toLowerCase())) {
-            setError(`Code "${newCode.trim()}" is already used by another community.`);
-            setEditingCode(null);
-            return;
-        }
-        setError("");
-        try {
-            if (codeMap[communityName] !== undefined) {
-                await onUpdateCode(communityName, newCode.trim());
-            } else {
-                await onAddCode(communityName, newCode.trim());
-            }
-            setEditingCode(null);
-        } catch (e: any) {
-            setError(e?.response?.data?.detail ?? "Error saving code");
-        }
-    }
-
     return (
         <Section title="Communities">
             {/* Header row */}
-            <div className="grid grid-cols-[1fr_100px_60px] gap-2 px-2 pb-1 border-b border-border mb-1">
-                <span className="text-xs font-medium text-default-fg2 uppercase tracking-wide">Community Name</span>
-                <span className="text-xs font-medium text-default-fg2 uppercase tracking-wide">Code</span>
-                <span />
+            <div className="flex gap-2 px-2 pb-1 border-b border-border mb-1">
+                <span style={COL_NAME} className="text-xs font-medium text-default-fg2 uppercase tracking-wide">Community Name</span>
+                <span style={COL_CODE} className="text-xs font-medium text-default-fg2 uppercase tracking-wide">Code</span>
+                <span style={COL_BTNS} />
             </div>
 
-            <div className="space-y-0.5 mb-3">
+            <div className="mb-3">
                 {communities.map(name => (
-                    <div key={name} className="grid grid-cols-[1fr_100px_60px] gap-2 items-center px-2 py-1 rounded hover:bg-default-bg2 group">
+                    <div key={name} className="flex gap-2 items-center px-2 py-1 rounded hover:bg-default-bg2 group">
 
-                        {/* Name column */}
-                        {editingCommunity === name ? (
-                            <EditableRow
-                                value={name}
-                                onSave={val => handleRenameCommunity(name, val)}
-                                onCancel={() => setEditingCommunity(null)}
-                            />
+                        {editingName === name ? (
+                            /* ── Edit mode: both fields + one confirm ── */
+                            <>
+                                <div style={COL_NAME}>
+                                    <input
+                                        autoFocus
+                                        value={draftName}
+                                        onChange={e => setDraftName(e.target.value)}
+                                        onKeyDown={e => { if (e.key === "Escape") cancelEdit(); }}
+                                        className="w-full border border-border rounded px-2 py-0.5 text-sm bg-default-bg2 text-default-fg1"
+                                    />
+                                </div>
+                                <div style={COL_CODE}>
+                                    <input
+                                        value={draftCode}
+                                        onChange={e => setDraftCode(e.target.value)}
+                                        onKeyDown={e => { if (e.key === "Enter") handleSaveEdit(); if (e.key === "Escape") cancelEdit(); }}
+                                        className="w-full border border-border rounded px-2 py-0.5 text-sm bg-default-bg2 text-default-fg1 font-mono"
+                                        placeholder="Code"
+                                    />
+                                </div>
+                                <div style={COL_BTNS} className="flex items-center gap-1">
+                                    <button onClick={handleSaveEdit} className="text-green-600 hover:text-green-800"><MdCheck size="1.2rem" /></button>
+                                    <button onClick={cancelEdit} className="text-red-500 hover:text-red-700"><MdClose size="1.2rem" /></button>
+                                </div>
+                            </>
                         ) : (
-                            <span className="text-sm text-default-fg1">{name}</span>
+                            /* ── View mode ── */
+                            <>
+                                <span style={COL_NAME} className="text-sm text-default-fg1 truncate">{name}</span>
+                                <span style={COL_CODE} className="text-sm font-mono text-default-fg2">
+                                    {codeMap[name] ?? <span className="text-xs italic opacity-50">— none —</span>}
+                                </span>
+                                <div style={COL_BTNS} className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        className="text-default-fg2 hover:text-default-fg1"
+                                        onClick={() => openEdit(name)}
+                                        title="Edit"
+                                    >
+                                        <MdEdit size="1rem" />
+                                    </button>
+                                    <button
+                                        className="text-red-400 hover:text-red-600"
+                                        onClick={() => handleDeleteCommunity(name)}
+                                        title="Delete"
+                                    >
+                                        <MdDelete size="1rem" />
+                                    </button>
+                                </div>
+                            </>
                         )}
-
-                        {/* Code column */}
-                        {editingCode === name ? (
-                            <div className="flex items-center gap-1">
-                                <input
-                                    autoFocus
-                                    defaultValue={codeMap[name] ?? ""}
-                                    onKeyDown={e => {
-                                        if (e.key === "Enter") handleSaveCode(name, (e.target as HTMLInputElement).value);
-                                        if (e.key === "Escape") setEditingCode(null);
-                                    }}
-                                    onBlur={e => handleSaveCode(name, e.target.value)}
-                                    className="w-full border border-border rounded px-1 py-0.5 text-sm bg-default-bg2 text-default-fg1"
-                                />
-                            </div>
-                        ) : (
-                            <span
-                                className="text-sm font-mono text-default-fg2 cursor-pointer hover:text-default-fg1"
-                                title="Click to edit code"
-                                onClick={() => setEditingCode(name)}
-                            >
-                                {codeMap[name] ?? <span className="text-xs italic text-default-fg2 opacity-60">— no code —</span>}
-                            </span>
-                        )}
-
-                        {/* Action buttons */}
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                                className="text-default-fg2 hover:text-default-fg1"
-                                onClick={() => setEditingCommunity(name)}
-                                title="Rename community"
-                            >
-                                <MdEdit size="1rem" />
-                            </button>
-                            <button
-                                className="text-red-400 hover:text-red-600"
-                                onClick={() => handleDeleteCommunity(name)}
-                                title="Delete community"
-                            >
-                                <MdDelete size="1rem" />
-                            </button>
-                        </div>
                     </div>
                 ))}
             </div>
 
             {/* Add new community row */}
             {addingNew ? (
-                <div className="grid grid-cols-[1fr_100px_60px] gap-2 items-center mt-2">
-                    <input
-                        autoFocus
-                        placeholder="Community name"
-                        value={newCommunityName}
-                        onChange={e => setNewCommunityName(e.target.value)}
-                        onKeyDown={e => { if (e.key === "Escape") { setAddingNew(false); setNewCommunityName(""); setNewCommunityCode(""); }}}
-                        className="border border-border rounded px-2 py-1 text-sm bg-default-bg2 text-default-fg1"
-                    />
-                    <input
-                        placeholder="Code (e.g. CC)"
-                        value={newCommunityCode}
-                        onChange={e => setNewCommunityCode(e.target.value)}
-                        onKeyDown={e => { if (e.key === "Enter") handleAddCommunity(); }}
-                        className="border border-border rounded px-2 py-1 text-sm bg-default-bg2 text-default-fg1 font-mono"
-                    />
-                    <div className="flex items-center gap-1">
+                <div className="flex gap-2 items-center mt-2">
+                    <div style={COL_NAME}>
+                        <input
+                            autoFocus
+                            placeholder="Community name"
+                            value={newCommunityName}
+                            onChange={e => setNewCommunityName(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Escape") { setAddingNew(false); setNewCommunityName(""); setNewCommunityCode(""); } }}
+                            className="w-full border border-border rounded px-2 py-1 text-sm bg-default-bg2 text-default-fg1"
+                        />
+                    </div>
+                    <div style={COL_CODE}>
+                        <input
+                            placeholder="Code"
+                            value={newCommunityCode}
+                            onChange={e => setNewCommunityCode(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter") handleAddCommunity(); }}
+                            className="w-full border border-border rounded px-2 py-1 text-sm bg-default-bg2 text-default-fg1 font-mono"
+                        />
+                    </div>
+                    <div style={COL_BTNS} className="flex items-center gap-1">
                         <button onClick={handleAddCommunity} className="text-green-600 hover:text-green-800"><MdCheck size="1.2rem" /></button>
                         <button onClick={() => { setAddingNew(false); setNewCommunityName(""); setNewCommunityCode(""); }} className="text-red-500 hover:text-red-700"><MdClose size="1.2rem" /></button>
                     </div>
