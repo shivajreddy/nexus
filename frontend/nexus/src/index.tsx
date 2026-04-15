@@ -65,6 +65,8 @@ import ProjectGraph from "./pages/dev/projectgraphview/ProjectGraph";
 import Pipeline from "./pages/department/eagle/reports/pipeline/view/Pipeline";
 import AuthPipeline from "./pages/department/eagle/reports/pipeline/AuthPipeline";
 import IhmsAll from "./pages/department/teclab/Epc/View/IhmsAll";
+import AuthReports from "./pages/reports/AuthReports";
+import ReportsPage from "./pages/reports/ReportsPage";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -139,6 +141,10 @@ const router = createBrowserRouter(
                             <Route path="edit" element={<SearchAndUpdateFOSCData />} />
                             <Route path="edit/:project_uid" element={<EditFOSCData />} />
                         </Route>
+                    </Route>
+
+                    <Route path="reports" element={<AuthReports />}>
+                        <Route index element={<ReportsPage />} />
                     </Route>
 
                     <Route path="core-dashboard" element={<CoreDashboard />} />

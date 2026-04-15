@@ -6,13 +6,13 @@ import {
     SheetTrigger,
 } from "@components/ui/sheet.tsx";
 import {Separator} from "@components/ui/separator.tsx";
+import {MdOutlineStorage} from "react-icons/md";
+import {FaInfoCircle} from "react-icons/fa";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@components/ui/popover.tsx";
-import {FaInfoCircle} from "react-icons/fa";
-import {MdOutlineStorage} from "react-icons/md";
 import {useNavigate} from "react-router-dom";
 import {CgMenuGridO} from "react-icons/cg";
 
@@ -47,30 +47,9 @@ function EpcMenu() {
                         <Button onClick={()=>navigate('/epc/edit-newlot-form-data')}>Edit Form Data</Button>
                     </div>
 
-                    <p>Download current view</p>
+                    <p>Reports</p>
                     <div className="flex justify-center items-center">
-                        <Button className="w-[10rem]">Download CSV</Button>
-                        <Popover>
-                            <PopoverTrigger className="pl-2">
-                                <div>
-                                    <FaInfoCircle size={"1.2rem"}/>
-                                </div>
-                            </PopoverTrigger>
-                            <PopoverContent>
-                                <p>
-                                    To convert the CSV file into Excel file, Open the CSV file in
-                                    Excel.
-                                </p>
-                                <br/>
-                                <p className="text-sm">
-                                    1. click <b>File</b>&rarr; <b>Save as</b> <br/>
-                                    2. Browse for the folder where you want to save the file.
-                                    <br/>
-                                    3. Select Excel Workbook <b>(*.xlsx)</b> from the Save as type
-                                    drop-down menu.
-                                </p>
-                            </PopoverContent>
-                        </Popover>
+                        <Button className="w-[10rem]" onClick={() => navigate('/reports')}>Generate Report</Button>
                     </div>
 
                     <Separator/>

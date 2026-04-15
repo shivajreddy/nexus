@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { ReactElement } from "react";
 import { FaExpand, FaRegCircle } from "react-icons/fa";
 
-import { BsCollection, BsGraphUp, BsHouses } from "react-icons/bs";
+import { BsCollection, BsFileEarmarkSpreadsheet, BsGraphUp, BsHouses } from "react-icons/bs";
 import { MdAutoGraph } from "react-icons/md";
 import { FaChartColumn } from "react-icons/fa6";
 import { PiGraphBold } from "react-icons/pi";
@@ -84,6 +84,13 @@ function Navbar() {
             icon: <MdAutoGraph size={"1.5em"} />,
             isBeta: true,
             roles: [999],
+        },
+        {
+            name: "Reports",
+            link: "/reports",
+            icon: <BsFileEarmarkSpreadsheet size={"1.5em"} />,
+            isBeta: false,
+            roles: [299, 999],
         },
     ]
 
