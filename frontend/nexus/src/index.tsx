@@ -67,6 +67,8 @@ import AuthPipeline from "./pages/department/eagle/reports/pipeline/AuthPipeline
 import IhmsAll from "./pages/department/teclab/Epc/View/IhmsAll";
 import AuthReports from "./pages/reports/AuthReports";
 import ReportsPage from "./pages/reports/ReportsPage";
+import AuthAdminData from "./pages/admin/AuthAdminData";
+import AdminDataPage from "./pages/admin/AdminDataPage";
 
 // # Router configuration
 const router = createBrowserRouter(
@@ -145,6 +147,10 @@ const router = createBrowserRouter(
 
                     <Route path="reports" element={<AuthReports />}>
                         <Route index element={<ReportsPage />} />
+                    </Route>
+
+                    <Route path="admin" element={<AuthAdminData />}>
+                        <Route path="data" element={<AdminDataPage />} />
                     </Route>
 
                     <Route path="core-dashboard" element={<CoreDashboard />} />

@@ -4,7 +4,7 @@ from starlette import status
 
 from app.database.database import eagle_data_coll
 from app.database.schemas.eagle_data import Community, UpdateCommunity, Engineer, UpdateEngineer, PlatEngineer, \
-    UpdatePlatEngineer, County, UpdateCounty
+    UpdatePlatEngineer, County, UpdateCounty, CommunityCode, UpdateCommunityCode, RenameCommunityCode
 from app.security.oauth2 import get_current_user_data, HasRequiredRoles
 
 """
@@ -348,3 +348,123 @@ def delete_county(target_county: County):
     if not counties_doc: return []
     all_counties_names = counties_doc["all_counties_names"]
     return {"deleted. now": all_counties_names}
+
+
+# :: community-codes ::
+# Stored inside the communities document: {"table_name": "communities", "community_codes": [["name", "code"], ...]}
+# Helper to normalize the raw array-of-arrays into [{community_name, community_code}] dicts
+
+def _raw_codes_to_list(raw: list) -> list[dict]:
+    result = []
+    for entry in raw:
+        if isinstance(entry, list) and len(entry) == 2:
+            result.append({"community_name": entry[0], "community_code": entry[1]})
+        elif isinstance(entry, dict):
+            result.append(entry)
+    return result
+
+
+def _get_communities_doc():
+    doc = eagle_data_coll.find_one({"table_name": "communities"})
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="communities document not found")
+    return doc
+
+
+@router.get("/community-codes", dependencies=[Depends(get_current_user_data)])
+def get_all_community_codes():
+    doc = _get_communities_doc()
+    raw = doc.get("community_codes", [])
+    return _raw_codes_to_list(raw)
+
+
+@router.post("/community-codes", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
+def add_community_code(new_entry: CommunityCode):
+    doc = _get_communities_doc()
+    raw = doc.get("community_codes", [])
+    codes = _raw_codes_to_list(raw)
+    existing_names = [c["community_name"] for c in codes]
+
+    if new_entry.community_name in existing_names:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Code for '{new_entry.community_name}' already exists"
+        )
+
+    eagle_data_coll.update_one(
+        {"table_name": "communities"},
+        {"$push": {"community_codes": [new_entry.community_name, new_entry.community_code]}}
+    )
+    doc = _get_communities_doc()
+    return _raw_codes_to_list(doc.get("community_codes", []))
+
+
+@router.patch("/community-codes", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
+def update_community_code(update: UpdateCommunityCode):
+    doc = _get_communities_doc()
+    raw = doc.get("community_codes", [])
+    codes = _raw_codes_to_list(raw)
+    names = [c["community_name"] for c in codes]
+
+    if update.target_community_name not in names:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"'{update.target_community_name}' not found in community codes"
+        )
+
+    idx = names.index(update.target_community_name)
+    eagle_data_coll.update_one(
+        {"table_name": "communities"},
+        {"$set": {f"community_codes.{idx}.1": update.new_community_code}}
+    )
+    doc = _get_communities_doc()
+    return _raw_codes_to_list(doc.get("community_codes", []))
+
+
+@router.patch("/community-codes/rename", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
+def rename_community_code(rename: RenameCommunityCode):
+    doc = _get_communities_doc()
+    raw = doc.get("community_codes", [])
+    codes = _raw_codes_to_list(raw)
+    names = [c["community_name"] for c in codes]
+
+    if rename.target_community_name not in names:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"'{rename.target_community_name}' not found in community codes"
+        )
+
+    idx = names.index(rename.target_community_name)
+    eagle_data_coll.update_one(
+        {"table_name": "communities"},
+        {"$set": {
+            f"community_codes.{idx}.0": rename.new_community_name,
+            f"community_codes.{idx}.1": rename.new_community_code,
+        }}
+    )
+    doc = _get_communities_doc()
+    return _raw_codes_to_list(doc.get("community_codes", []))
+
+
+@router.delete("/community-codes", dependencies=[Depends(HasRequiredRoles(required_roles=[101]))])
+def delete_community_code(target: CommunityCode):
+    doc = _get_communities_doc()
+    raw = doc.get("community_codes", [])
+    codes = _raw_codes_to_list(raw)
+    names = [c["community_name"] for c in codes]
+
+    if target.community_name not in names:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"'{target.community_name}' not found in community codes"
+        )
+
+    # $pull on arrays-of-arrays requires matching the exact element
+    idx = names.index(target.community_name)
+    original_entry = raw[idx]
+    eagle_data_coll.update_one(
+        {"table_name": "communities"},
+        {"$pull": {"community_codes": original_entry}}
+    )
+    doc = _get_communities_doc()
+    return _raw_codes_to_list(doc.get("community_codes", []))

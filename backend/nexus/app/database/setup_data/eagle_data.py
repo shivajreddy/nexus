@@ -155,6 +155,39 @@ eagle_data_coll_initial_data = [
             'Bay Design'
         ]
     },
+    {
+        "table_name": "community_codes",
+        "codes": [
+            {"community_name": "Cypress Creek",           "community_code": "CC"},
+            {"community_name": "Ford's Colony",           "community_code": "FC"},
+            {"community_name": "Foushee",                 "community_code": "FO"},
+            {"community_name": "Ginter Park",             "community_code": "GP"},
+            {"community_name": "Givens Farm",             "community_code": "GF"},
+            {"community_name": "GreenGate",               "community_code": "GG"},
+            {"community_name": "Harpers Mill",            "community_code": "HM"},
+            {"community_name": "Lankford Crossing",       "community_code": "LC"},
+            {"community_name": "Lauradell",               "community_code": "LA"},
+            {"community_name": "McRae & Lacy",            "community_code": "ML"},
+            {"community_name": "Parkside Village",        "community_code": "PV"},
+            {"community_name": "Readers Branch",          "community_code": "RB"},
+            {"community_name": "Row at Westhampton",      "community_code": "RW"},
+            {"community_name": "The Meadows",             "community_code": "TM"},
+            {"community_name": "The Parke @ Cypress Creek", "community_code": "PC"},
+            {"community_name": "Settler's Ridge",         "community_code": "SR"},
+            {"community_name": "Stags Trail",             "community_code": "ST"},
+            {"community_name": "GreenGate Condos",        "community_code": "GC"},
+            {"community_name": "Midtown",                 "community_code": "MT"},
+            {"community_name": "BHC Armstrong",           "community_code": "BA"},
+            {"community_name": "WBV EE",                  "community_code": "WE"},
+            {"community_name": "The Blufftons",           "community_code": "TB"},
+            {"community_name": "The Preserve",            "community_code": "TP"},
+            {"community_name": "GreenGate Villas",        "community_code": "GV"},
+            {"community_name": "Parke @ Westport",        "community_code": "PW"},
+            {"community_name": "Maggie Walker Trust",     "community_code": "MW"},
+            {"community_name": "Womack",                  "community_code": "WO"},
+            {"community_name": "The Preserve TH",        "community_code": "PT"}
+        ]
+    },
 ]
 
 """

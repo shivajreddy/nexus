@@ -50,3 +50,20 @@ class County(BaseModel):
 class UpdateCounty(BaseModel):
     target_county_name: str
     new_county_name: str
+
+
+# Community codes — separate mapping of community_name -> community_code
+class CommunityCode(BaseModel):
+    community_name: str
+    community_code: str
+
+
+class UpdateCommunityCode(BaseModel):
+    target_community_name: str   # used as the lookup key (name doesn't change here)
+    new_community_code: str
+
+
+class RenameCommunityCode(BaseModel):
+    target_community_name: str
+    new_community_name: str
+    new_community_code: str
