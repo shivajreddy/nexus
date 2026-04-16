@@ -1,0 +1,63 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ── Job 1: Build and push Docker images to Docker Hub ─────────────────────────
+  build:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/nexus
+          push: true
+          tags: simplecolon/nexus-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend/nexus
+          push: true
+          tags: simplecolon/nexus-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── Job 2: SSH into GCP VM and redeploy ───────────────────────────────────────
+  deploy:
+    name: Deploy to GCP VM
+    runs-on: ubuntu-latest
+    needs: build   # only runs after build succeeds
+
+    steps:
+      - name: SSH and deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.GCP_VM_IP }}
+          username: ${{ secrets.GCP_VM_USER }}
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/shiva/nexus
+            sudo git pull
+            sudo docker compose -f docker-compose-prod.yml pull
+            sudo docker compose -f docker-compose-prod.yml up -d --remove-orphans
+            sudo docker image prune -f
