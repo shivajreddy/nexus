@@ -43,15 +43,13 @@ class Settings(BaseSettings):
         env_file: str
 
 
-# Determine the environment and set the appropriate .env.prod file
+# In production, vars are injected by docker compose (env_file / environment:).
+# In dev/test, load from a local .env file.
 env = os.getenv("APP_ENV", "dev")
 print("Environment is :APP_ENV=", env)
 if env == "production":
-    settings = Settings(_env_file="./.env.prod")
+    settings = Settings()
 elif env == "test":
     settings = Settings(_env_file="./.env.test")
-elif env == "dev":
-    settings = Settings(_env_file="./.env.dev")
 else:
-    print("curr dir", os.getcwd())
     settings = Settings(_env_file="./.env.dev")

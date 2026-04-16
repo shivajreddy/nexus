@@ -49,13 +49,42 @@ jobs:
     needs: build   # only runs after build succeeds
 
     steps:
-      - name: SSH and deploy
+      - name: Write backend .env.prod and deploy
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.GCP_VM_IP }}
           username: ${{ secrets.GCP_VM_USER }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           script: |
+            # Write .env at repo root — docker compose auto-loads it for ${VAR} substitution
+            cat > /home/shiva/nexus/.env <<EOF
+            ENVIRONMENT=${{ secrets.ENVIRONMENT }}
+            MONGODB_URL=${{ secrets.MONGODB_URL }}
+            DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+            SERVER_ORIGIN=${{ secrets.SERVER_ORIGIN }}
+            CLIENT_ORIGIN=${{ secrets.CLIENT_ORIGIN }}
+            ACCESS_TOKEN_EXPIRES_IN=${{ secrets.ACCESS_TOKEN_EXPIRES_IN }}
+            REFRESH_TOKEN_EXPIRES_IN=${{ secrets.REFRESH_TOKEN_EXPIRES_IN }}
+            JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}
+            ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}
+            REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
+            SMTP_SERVER_ADDRESS=${{ secrets.SMTP_SERVER_ADDRESS }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
+            SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+            SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
+            CLIENT_ID=${{ secrets.CLIENT_ID }}
+            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+            IHMS_DB_USER=${{ secrets.IHMS_DB_USER }}
+            IHMS_DB_PASS=${{ secrets.IHMS_DB_PASS }}
+            IHMS_DB_HOST=${{ secrets.IHMS_DB_HOST }}
+            IHMS_DB_PORT=${{ secrets.IHMS_DB_PORT }}
+            IHMS_DB_NAME=${{ secrets.IHMS_DB_NAME }}
+            VITE_APP_ENV=${{ secrets.VITE_APP_ENV }}
+            VITE_API_URL_PROD=${{ secrets.VITE_API_URL_PROD }}
+            VITE_API_URL_DEV=${{ secrets.VITE_API_URL_DEV }}
+            EOF
+
             cd /home/shiva/nexus
             sudo git pull
             sudo docker compose -f docker-compose-prod.yml pull

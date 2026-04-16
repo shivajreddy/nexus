@@ -1,10 +1,15 @@
 version: '3'
 
+# Local development compose file.
+# Requires a .env file at the repo root with all variables defined.
+# The .env file is gitignored — copy from .env.example or populate manually.
+
 services:
   backend:
-    image: simplecolon/nexus-backend:latest
+    build:
+      context: ./backend/nexus
     environment:
-      - APP_ENV=production
+      - APP_ENV=dev
       - ENVIRONMENT=${ENVIRONMENT}
       - MONGODB_URL=${MONGODB_URL}
       - DATABASE_NAME=${DATABASE_NAME}
@@ -32,7 +37,8 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: simplecolon/nexus-frontend:latest
+    build:
+      context: ./frontend/nexus
     environment:
       - VITE_APP_ENV=${VITE_APP_ENV}
       - VITE_API_URL_PROD=${VITE_API_URL_PROD}
