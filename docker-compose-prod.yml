@@ -3,6 +3,8 @@ version: '3'
 services:
   backend:
     image: simplecolon/nexus-backend:latest
+    environment:
+      - APP_ENV=production
     env_file:
       - ./backend/nexus/.env.prod
     expose:
