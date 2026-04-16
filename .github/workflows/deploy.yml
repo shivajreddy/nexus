@@ -49,15 +49,43 @@ jobs:
     needs: build   # only runs after build succeeds
 
     steps:
-      - name: SSH and deploy
+      - name: Write .env.prod to VM and deploy
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.GCP_VM_IP }}
           username: ${{ secrets.GCP_VM_USER }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          envs: MONGODB_URL,DATABASE_NAME,SERVER_ORIGIN,CLIENT_ORIGIN,ACCESS_TOKEN_EXPIRES_IN,REFRESH_TOKEN_EXPIRES_IN,JWT_ALGORITHM,ACCESS_TOKEN_SECRET,REFRESH_TOKEN_SECRET,SMTP_SERVER_ADDRESS,SMTP_PORT,SMTP_USERNAME,SMTP_PASSWORD,SENDER_EMAIL,CLIENT_ID,CLIENT_SECRET,IHMS_DB_USER,IHMS_DB_PASS,IHMS_DB_HOST,IHMS_DB_PORT,IHMS_DB_NAME
           script: |
+            # Write .env.prod from GitHub Secrets
+            cat > /home/shiva/nexus/backend/nexus/.env.prod << EOF
+            ENVIRONMENT=production
+            MONGODB_URL=${MONGODB_URL}
+            DATABASE_NAME=${DATABASE_NAME}
+            SERVER_ORIGIN=${SERVER_ORIGIN}
+            CLIENT_ORIGIN=${CLIENT_ORIGIN}
+            ACCESS_TOKEN_EXPIRES_IN=${ACCESS_TOKEN_EXPIRES_IN}
+            REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
+            JWT_ALGORITHM=${JWT_ALGORITHM}
+            ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+            REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+            SMTP_SERVER_ADDRESS=${SMTP_SERVER_ADDRESS}
+            SMTP_PORT=${SMTP_PORT}
+            SMTP_USERNAME=${SMTP_USERNAME}
+            SMTP_PASSWORD=${SMTP_PASSWORD}
+            SENDER_EMAIL=${SENDER_EMAIL}
+            CLIENT_ID=${CLIENT_ID}
+            CLIENT_SECRET=${CLIENT_SECRET}
+            IHMS_DB_USER=${IHMS_DB_USER}
+            IHMS_DB_PASS=${IHMS_DB_PASS}
+            IHMS_DB_HOST=${IHMS_DB_HOST}
+            IHMS_DB_PORT=${IHMS_DB_PORT}
+            IHMS_DB_NAME=${IHMS_DB_NAME}
+            EOF
+
+            # Deploy
             cd /home/shiva/nexus
             sudo git pull
-            sudo docker compose -f docker-compose-prod.yml pull
-            sudo docker compose -f docker-compose-prod.yml up -d --remove-orphans
+            sudo docker-compose -f docker-compose-prod.yml pull
+            sudo docker-compose -f docker-compose-prod.yml up -d --remove-orphans
             sudo docker image prune -f
