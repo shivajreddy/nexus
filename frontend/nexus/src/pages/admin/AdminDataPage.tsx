@@ -218,7 +218,13 @@ function CommunitiesSection({
     const [newCommunityCode, setNewCommunityCode] = useState("");
     const [error, setError] = useState("");
 
-    const codeMap = Object.fromEntries(communityCodes.map(c => [c.community_name, c.community_code]));
+    // Only include codes for communities that actually exist in the list
+    const communitySet = new Set(communities);
+    const codeMap = Object.fromEntries(
+        communityCodes
+            .filter(c => communitySet.has(c.community_name))
+            .map(c => [c.community_name, c.community_code])
+    );
 
     function openEdit(name: string) {
         setEditingName(name);
